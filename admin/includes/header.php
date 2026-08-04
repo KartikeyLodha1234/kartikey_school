@@ -72,56 +72,93 @@
                                     <i class="fas fa-id-card"></i> Student ID
                                 </a>
                                 <a class="nav-link py-2" href="student_fees.php">
-    <i class="fas fa-wallet"></i> Student Fees
-</a>
+                                    <i class="fas fa-wallet"></i> Student Fees
+                                </a>
                             </nav>
                         </div>
                     </li>
                     <li class="nav-item">
-    <a class="nav-link d-flex justify-content-between align-items-center" 
-       data-bs-toggle="collapse" 
-       href="#transportMenu">
-        <span>
-            <i class="fas fa-bus"></i> Transport
-        </span>
-        <i class="fas fa-chevron-down"></i>
-    </a>
+                        <a class="nav-link d-flex justify-content-between align-items-center" data-bs-toggle="collapse"
+                            href="#transportMenu">
+                            <span>
+                                <i class="fas fa-bus"></i> Transport
+                            </span>
+                            <i class="fas fa-chevron-down"></i>
+                        </a>
 
-    <div class="collapse" id="transportMenu">
-        <ul class="nav flex-column ms-3">
-            <li class="nav-item">
-                <a class="nav-link py-2" href="vehicle.php">
-                    <i class="fas fa-car"></i> Vehicles
-                </a>
-            </li>
+                        <div class="collapse" id="transportMenu">
+                            <ul class="nav flex-column ms-3">
+                                <li class="nav-item">
+                                    <a class="nav-link py-2" href="vehicle.php">
+                                        <i class="fas fa-car"></i> Vehicles
+                                    </a>
+                                </li>
 
-            <li class="nav-item">
-                <a class="nav-link py-2" href="route.php">
-                    <i class="fas fa-route"></i> Routes
-                </a>
-            </li>
+                                <li class="nav-item">
+                                    <a class="nav-link py-2" href="route.php">
+                                        <i class="fas fa-route"></i> Routes
+                                    </a>
+                                </li>
 
-            <li class="nav-item">
-                <a class="nav-link py-2" href="driver.php">
-                    <i class="fas fa-id-card"></i> Drivers
-                </a>
-            </li>
+                                <li class="nav-item">
+                                    <a class="nav-link py-2" href="driver.php">
+                                        <i class="fas fa-id-card"></i> Drivers
+                                    </a>
+                                </li>
 
-            <li class="nav-item">
-                <a class="nav-link py-2" href="transport_assign.php">
-                    <i class="fas fa-user-check"></i> Assign Students
-                </a>
-            </li>
+                                <li class="nav-item">
+                                    <a class="nav-link py-2" href="transport_assign.php">
+                                        <i class="fas fa-user-check"></i> Assign Students
+                                    </a>
+                                </li>
 
-            <li class="nav-item">
-                <a class="nav-link py-2" href="transport_fee.php">
-                    <i class="fas fa-money-bill-wave"></i> Transport Fees
-                </a>
-            </li>
-        </ul>
-    </div>
-</li>
-                    <a class="nav-link" href="#"><i class="fas fa-book-open"></i> Academics</a>
+                                <li class="nav-item">
+                                    <a class="nav-link py-2" href="transport_fee.php">
+                                        <i class="fas fa-money-bill-wave"></i> Transport Fees
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link d-flex justify-content-between align-items-center" data-bs-toggle="collapse"
+                            href="#expenseMenu">
+                            <span>
+                                <i class="fas fa-wallet"></i> Expenses
+                            </span>
+                            <i class="fas fa-chevron-down"></i>
+                        </a>
+
+                        <div class="collapse" id="expenseMenu">
+                            <ul class="nav flex-column ms-3">
+
+                                <li class="nav-item">
+                                    <a class="nav-link py-2" href="expense_category.php">
+                                        <i class="fas fa-list"></i> Expense Categories
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link py-2" href="add_expense.php">
+                                        <i class="fas fa-plus-circle"></i> Add Expense
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link py-2" href="expense_list.php">
+                                        <i class="fas fa-file-invoice"></i> Expense List
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link py-2" href="expense_report.php">
+                                        <i class="fas fa-chart-line"></i> Expense Reports
+                                    </a>
+                                </li>
+
+                            </ul>
+                        </div>
+                    </li>
                     <a class="nav-link" href="#"><i class="fas fa-user-tie"></i> Staff & Payroll <span
                             class="badge-soft">5</span></a>
                     <a class="nav-link" href="#"><i class="fas fa-chart-pie"></i> Reports</a>
