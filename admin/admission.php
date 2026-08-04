@@ -44,6 +44,14 @@ include 'includes/header.php';
                         <option value="Other">Other</option>
                     </select>
                 </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">RTE Status <span class="text-danger">*</span></label>
+                    <select class="form-select" name="rte_status" required>
+                        <option value="">Select Status</option>
+                        <option value="RTE">RTE</option>
+                        <option value="Non-RTE">Non-RTE</option>
+                    </select>
+                </div>
                 <div class="col-12">
                     <h6 class="fw-bold mb-3 mt-2"><i class="fas fa-address-card text-primary me-2"></i>Parent / Guardian
                         Details</h6>

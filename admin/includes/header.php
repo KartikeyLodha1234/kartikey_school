@@ -71,9 +71,9 @@
                                 <a class="nav-link py-2" href="id_card.php">
                                     <i class="fas fa-id-card"></i> Student ID
                                 </a>
-                                <a class="nav-link py-2" href="#">
-                                    <i class="fas fa-users"></i> Parents
-                                </a>
+                                <a class="nav-link py-2" href="student_fees.php">
+    <i class="fas fa-wallet"></i> Student Fees
+</a>
                             </nav>
                         </div>
                     </li>
