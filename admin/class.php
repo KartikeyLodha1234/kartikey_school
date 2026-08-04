@@ -1,5 +1,8 @@
 <?php
+include '../config/config.php';
 include 'includes/header.php';
+
+$classes = $conn->query("SELECT id, class_name, section_count FROM classes ORDER BY id ASC")->fetchAll();
 ?>
 <div class="main-content">
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
@@ -8,6 +11,7 @@ include 'includes/header.php';
             <div class="text-secondary small">Manage academic class strength.</div>
         </div>
     </div>
+
     <div class="card border-0 rounded-4 shadow-sm mb-4">
         <div class="card-body">
             <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
@@ -15,6 +19,10 @@ include 'includes/header.php';
                 <span class="text-secondary small">Create a new academic class record</span>
             </div>
             <form class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Class id</label>
+                    <input type="text" class="form-control" placeholder="Class ID">
+                </div>
                 <div class="col-md-4">
                     <label class="form-label">Class Name</label>
                     <input type="text" class="form-control" placeholder="Grade 10">
@@ -43,6 +51,7 @@ include 'includes/header.php';
                 <table class="table table-custom align-middle mb-0">
                     <thead class="table-light">
                         <tr>
+                            <th>Class ID</th>
                             <th>Class</th>
                             <th>Students</th>
                             <th>Status</th>
@@ -50,54 +59,27 @@ include 'includes/header.php';
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>Grade 1</td>
-                            <td>38</td>
-                            <td><span class="status-badge bg-success-subtle text-success">Active</span></td>
-                            <td>
-                                <div class="d-flex gap-2">
-                                    <a href="#" class="text-primary text-decoration-none">View</a>
-                                    <a href="#" class="text-primary text-decoration-none">Edit</a>
-                                    <a href="#" class="text-primary text-decoration-none">Delete</a>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Grade 3</td>
-                            <td>41</td>
-                            <td><span class="status-badge bg-warning-subtle text-warning">Pending</span></td>
-                            <td>
-                                <div class="d-flex gap-2">
-                                    <a href="#" class="text-primary text-decoration-none">View</a>
-                                    <a href="#" class="text-primary text-decoration-none">Edit</a>
-                                    <a href="#" class="text-primary text-decoration-none">Delete</a>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Grade 6</td>
-                            <td>36</td>
-                            <td><span class="status-badge bg-success-subtle text-success">Active</span></td>
-                            <td>
-                                <div class="d-flex gap-2">
-                                    <a href="#" class="text-primary text-decoration-none">View</a>
-                                    <a href="#" class="text-primary text-decoration-none">Edit</a>
-                                    <a href="#" class="text-primary text-decoration-none">Delete</a>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Grade 9</td>
-                            <td>44</td>
-                            <td><span class="status-badge bg-success-subtle text-success">Active</span></td>
-                            <td>
-                                <div class="d-flex gap-2">
-                                    <a href="#" class="text-primary text-decoration-none">View</a>
-                                    <a href="#" class="text-primary text-decoration-none">Edit</a>
-                                    <a href="#" class="text-primary text-decoration-none">Delete</a>
-                                </div>
-                            </td>
-                        </tr>
+                        <?php if (!empty($classes)): ?>
+                            <?php foreach ($classes as $row): ?>
+                                <tr>
+                                    <td><?php echo htmlspecialchars($row['id']); ?></td>
+                                    <td><?php echo htmlspecialchars($row['class_name']); ?></td>
+                                    <td><?php echo (int)$row['section_count']; ?></td>
+                                    <td><span class="status-badge bg-success-subtle text-success">Active</span></td>
+                                    <td>
+                                        <div class="d-flex gap-2">
+                                            <a href="#" class="text-primary text-decoration-none">View</a>
+                                            <a href="#" class="text-primary text-decoration-none">Edit</a>
+                                            <a href="#" class="text-primary text-decoration-none">Delete</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="5" class="text-center text-secondary py-4">No classes found.</td>
+                            </tr>
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>
