@@ -31,7 +31,7 @@
                         </a>
                         <div class="collapse" id="masterMenu">
                             <nav class="nav flex-column ms-4 mt-2">
-                                <a class="nav-link py-2" href="master.php">
+                                <a class="nav-link py-2" href="class.php">
                                     <i class="fas fa-school"></i> Classes
                                 </a>
 
