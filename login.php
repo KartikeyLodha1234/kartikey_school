@@ -13,7 +13,7 @@
         <div class="login-card">
             <div class="login-brand">
                 <h2><i class="fas fa-graduation-cap me-2"></i>Kartikey School</h2>
-                <p>Admin Login Portal</p>
+                <p>Login Portal</p>
             </div>
 
             <form action="#">
