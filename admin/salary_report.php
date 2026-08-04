@@ -4,7 +4,7 @@ include 'includes/header.php';
 <div class="main-content">
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
         <div>
-            <h3 class="mb-1"><i class="fas fa-file-invoice-dollar text-primary me-2"></i>Salary Report</h3>
+            <h3 class="mb-1">Salary Report</h3>
             <div class="text-secondary small">View and manage staff salary reports.</div>
         </div>
         <div class="d-flex gap-2">
@@ -71,56 +71,6 @@ include 'includes/header.php';
                         <i class="fas fa-search me-2"></i>Generate Report
                     </button>
                 </div>
-            </div>
-        </div>
-    </div>
-    <div class="row g-3 mb-4">
-        <div class="col-xl-3 col-md-6">
-            <div class="stat-card" style="border-left: 4px solid #2563eb;">
-                <div class="d-flex align-items-center justify-content-between">
-                    <div>
-                        <div class="stat-label">Total Staff</div>
-                        <div class="stat-number">48</div>
-                    </div>
-                    <div class="stat-icon" style="background:#2563eb;"><i class="fas fa-users"></i></div>
-                </div>
-                <div class="stat-sub">Staff members</div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="stat-card" style="border-left: 4px solid #10b981;">
-                <div class="d-flex align-items-center justify-content-between">
-                    <div>
-                        <div class="stat-label">Total Salary</div>
-                        <div class="stat-number">₹12,50,000</div>
-                    </div>
-                    <div class="stat-icon" style="background:#10b981;"><i class="fas fa-rupee-sign"></i></div>
-                </div>
-                <div class="stat-sub">August 2025</div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="stat-card" style="border-left: 4px solid #f59e0b;">
-                <div class="d-flex align-items-center justify-content-between">
-                    <div>
-                        <div class="stat-label">Average Salary</div>
-                        <div class="stat-number">₹26,042</div>
-                    </div>
-                    <div class="stat-icon" style="background:#f59e0b;"><i class="fas fa-chart-line"></i></div>
-                </div>
-                <div class="stat-sub">Per staff member</div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="stat-card" style="border-left: 4px solid #ef4444;">
-                <div class="d-flex align-items-center justify-content-between">
-                    <div>
-                        <div class="stat-label">Highest Salary</div>
-                        <div class="stat-number">₹60,000</div>
-                    </div>
-                    <div class="stat-icon" style="background:#ef4444;"><i class="fas fa-arrow-up"></i></div>
-                </div>
-                <div class="stat-sub">Principal</div>
             </div>
         </div>
     </div>

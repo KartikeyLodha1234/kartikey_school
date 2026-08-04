@@ -53,56 +53,6 @@ include 'includes/header.php';
             </form>
         </div>
     </div>
-    <div class="row g-3 mb-4">
-        <div class="col-xl-3 col-md-6">
-            <div class="stat-card" style="border-left: 4px solid #2563eb;">
-                <div class="d-flex align-items-center justify-content-between">
-                    <div>
-                        <div class="stat-label">Total Routes</div>
-                        <div class="stat-number">12</div>
-                    </div>
-                    <div class="stat-icon" style="background:#2563eb;"><i class="fas fa-route"></i></div>
-                </div>
-                <div class="stat-sub">Active transport routes</div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="stat-card" style="border-left: 4px solid #10b981;">
-                <div class="d-flex align-items-center justify-content-between">
-                    <div>
-                        <div class="stat-label">Active Fees</div>
-                        <div class="stat-number">10</div>
-                    </div>
-                    <div class="stat-icon" style="background:#10b981;"><i class="fas fa-check-circle"></i></div>
-                </div>
-                <div class="stat-sub">Fee structures active</div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="stat-card" style="border-left: 4px solid #f59e0b;">
-                <div class="d-flex align-items-center justify-content-between">
-                    <div>
-                        <div class="stat-label">Avg Fee</div>
-                        <div class="stat-number">₹1,250</div>
-                    </div>
-                    <div class="stat-icon" style="background:#f59e0b;"><i class="fas fa-chart-line"></i></div>
-                </div>
-                <div class="stat-sub">Average transport fee</div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="stat-card" style="border-left: 4px solid #ef4444;">
-                <div class="d-flex align-items-center justify-content-between">
-                    <div>
-                        <div class="stat-label">Highest Fee</div>
-                        <div class="stat-number">₹2,000</div>
-                    </div>
-                    <div class="stat-icon" style="background:#ef4444;"><i class="fas fa-arrow-up"></i></div>
-                </div>
-                <div class="stat-sub">Route 6 - Far Side</div>
-            </div>
-        </div>
-    </div>
     <div class="card border-0 rounded-4 shadow-sm">
         <div class="card-header bg-transparent border-bottom-0 p-3">
             <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">

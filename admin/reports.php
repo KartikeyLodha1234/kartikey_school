@@ -4,7 +4,7 @@ include 'includes/header.php';
 <div class="main-content">
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
         <div>
-            <h3 class="mb-1"><i class="fas fa-chart-pie text-primary me-2"></i>Reports</h3>
+            <h3 class="mb-1">Reports</h3>
             <div class="text-secondary small">View and generate various school reports.</div>
         </div>
         <div class="d-flex gap-2">

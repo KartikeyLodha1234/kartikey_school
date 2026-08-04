@@ -13,56 +13,6 @@ include 'includes/header.php';
             </button>
         </div>
     </div>
-    <div class="row g-3 mb-4">
-        <div class="col-xl-3 col-md-6">
-            <div class="stat-card" style="border-left: 4px solid #2563eb;">
-                <div class="d-flex align-items-center justify-content-between">
-                    <div>
-                        <div class="stat-label">Total Staff</div>
-                        <div class="stat-number">48</div>
-                    </div>
-                    <div class="stat-icon" style="background:#2563eb;"><i class="fas fa-users"></i></div>
-                </div>
-                <div class="stat-sub">All staff members</div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="stat-card" style="border-left: 4px solid #10b981;">
-                <div class="d-flex align-items-center justify-content-between">
-                    <div>
-                        <div class="stat-label">Present</div>
-                        <div class="stat-number">42</div>
-                    </div>
-                    <div class="stat-icon" style="background:#10b981;"><i class="fas fa-check-circle"></i></div>
-                </div>
-                <div class="stat-sub">Today</div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="stat-card" style="border-left: 4px solid #ef4444;">
-                <div class="d-flex align-items-center justify-content-between">
-                    <div>
-                        <div class="stat-label">Absent</div>
-                        <div class="stat-number">4</div>
-                    </div>
-                    <div class="stat-icon" style="background:#ef4444;"><i class="fas fa-user-slash"></i></div>
-                </div>
-                <div class="stat-sub">Today</div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="stat-card" style="border-left: 4px solid #f59e0b;">
-                <div class="d-flex align-items-center justify-content-between">
-                    <div>
-                        <div class="stat-label">On Leave</div>
-                        <div class="stat-number">2</div>
-                    </div>
-                    <div class="stat-icon" style="background:#f59e0b;"><i class="fas fa-clock"></i></div>
-                </div>
-                <div class="stat-sub">Today</div>
-            </div>
-        </div>
-    </div>
     <div class="card border-0 rounded-4 shadow-sm mb-4">
         <div class="card-body">
             <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">

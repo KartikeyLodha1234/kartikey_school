@@ -37,44 +37,6 @@ include 'includes/header.php';
             </form>
         </div>
     </div>
-    <div class="row g-3 mb-4">
-        <div class="col-xl-3 col-md-6">
-            <div class="stat-card">
-                <div class="d-flex align-items-center justify-content-between">
-                    <div>
-                        <div class="stat-label">Total Classes</div>
-                        <div class="stat-number">18</div>
-                    </div>
-                    <div class="stat-icon" style="background:#2563eb;"><i class="fas fa-school"></i></div>
-                </div>
-                <div class="stat-sub">Across primary and senior wing</div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="stat-card">
-                <div class="d-flex align-items-center justify-content-between">
-                    <div>
-                        <div class="stat-label">Active Sections</div>
-                        <div class="stat-number">42</div>
-                    </div>
-                    <div class="stat-icon" style="background:#0ea5e9;"><i class="fas fa-layer-group"></i></div>
-                </div>
-                <div class="stat-sub">Sections currently running</div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="stat-card">
-                <div class="d-flex align-items-center justify-content-between">
-                    <div>
-                        <div class="stat-label">Students Enrolled</div>
-                        <div class="stat-number">826</div>
-                    </div>
-                    <div class="stat-icon" style="background:#f59e0b;"><i class="fas fa-user-graduate"></i></div>
-                </div>
-                <div class="stat-sub">Live student count</div>
-            </div>
-        </div>
-    </div>
     <div class="card border-0 rounded-4 shadow-sm">
         <div class="card-body p-0">
             <div class="table-responsive">

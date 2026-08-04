@@ -11,7 +11,7 @@ include 'includes/header.php';
     <div class="card border-0 rounded-4 shadow-sm mb-4">
         <div class="card-body">
             <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
-                <h5 class="mb-0">Assign Transport</h5>
+                <h5 class="mb-0">Assign Transport students</h5>
                 <span class="text-secondary small">Assign a vehicle and route to a student</span>
             </div>
             <form class="row g-3">

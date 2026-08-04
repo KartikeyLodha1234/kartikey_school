@@ -13,56 +13,6 @@ include 'includes/header.php';
             </button>
         </div>
     </div>
-    <div class="row g-3 mb-4">
-        <div class="col-xl-3 col-md-6">
-            <div class="stat-card" style="border-left: 4px solid #2563eb;">
-                <div class="d-flex align-items-center justify-content-between">
-                    <div>
-                        <div class="stat-label">Total Expenses</div>
-                        <div class="stat-number">₹1,25,000</div>
-                    </div>
-                    <div class="stat-icon" style="background:#2563eb;"><i class="fas fa-chart-pie"></i></div>
-                </div>
-                <div class="stat-sub">This month</div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="stat-card" style="border-left: 4px solid #10b981;">
-                <div class="d-flex align-items-center justify-content-between">
-                    <div>
-                        <div class="stat-label">Paid</div>
-                        <div class="stat-number">₹98,000</div>
-                    </div>
-                    <div class="stat-icon" style="background:#10b981;"><i class="fas fa-check-circle"></i></div>
-                </div>
-                <div class="stat-sub">Completed payments</div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="stat-card" style="border-left: 4px solid #f59e0b;">
-                <div class="d-flex align-items-center justify-content-between">
-                    <div>
-                        <div class="stat-label">Pending</div>
-                        <div class="stat-number">₹20,000</div>
-                    </div>
-                    <div class="stat-icon" style="background:#f59e0b;"><i class="fas fa-clock"></i></div>
-                </div>
-                <div class="stat-sub">Pending payments</div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="stat-card" style="border-left: 4px solid #ef4444;">
-                <div class="d-flex align-items-center justify-content-between">
-                    <div>
-                        <div class="stat-label">Overdue</div>
-                        <div class="stat-number">₹7,000</div>
-                    </div>
-                    <div class="stat-icon" style="background:#ef4444;"><i class="fas fa-exclamation-triangle"></i></div>
-                </div>
-                <div class="stat-sub">Overdue payments</div>
-            </div>
-        </div>
-    </div>
     <div class="card border-0 rounded-4 shadow-sm mb-4">
         <div class="card-body">
             <div class="row g-3 align-items-center">
