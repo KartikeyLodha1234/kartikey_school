@@ -65,8 +65,8 @@
                                 <a class="nav-link py-2" href="admission.php">
                                     <i class="fas fa-user-plus"></i> Add Student
                                 </a>
-                                <a class="nav-link py-2" href="#">
-                                    <i class="fas fa-user-plus"></i> Add Student
+                                <a class="nav-link py-2" href="student_report.php">
+                                    <i class="fas fa-chart-bar"></i> Student Report
                                 </a>
                                 <a class="nav-link py-2" href="#">
                                     <i class="fas fa-id-card"></i> Student ID
