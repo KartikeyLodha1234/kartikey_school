@@ -81,6 +81,9 @@ body {
     background: #0b1629 !important;
     padding: 0.6rem 1.8rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    position: sticky;
+    top: 0;
+    z-index: 1020;
 }
 .topbar .navbar-brand {
     font-weight: 600;

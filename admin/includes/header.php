@@ -219,7 +219,8 @@
                                         <i class="fas fa-user-circle"></i> Profile
                                     </a>
                                     <ul class="dropdown-menu dropdown-menu-end">
-                                        <li><a class="dropdown-item" href="profile.php"><i class="fas fa-user me-2"></i>My
+                                        <li><a class="dropdown-item" href="profile.php"><i
+                                                    class="fas fa-user me-2"></i>My
                                                 Account</a></li>
                                         <li><a class="dropdown-item" href="settings.php"><i
                                                     class="fas fa-cog me-2"></i>Settings</a></li>
@@ -243,11 +244,9 @@
                         sidebarLinks.forEach(item => item.classList.remove('active'));
                         link.classList.add('active');
                     }
-
                     sidebarLinks.forEach(link => {
                         const href = link.getAttribute('href');
                         const isCollapseToggle = link.getAttribute('data-bs-toggle') === 'collapse';
-
                         if (!href || href === '#') {
                             if (isCollapseToggle) {
                                 link.addEventListener('click', function(e) {
@@ -256,11 +255,9 @@
                             }
                             return;
                         }
-
                         if (href === currentPage) {
                             setActiveSidebar(link);
                         }
-
                         link.addEventListener('click', function(e) {
                             if (href === '#') {
                                 e.preventDefault();
