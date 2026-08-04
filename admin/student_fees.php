@@ -52,6 +52,15 @@ include 'includes/header.php';
                         <option value="12">Grade 12</option>
                     </select>
                 </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Select Section</label>
+                    <select class="form-select">
+                        <option value="">All Sections</option>
+                        <option value="A">Section A</option>
+                        <option value="B">Section B</option>
+                        <option value="C">Section C</option>
+                    </select>
+                </div>
                 <div class="col-12 mt-2">
                     <h6 class="fw-bold"><i class="fas fa-file-invoice text-primary me-2"></i>Fee Details</h6>
                     <hr>
