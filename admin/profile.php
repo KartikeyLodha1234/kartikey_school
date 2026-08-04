@@ -18,7 +18,6 @@ include 'includes/header.php';
     </div>
 
     <div class="row g-4">
-        <!-- Profile Sidebar -->
         <div class="col-xl-3 col-lg-4">
             <div class="card border-0 rounded-4 shadow-sm text-center">
                 <div class="card-body p-4">
@@ -52,8 +51,6 @@ include 'includes/header.php';
                 </div>
             </div>
         </div>
-
-        <!-- Profile Details -->
         <div class="col-xl-9 col-lg-8">
             <div class="card border-0 rounded-4 shadow-sm">
                 <div class="card-body p-4">
@@ -74,9 +71,7 @@ include 'includes/header.php';
                             </button>
                         </li>
                     </ul>
-
                     <div class="tab-content" id="profileTabContent">
-                        <!-- Personal Information -->
                         <div class="tab-pane fade show active" id="personal" role="tabpanel">
                             <h6 class="fw-bold mb-3"><i class="fas fa-user text-primary me-2"></i>Personal Information</h6>
                             <div class="row g-3">
@@ -123,8 +118,6 @@ include 'includes/header.php';
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Account Settings -->
                         <div class="tab-pane fade" id="account" role="tabpanel">
                             <h6 class="fw-bold mb-3"><i class="fas fa-cog text-primary me-2"></i>Account Settings</h6>
                             <div class="row g-3">
@@ -167,8 +160,6 @@ include 'includes/header.php';
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Security -->
                         <div class="tab-pane fade" id="security" role="tabpanel">
                             <h6 class="fw-bold mb-3"><i class="fas fa-lock text-primary me-2"></i>Security Settings</h6>
                             <div class="row g-3">

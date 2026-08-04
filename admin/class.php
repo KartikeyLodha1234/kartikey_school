@@ -2,7 +2,6 @@
 include '../config/config.php';
 include 'includes/auth_check.php'; 
 checkRole(['admin']);
-
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_class'])) {
     $class_name = trim($_POST['class_name']);
     $student_capacity = (int)$_POST['student_capacity'];
@@ -70,8 +69,19 @@ $total_capacity = $conn->query("SELECT SUM(student_capacity) as total FROM class
 
 include 'includes/header.php';
 ?>
+
 <div class="main-content">
-    <!-- Stats Cards -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+        <div>
+            <h3 class="mb-1"><i class="fas fa-school text-primary me-2"></i>Classes</h3>
+            <div class="text-secondary small">Manage academic classes with student capacity.</div>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-primary rounded-pill px-3" data-bs-toggle="collapse" data-bs-target="#addClassForm">
+                <i class="fas fa-plus me-2"></i>Add New Class
+            </button>
+        </div>
+    </div>
     <div class="row g-3 mb-4">
         <div class="col-xl-4 col-md-6">
             <div class="stat-card">
@@ -116,6 +126,7 @@ include 'includes/header.php';
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     <?php endif; ?>
+    
     <?php if (isset($_SESSION['error'])): ?>
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <i class="fas fa-exclamation-circle me-2"></i><?php echo $_SESSION['error']; unset($_SESSION['error']); ?>
@@ -173,13 +184,6 @@ include 'includes/header.php';
             </form>
         </div>
     </div>
-    <?php if (!isset($_GET['edit'])): ?>
-        <div class="text-center mb-3">
-            <button class="btn btn-primary rounded-pill px-4" data-bs-toggle="collapse" data-bs-target="#addClassForm">
-                <i class="fas fa-plus me-2"></i>Add New Class
-            </button>
-        </div>
-    <?php endif; ?>
     <div class="card border-0 rounded-4 shadow-sm">
         <div class="card-header bg-transparent border-bottom-0 p-3">
             <div class="d-flex justify-content-between align-items-center">
@@ -239,4 +243,5 @@ include 'includes/header.php';
         </div>
     </div>
 </div>
+
 <?php include 'includes/footer.php'; ?>
