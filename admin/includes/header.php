@@ -47,8 +47,8 @@
                                 </a>
 
                                 <a class="nav-link py-2" href="marks.php">
-    <i class="fas fa-chart-line"></i> Marks
-</a>
+                                    <i class="fas fa-chart-line"></i> Marks
+                                </a>
                             </nav>
                         </div>
                     </li>
@@ -62,8 +62,8 @@
                         </a>
                         <div class="collapse" id="studentMenu">
                             <nav class="nav flex-column ms-4 mt-2">
-                                <a class="nav-link py-2" href="#">
-                                    <i class="fas fa-list"></i> All Students
+                                <a class="nav-link py-2" href="admission.php">
+                                    <i class="fas fa-user-plus"></i> Add Student
                                 </a>
                                 <a class="nav-link py-2" href="#">
                                     <i class="fas fa-user-plus"></i> Add Student
