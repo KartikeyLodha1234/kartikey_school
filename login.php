@@ -9,7 +9,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = trim($_POST['pswd'] ?? '');
 
     if ($email === 'adminkartikey@gmail.com' && $password === 'kartikey@1805') {
-        $_SESSION['admin_logged_in'] = true;
+        $_SESSION['logged_in'] = true;
+        $_SESSION['user_role'] = 'admin';
         $_SESSION['admin_email'] = $email;
         header('Location: admin/index.php');
         exit;
