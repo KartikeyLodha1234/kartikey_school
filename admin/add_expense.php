@@ -158,7 +158,6 @@ include 'includes/header.php';
             </div>
         </div>
         <div class="card-body p-0">
-            <!-- Search & Filter -->
             <div class="px-3 pb-3">
                 <div class="row g-2">
                     <div class="col-md-4">
@@ -194,12 +193,11 @@ include 'includes/header.php';
                     </div>
                     <div class="col-md-2">
                         <button class="btn btn-primary w-100 rounded-pill">
-                            <i class="fas fa-filter me-2"></i>Filter
-                        </button>
+                        <i class="fas fa-search me-2"></i> Search
+                    </button>
                     </div>
                 </div>
             </div>
-
             <div class="table-responsive">
                 <table class="table table-custom align-middle mb-0">
                     <thead class="table-light">
@@ -303,23 +301,6 @@ include 'includes/header.php';
                         </tr>
                     </tbody>
                 </table>
-            </div>
-        </div>
-        <!-- Pagination -->
-        <div class="card-footer bg-transparent border-top-0 p-3">
-            <div class="d-flex justify-content-between align-items-center">
-                <div class="text-secondary small">Showing 1-5 of 24 expenses</div>
-                <nav>
-                    <ul class="pagination pagination-custom mb-0">
-                        <li class="page-item disabled"><a class="page-link" href="#"><i class="fas fa-chevron-left"></i></a></li>
-                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                        <li class="page-item"><a class="page-link" href="#">3</a></li>
-                        <li class="page-item"><a class="page-link" href="#">4</a></li>
-                        <li class="page-item"><a class="page-link" href="#">5</a></li>
-                        <li class="page-item"><a class="page-link" href="#"><i class="fas fa-chevron-right"></i></a></li>
-                    </ul>
-                </nav>
             </div>
         </div>
     </div>
