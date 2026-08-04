@@ -212,8 +212,7 @@ include 'includes/header.php';
             </div>
         </div>
     </div>
-
-    <div class="text-center text-secondary small mt-4">
-        © 2026 School ERP · Transport Fee Management
-    </div>
 </div>
+<?php
+include 'includes/footer.php';
+?>

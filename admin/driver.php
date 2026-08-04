@@ -4,14 +4,14 @@ include 'includes/header.php';
 <div class="main-content">
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
         <div>
-            <h3 class="mb-1"><i class="fas fa-user-tie text-primary me-2"></i>Driver</h3>
+            <h3 class="mb-1">Drivers</h3>
             <div class="text-secondary small">Manage school drivers.</div>
         </div>
     </div>
     <div class="card border-0 rounded-4 shadow-sm mb-4">
         <div class="card-body">
             <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
-                <h5 class="mb-0">Add New Driver</h5>
+                <h5 class="mb-0">Add New Drivers</h5>
                 <span class="text-secondary small">Register a new driver</span>
             </div>
             

@@ -4,7 +4,7 @@ include 'includes/header.php';
 <div class="main-content">
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
         <div>
-            <h3 class="mb-1"><i class="fas fa-bus text-primary me-2"></i>Vehicle</h3>
+            <h3 class="mb-1">Vehicle</h3>
             <div class="text-secondary small">Manage school vehicles.</div>
         </div>
     </div>

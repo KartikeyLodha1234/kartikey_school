@@ -7,11 +7,6 @@ include 'includes/header.php';
             <h3 class="mb-1">Admission</h3>
             <div class="text-secondary small">Manage student admissions, applications, and enrollments</div>
         </div>
-        <div class="d-flex gap-2">
-            <button class="btn btn-outline-primary rounded-pill px-3">
-                <i class="fas fa-file-export me-2"></i>Export
-            </button>
-        </div>
     </div>
 
     <div class="card border-0 rounded-4 shadow-sm mb-4">

@@ -3,7 +3,7 @@ include 'includes/header.php';
 ?><div class="main-content">
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
         <div>
-            <h3 class="mb-1"><i class="fas fa-route text-primary me-2"></i>Route</h3>
+            <h3 class="mb-1">Route</h3>
             <div class="text-secondary small">Manage school transport routes.</div>
         </div>
     </div>
