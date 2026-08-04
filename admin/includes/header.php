@@ -46,9 +46,9 @@
                                     <i class="fas fa-money-bill-wave"></i> Fees
                                 </a>
 
-                                <a class="nav-link py-2" href="designation.php">
-                                    <i class="fas fa-user-tie"></i> Designations
-                                </a>
+                                <a class="nav-link py-2" href="marks.php">
+    <i class="fas fa-chart-line"></i> Marks
+</a>
                             </nav>
                         </div>
                     </li>
