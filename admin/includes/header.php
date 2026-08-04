@@ -20,7 +20,7 @@
                     <i class="fas fa-graduation-cap"></i> School
                 </div>
                 <nav class="nav flex-column">
-                    <a class="nav-link active" href="#"><i class="fas fa-th-large"></i> Dashboard</a>
+                    <a class="nav-link active" href="index.php"><i class="fas fa-th-large"></i> Dashboard</a>
                     <li class="nav-item">
                         <a class="nav-link d-flex justify-content-between align-items-center" data-bs-toggle="collapse"
                             href="#masterMenu" role="button" aria-expanded="false">
