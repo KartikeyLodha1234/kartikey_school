@@ -11,7 +11,7 @@ include 'includes/header.php';
     <div class="card border-0 rounded-4 shadow-sm mb-4">
         <div class="card-body">
             <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
-                <h5 class="mb-0"><i class="fas fa-user-plus text-primary me-2"></i>Add New Staff</h5>
+                <h5 class="mb-0">Add New Staff</h5>
                 <span class="text-secondary small">Create a new staff record</span>
             </div>
             <form class="row g-3">
