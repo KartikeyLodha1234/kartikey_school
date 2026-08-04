@@ -1,25 +1,16 @@
 <?php
-// ============================================
-// CLASSES PAGE
-// ============================================
 include '../config/config.php';
 include 'includes/auth_check.php'; 
 checkRole(['admin']);
 
-// ============================================
-// INSERT CLASS
-// ============================================
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_class'])) {
     $class_name = trim($_POST['class_name']);
     $student_capacity = (int)$_POST['student_capacity'];
     $status = $_POST['status'];
     
-    $errors = [];
     if (empty($class_name)) {
-        $errors[] = "Class name is required";
-    }
-    
-    if (empty($errors)) {
+        $_SESSION['error'] = "Class name is required";
+    } else {
         try {
             $stmt = $conn->prepare("INSERT INTO classes (class_name, student_capacity, status) VALUES (?, ?, ?)");
             $stmt->execute([$class_name, $student_capacity, $status]);
@@ -29,14 +20,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_class'])) {
         } catch(PDOException $e) {
             $_SESSION['error'] = "Error: " . $e->getMessage();
         }
-    } else {
-        $_SESSION['error'] = implode(", ", $errors);
     }
 }
-
-// ============================================
-// UPDATE CLASS
-// ============================================
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['edit_class'])) {
     $id = (int)$_POST['edit_id'];
     $class_name = trim($_POST['edit_class_name']);
@@ -53,10 +38,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['edit_class'])) {
         $_SESSION['error'] = "Error: " . $e->getMessage();
     }
 }
-
-// ============================================
-// DELETE CLASS
-// ============================================
 if (isset($_GET['delete'])) {
     $id = (int)$_GET['delete'];
     try {
@@ -69,46 +50,26 @@ if (isset($_GET['delete'])) {
         $_SESSION['error'] = "Error: " . $e->getMessage();
     }
 }
-
-// ============================================
-// GET CLASS DATA FOR EDIT
-// ============================================
 $edit_data = null;
 if (isset($_GET['edit'])) {
     $id = (int)$_GET['edit'];
     $stmt = $conn->prepare("SELECT * FROM classes WHERE id = ?");
     $stmt->execute([$id]);
     $edit_data = $stmt->fetch();
+    
+    if (!$edit_data) {
+        $_SESSION['error'] = "Class not found!";
+        header("Location: class.php");
+        exit();
+    }
 }
-
-// ============================================
-// FETCH ALL CLASSES
-// ============================================
 $classes = $conn->query("SELECT * FROM classes ORDER BY id ASC")->fetchAll();
-
-// Fix empty class names
-foreach ($classes as &$row) {
-    if (empty($row['class_name'])) {
-        $row['class_name'] = 'Class ' . $row['id'];
-    }
-    if ($row['student_capacity'] === null || $row['student_capacity'] == '') {
-        $row['student_capacity'] = 0;
-    }
-    if (empty($row['status'])) {
-        $row['status'] = 'Inactive';
-    }
-}
-
-// ============================================
-// GET STATS
-// ============================================
 $total_classes = count($classes);
 $active_classes = $conn->query("SELECT COUNT(*) as total FROM classes WHERE status = 'Active'")->fetch()['total'] ?? 0;
 $total_capacity = $conn->query("SELECT SUM(student_capacity) as total FROM classes")->fetch()['total'] ?? 0;
 
 include 'includes/header.php';
 ?>
-
 <div class="main-content">
     <!-- Stats Cards -->
     <div class="row g-3 mb-4">
@@ -149,24 +110,19 @@ include 'includes/header.php';
             </div>
         </div>
     </div>
-
-    <!-- Flash Messages -->
     <?php if (isset($_SESSION['success'])): ?>
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             <i class="fas fa-check-circle me-2"></i><?php echo $_SESSION['success']; unset($_SESSION['success']); ?>
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     <?php endif; ?>
-    
     <?php if (isset($_SESSION['error'])): ?>
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <i class="fas fa-exclamation-circle me-2"></i><?php echo $_SESSION['error']; unset($_SESSION['error']); ?>
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     <?php endif; ?>
-
-    <!-- Add Class Form -->
-    <div class="card border-0 rounded-4 shadow-sm mb-4 collapse <?php echo isset($_GET['edit']) ? '' : 'show'; ?>" id="addClassForm">
+    <div class="card border-0 rounded-4 shadow-sm mb-4 <?php echo isset($_GET['edit']) ? '' : 'collapse'; ?>" id="addClassForm">
         <div class="card-body">
             <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
                 <h5 class="mb-0">
@@ -184,17 +140,19 @@ include 'includes/header.php';
                 
                 <div class="col-md-4">
                     <label class="form-label fw-semibold">Class Name <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" name="class_name" placeholder="e.g., Grade 10" 
+                    <input type="text" class="form-control" name="<?php echo isset($edit_data) ? 'edit_class_name' : 'class_name'; ?>" 
+                           placeholder="e.g., Grade 10" 
                            value="<?php echo isset($edit_data) ? htmlspecialchars($edit_data['class_name']) : ''; ?>" required>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label fw-semibold">Student Capacity</label>
-                    <input type="number" class="form-control" name="student_capacity" placeholder="e.g., 40" 
+                    <input type="number" class="form-control" name="<?php echo isset($edit_data) ? 'edit_student_capacity' : 'student_capacity'; ?>" 
+                           placeholder="e.g., 40" 
                            value="<?php echo isset($edit_data) ? $edit_data['student_capacity'] : ''; ?>" min="0">
                 </div>
                 <div class="col-md-4">
                     <label class="form-label fw-semibold">Status</label>
-                    <select class="form-select" name="status">
+                    <select class="form-select" name="<?php echo isset($edit_data) ? 'edit_status' : 'status'; ?>">
                         <option value="Active" <?php echo (isset($edit_data) && $edit_data['status'] == 'Active') ? 'selected' : ''; ?>>Active</option>
                         <option value="Inactive" <?php echo (isset($edit_data) && $edit_data['status'] == 'Inactive') ? 'selected' : ''; ?>>Inactive</option>
                     </select>
@@ -215,8 +173,13 @@ include 'includes/header.php';
             </form>
         </div>
     </div>
-
-    <!-- Classes Table -->
+    <?php if (!isset($_GET['edit'])): ?>
+        <div class="text-center mb-3">
+            <button class="btn btn-primary rounded-pill px-4" data-bs-toggle="collapse" data-bs-target="#addClassForm">
+                <i class="fas fa-plus me-2"></i>Add New Class
+            </button>
+        </div>
+    <?php endif; ?>
     <div class="card border-0 rounded-4 shadow-sm">
         <div class="card-header bg-transparent border-bottom-0 p-3">
             <div class="d-flex justify-content-between align-items-center">
@@ -266,7 +229,7 @@ include 'includes/header.php';
                             <tr>
                                 <td colspan="5" class="text-center text-secondary py-4">
                                     <i class="fas fa-inbox fa-2x d-block mb-2"></i>
-                                    No classes found. Click "Add New Class" to create one.
+                                    No classes found.
                                 </td>
                             </tr>
                         <?php endif; ?>
@@ -276,5 +239,4 @@ include 'includes/header.php';
         </div>
     </div>
 </div>
-
 <?php include 'includes/footer.php'; ?>
