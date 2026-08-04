@@ -32,10 +32,23 @@
                         <div class="collapse" id="masterMenu">
                             <nav class="nav flex-column ms-4 mt-2">
                                 <a class="nav-link py-2" href="master.php">
-                                    <i class="fas fa-list"></i> Classes
+                                    <i class="fas fa-school"></i> Classes
                                 </a>
-                                <a class="nav-link py-2" href="#">
-                                    <i class="fas fa-user-plus"></i> Add Master
+
+                                <a class="nav-link py-2" href="section.php">
+                                    <i class="fas fa-layer-group"></i> Sections
+                                </a>
+
+                                <a class="nav-link py-2" href="subject.php">
+                                    <i class="fas fa-book-open"></i> Subjects
+                                </a>
+
+                                <a class="nav-link py-2" href="department.php">
+                                    <i class="fas fa-building"></i> Departments
+                                </a>
+
+                                <a class="nav-link py-2" href="designation.php">
+                                    <i class="fas fa-user-tie"></i> Designations
                                 </a>
                             </nav>
                         </div>
@@ -108,14 +121,15 @@
                         </div>
                     </div>
                 </nav>
-                 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        document.querySelectorAll('.sidebar .nav-link').forEach(link => {
-            link.addEventListener('click', function(e) {
-                if (this.getAttribute('href') === '#') e.preventDefault();
-                document.querySelectorAll('.sidebar .nav-link').forEach(l => l.classList.remove(
-                    'active'));
-                this.classList.add('active');
-            });
-        });
-    </script>
+                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+                <script>
+                    document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+                        link.addEventListener('click', function(e) {
+                            if (this.getAttribute('href') === '#') e.preventDefault();
+                            document.querySelectorAll('.sidebar .nav-link').forEach(l => l.classList
+                                .remove(
+                                    'active'));
+                            this.classList.add('active');
+                        });
+                    });
+                </script>
