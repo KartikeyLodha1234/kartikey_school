@@ -73,7 +73,6 @@ include 'includes/header.php';
     </div>
 </div>
 <div class="main-content">
-    <!-- Stats Cards -->
     <div class="row g-3 mb-4">
         <div class="col-xl-3 col-md-6">
             <div class="stat-card" style="border-left: 4px solid #2563eb;">
@@ -124,8 +123,6 @@ include 'includes/header.php';
             </div>
         </div>
     </div>
-
-    <!-- Designation Table -->
     <div class="card border-0 rounded-4 shadow-sm">
         <div class="card-body p-0">
             <div class="table-responsive">
@@ -322,7 +319,6 @@ include 'includes/header.php';
                 </table>
             </div>
         </div>
-        <!-- Pagination -->
         <div class="card-footer bg-transparent border-top-0 p-3">
             <div class="d-flex justify-content-between align-items-center">
                 <div class="text-secondary small">Showing 1-9 of 12 designations</div>
@@ -338,8 +334,8 @@ include 'includes/header.php';
                 </nav>
             </div>
         </div>
-        /div>
     </div>
-    <?php
+</div>
+<?php
 include 'includes/footer.php';
 ?>
