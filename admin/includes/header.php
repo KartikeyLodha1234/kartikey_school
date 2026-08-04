@@ -131,31 +131,16 @@
 
                         <div class="collapse" id="expenseMenu">
                             <ul class="nav flex-column ms-3">
-
-                                <li class="nav-item">
-                                    <a class="nav-link py-2" href="expense_category.php">
-                                        <i class="fas fa-list"></i> Expense Categories
-                                    </a>
-                                </li>
-
                                 <li class="nav-item">
                                     <a class="nav-link py-2" href="add_expense.php">
                                         <i class="fas fa-plus-circle"></i> Add Expense
                                     </a>
                                 </li>
-
                                 <li class="nav-item">
                                     <a class="nav-link py-2" href="expense_list.php">
                                         <i class="fas fa-file-invoice"></i> Expense List
                                     </a>
                                 </li>
-
-                                <li class="nav-item">
-                                    <a class="nav-link py-2" href="expense_report.php">
-                                        <i class="fas fa-chart-line"></i> Expense Reports
-                                    </a>
-                                </li>
-
                             </ul>
                         </div>
                     </li>
