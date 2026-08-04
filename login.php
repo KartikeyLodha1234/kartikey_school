@@ -1,3 +1,23 @@
+<?php
+session_start();
+include 'config/config.php';
+
+$message = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $email = trim($_POST['email'] ?? '');
+    $password = trim($_POST['pswd'] ?? '');
+
+    if ($email === 'adminkartikey@gmail.com' && $password === 'kartikey@1805') {
+        $_SESSION['admin_logged_in'] = true;
+        $_SESSION['admin_email'] = $email;
+        header('Location: admin/index.php');
+        exit;
+    } else {
+        $message = 'Invalid email or password.';
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,14 +36,18 @@
                 <p>Login Portal</p>
             </div>
 
-            <form action="#">
+            <?php if (!empty($message)): ?>
+                <div class="alert alert-danger rounded-3"><?php echo htmlspecialchars($message); ?></div>
+            <?php endif; ?>
+
+            <form method="POST" action="login.php">
                 <div class="mb-3">
                     <label for="email" class="form-label">Email</label>
-                    <input type="email" class="form-control" id="email" placeholder="Enter email" name="email">
+                    <input type="email" class="form-control" id="email" placeholder="Enter email" name="email" value="adminkartikey@gmail.com" required>
                 </div>
                 <div class="mb-3">
                     <label for="pwd" class="form-label">Password</label>
-                    <input type="password" class="form-control" id="pwd" placeholder="Enter password" name="pswd">
+                    <input type="password" class="form-control" id="pwd" placeholder="Enter password" name="pswd" value="kartikey@1805" required>
                 </div>
                 <button type="submit" class="btn btn-primary login-btn">
                     <i class="fas fa-sign-in-alt me-2"></i>Login
