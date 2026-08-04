@@ -2,7 +2,6 @@
 include 'includes/header.php';
 ?>
 <div class="main-content">
-    <!-- Welcome Section -->
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
         <div>
             <h3 class="mb-1">Welcome back, Admin!</h3>
@@ -148,53 +147,6 @@ include 'includes/header.php';
                 <div class="chart-container">
                     <canvas id="staffChart"></canvas>
                 </div>
-            </div>
-        </div>
-    </div>
-    <div class="row g-3 mb-4">
-        <div class="col-12">
-            <h6 class="fw-bold mb-3"><i class="fas fa-bolt text-primary me-2"></i>Quick Actions</h6>
-        </div>
-        <div class="col-xl-2 col-lg-3 col-md-4 col-6">
-            <div class="quick-action">
-                <div class="icon" style="background:#2563eb;"><i class="fas fa-user-plus"></i></div>
-                <div class="title">Add Student</div>
-                <div class="desc">New admission</div>
-            </div>
-        </div>
-        <div class="col-xl-2 col-lg-3 col-md-4 col-6">
-            <div class="quick-action">
-                <div class="icon" style="background:#10b981;"><i class="fas fa-money-bill"></i></div>
-                <div class="title">Collect Fee</div>
-                <div class="desc">Payment entry</div>
-            </div>
-        </div>
-        <div class="col-xl-2 col-lg-3 col-md-4 col-6">
-            <div class="quick-action">
-                <div class="icon" style="background:#f59e0b;"><i class="fas fa-user-tie"></i></div>
-                <div class="title">Add Staff</div>
-                <div class="desc">New employee</div>
-            </div>
-        </div>
-        <div class="col-xl-2 col-lg-3 col-md-4 col-6">
-            <div class="quick-action">
-                <div class="icon" style="background:#8b5cf6;"><i class="fas fa-bus"></i></div>
-                <div class="title">Add Vehicle</div>
-                <div class="desc">Transport</div>
-            </div>
-        </div>
-        <div class="col-xl-2 col-lg-3 col-md-4 col-6">
-            <div class="quick-action">
-                <div class="icon" style="background:#ef4444;"><i class="fas fa-file-alt"></i></div>
-                <div class="title">Add Exam</div>
-                <div class="desc">Schedule exam</div>
-            </div>
-        </div>
-        <div class="col-xl-2 col-lg-3 col-md-4 col-6">
-            <div class="quick-action">
-                <div class="icon" style="background:#06b6d4;"><i class="fas fa-route"></i></div>
-                <div class="title">Add Route</div>
-                <div class="desc">Transport route</div>
             </div>
         </div>
     </div>
