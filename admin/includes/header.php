@@ -144,8 +144,57 @@
                             </ul>
                         </div>
                     </li>
-                    <a class="nav-link" href="#"><i class="fas fa-user-tie"></i> Staff & Payroll <span
-                            class="badge-soft">5</span></a>
+                    <li class="nav-item">
+                        <a class="nav-link d-flex justify-content-between align-items-center" data-bs-toggle="collapse"
+                            href="#staffPayrollMenu">
+                            <span>
+                                <i class="fas fa-user-tie"></i> Staff & Payroll
+                            </span>
+                            <i class="fas fa-chevron-down"></i>
+                        </a>
+
+                        <div class="collapse" id="staffPayrollMenu">
+                            <ul class="nav flex-column ms-3">
+
+                                <li class="nav-item">
+                                    <a class="nav-link py-2" href="staff.php">
+                                        <i class="fas fa-users"></i> Staff List
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link py-2" href="add_staff.php">
+                                        <i class="fas fa-user-plus"></i> Add Staff
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link py-2" href="designation.php">
+                                        <i class="fas fa-id-badge"></i> Designations
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link py-2" href="attendance_staff.php">
+                                        <i class="fas fa-calendar-check"></i> Staff Attendance
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link py-2" href="payroll.php">
+                                        <i class="fas fa-money-check-alt"></i> Payroll
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link py-2" href="salary_report.php">
+                                        <i class="fas fa-file-invoice-dollar"></i> Salary Reports
+                                    </a>
+                                </li>
+
+                            </ul>
+                        </div>
+                    </li>
                     <a class="nav-link" href="#"><i class="fas fa-chart-pie"></i> Reports</a>
                     <a class="nav-link" href="#"><i class="fas fa-cog"></i> Settings</a>
                 </nav>
