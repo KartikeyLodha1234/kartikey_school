@@ -195,8 +195,8 @@
                             </ul>
                         </div>
                     </li>
-                    <a class="nav-link" href="#"><i class="fas fa-chart-pie"></i> Reports</a>
-                    <a class="nav-link" href="#"><i class="fas fa-cog"></i> Settings</a>
+                    <a class="nav-link" href="reports.php"><i class="fas fa-chart-pie"></i> Reports</a>
+                    <a class="nav-link" href="settings.php"><i class="fas fa-cog"></i> Settings</a>
                 </nav>
                 <hr class="border-secondary opacity-25 my-4">
                 <div class="px-3 small text-secondary">
