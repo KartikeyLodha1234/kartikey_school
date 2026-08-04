@@ -8,14 +8,12 @@ include 'includes/header.php';
             <div class="text-secondary small">Manage student admissions, applications, and enrollments</div>
         </div>
     </div>
-
     <div class="card border-0 rounded-4 shadow-sm mb-4">
         <div class="card-body">
             <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
                 <h5 class="mb-0">Add New Admission</h5>
                 <span class="text-secondary small">Create a new admission record for a student</span>
             </div>
-
             <form class="row g-3">
                 <h6 class="fw-bold mb-3"><i class="fas fa-user text-primary me-2"></i>Personal Information</h6>
                 <div class="col-md-4">

@@ -13,8 +13,6 @@ include 'includes/header.php';
             </button>
         </div>
     </div>
-
-    <!-- Stats Cards -->
     <div class="row g-3 mb-4">
         <div class="col-xl-3 col-md-6">
             <div class="stat-card" style="border-left: 4px solid #2563eb;">
@@ -65,15 +63,12 @@ include 'includes/header.php';
             </div>
         </div>
     </div>
-
-    <!-- Generate Payroll Form -->
     <div class="card border-0 rounded-4 shadow-sm mb-4">
         <div class="card-body">
             <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
                 <h5 class="mb-0"><i class="fas fa-calculator text-primary me-2"></i>Generate Payroll</h5>
                 <span class="text-secondary small">Select month and generate payroll</span>
             </div>
-            
             <form class="row g-3">
                 <div class="col-md-3">
                     <label class="form-label fw-semibold">Month <span class="text-danger">*</span></label>
@@ -126,8 +121,6 @@ include 'includes/header.php';
             </form>
         </div>
     </div>
-
-    <!-- Payroll Table -->
     <div class="card border-0 rounded-4 shadow-sm">
         <div class="card-body p-0">
             <div class="table-responsive">
@@ -323,7 +316,6 @@ include 'includes/header.php';
                 </table>
             </div>
         </div>
-        <!-- Pagination -->
         <div class="card-footer bg-transparent border-top-0 p-3">
             <div class="d-flex justify-content-between align-items-center">
                 <div class="text-secondary small">Showing 1-6 of 48 staff members</div>

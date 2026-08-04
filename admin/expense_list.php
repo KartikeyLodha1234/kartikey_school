@@ -13,8 +13,6 @@ include 'includes/header.php';
             </button>
         </div>
     </div>
-
-    <!-- Stats Cards -->
     <div class="row g-3 mb-4">
         <div class="col-xl-3 col-md-6">
             <div class="stat-card" style="border-left: 4px solid #2563eb;">
@@ -65,8 +63,6 @@ include 'includes/header.php';
             </div>
         </div>
     </div>
-
-    <!-- Search & Filter -->
     <div class="card border-0 rounded-4 shadow-sm mb-4">
         <div class="card-body">
             <div class="row g-3 align-items-center">
@@ -109,8 +105,6 @@ include 'includes/header.php';
             </div>
         </div>
     </div>
-
-    <!-- Expense Table -->
     <div class="card border-0 rounded-4 shadow-sm">
         <div class="card-body p-0">
             <div class="table-responsive">
@@ -282,7 +276,6 @@ include 'includes/header.php';
                 </table>
             </div>
         </div>
-        <!-- Pagination -->
         <div class="card-footer bg-transparent border-top-0 p-3">
             <div class="d-flex justify-content-between align-items-center">
                 <div class="text-secondary small">Showing 1-7 of 24 expenses</div>

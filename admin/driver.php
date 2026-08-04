@@ -65,8 +65,6 @@ include 'includes/header.php';
             </form>
         </div>
     </div>
-
-    <!-- Driver Table -->
     <div class="card border-0 rounded-4 shadow-sm">
         <div class="card-body p-0">
             <div class="table-responsive">
@@ -173,7 +171,6 @@ include 'includes/header.php';
                 </table>
             </div>
         </div>
-        <!-- Pagination -->
         <div class="card-footer bg-transparent border-top-0 p-3">
             <div class="d-flex justify-content-between align-items-center">
                 <div class="text-secondary small">Showing 1-5 of 12 drivers</div>

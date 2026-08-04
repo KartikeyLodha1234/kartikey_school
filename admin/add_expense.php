@@ -13,8 +13,6 @@ include 'includes/header.php';
             </button>
         </div>
     </div>
-
-    <!-- Add Expense Form -->
     <div class="card border-0 rounded-4 shadow-sm mb-4">
         <div class="card-body">
             <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
@@ -96,8 +94,6 @@ include 'includes/header.php';
             </form>
         </div>
     </div>
-
-    <!-- Stats Cards -->
     <div class="row g-3 mb-4">
         <div class="col-xl-3 col-md-6">
             <div class="stat-card" style="border-left: 4px solid #2563eb;">
@@ -148,8 +144,6 @@ include 'includes/header.php';
             </div>
         </div>
     </div>
-
-    <!-- Expense List Table -->
     <div class="card border-0 rounded-4 shadow-sm">
         <div class="card-header bg-transparent border-bottom-0 p-3">
             <div class="d-flex justify-content-between align-items-center">

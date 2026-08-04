@@ -8,7 +8,6 @@ include 'includes/header.php';
             <div class="text-secondary small">Manage student marks and grades.</div>
         </div>
     </div>
-
     <div class="card border-0 rounded-4 shadow-sm mb-4">
         <div class="card-body">
             <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
@@ -69,7 +68,6 @@ include 'includes/header.php';
             </form>
         </div>
     </div>
-
     <div class="row g-3 mb-4">
         <div class="col-xl-3 col-md-6">
             <div class="stat-card">
@@ -108,7 +106,6 @@ include 'includes/header.php';
             </div>
         </div>
     </div>
-
     <div class="card border-0 rounded-4 shadow-sm">
         <div class="card-body p-0">
             <div class="table-responsive">

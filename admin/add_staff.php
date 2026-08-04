@@ -72,7 +72,6 @@ include 'includes/header.php';
                     <label class="form-label fw-semibold">Phone <span class="text-danger">*</span></label>
                     <input type="tel" class="form-control" placeholder="+91 98765 43210" required>
                 </div>
-
                 <div class="col-md-12">
                     <label class="form-label fw-semibold">Address</label>
                     <textarea class="form-control" rows="2" placeholder="Full address"></textarea>

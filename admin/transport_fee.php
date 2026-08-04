@@ -8,7 +8,6 @@ include 'includes/header.php';
             <div class="text-secondary small">Manage transport charges by route and distance.</div>
         </div>
     </div>
-
     <div class="card border-0 rounded-4 shadow-sm mb-4">
         <div class="card-body">
             <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
