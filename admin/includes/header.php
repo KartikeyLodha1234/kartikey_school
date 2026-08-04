@@ -42,9 +42,8 @@
                                 <a class="nav-link py-2" href="subject.php">
                                     <i class="fas fa-book-open"></i> Subjects
                                 </a>
-
-                                <a class="nav-link py-2" href="department.php">
-                                    <i class="fas fa-building"></i> Departments
+                                <a class="nav-link py-2" href="fees.php">
+                                    <i class="fas fa-money-bill-wave"></i> Fees
                                 </a>
 
                                 <a class="nav-link py-2" href="designation.php">
