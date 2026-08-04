@@ -7,11 +7,6 @@ include 'includes/header.php';
             <h3 class="mb-1"><i class="fas fa-bus text-primary me-2"></i>Vehicle</h3>
             <div class="text-secondary small">Manage school vehicles.</div>
         </div>
-        <div class="d-flex gap-2">
-            <button class="btn btn-primary rounded-pill px-3">
-                <i class="fas fa-plus me-2"></i>Add Vehicle
-            </button>
-        </div>
     </div>
     <div class="card border-0 rounded-4 shadow-sm mb-4">
         <div class="card-body">
