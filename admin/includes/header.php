@@ -236,13 +236,37 @@
                 </nav>
                 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
                 <script>
-                    document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+                    const sidebarLinks = document.querySelectorAll('.sidebar .nav-link');
+                    const currentPage = window.location.pathname.split('/').pop();
+
+                    function setActiveSidebar(link) {
+                        sidebarLinks.forEach(item => item.classList.remove('active'));
+                        link.classList.add('active');
+                    }
+
+                    sidebarLinks.forEach(link => {
+                        const href = link.getAttribute('href');
+                        const isCollapseToggle = link.getAttribute('data-bs-toggle') === 'collapse';
+
+                        if (!href || href === '#') {
+                            if (isCollapseToggle) {
+                                link.addEventListener('click', function(e) {
+                                    e.preventDefault();
+                                });
+                            }
+                            return;
+                        }
+
+                        if (href === currentPage) {
+                            setActiveSidebar(link);
+                        }
+
                         link.addEventListener('click', function(e) {
-                            if (this.getAttribute('href') === '#') e.preventDefault();
-                            document.querySelectorAll('.sidebar .nav-link').forEach(l => l.classList
-                                .remove(
-                                    'active'));
-                            this.classList.add('active');
+                            if (href === '#') {
+                                e.preventDefault();
+                                return;
+                            }
+                            setActiveSidebar(this);
                         });
                     });
                 </script>
