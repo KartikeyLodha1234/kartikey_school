@@ -3,7 +3,39 @@ include 'includes/config.php';
 include 'includes/auth_check.php'; 
 checkRole(['admin']);
 
+$error = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $class_name = trim($_POST['class_name'] ?? '');
+    $section = trim($_POST['section'] ?? '');
+    $student_capacity = trim($_POST['student_capacity'] ?? '');
+    $status = trim($_POST['status'] ?? '');
+
+    if ($class_name === '' || $section === '' || $student_capacity === '' || $status === '') {
+        $error = 'Please fill all fields.';
+    } elseif (!ctype_digit($student_capacity) || (int)$student_capacity < 1) {
+        $error = 'Student capacity must be a positive integer.';
+    } else {
+        try {
+            $stmt = $conn->prepare("INSERT INTO sections (class_name, section, student_capacity, status) VALUES (?, ?, ?, ?)");
+            $stmt->execute([$class_name, $section, (int)$student_capacity, $status]);
+            header("Location: section.php");
+            exit();
+        } catch (Exception $e) {
+            $error = 'Database error: ' . $e->getMessage();
+        }
+    }
+}
+
 include 'includes/header.php';
+
+// Load existing sections
+try {
+    $stmt = $conn->query("SELECT * FROM sections ORDER BY id DESC");
+    $sections = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (Exception $e) {
+    $sections = [];
+    if ($error === '') $error = 'Failed to load sections.';
+}
 ?>
 <div class="main-content">
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
@@ -18,6 +50,9 @@ include 'includes/header.php';
                 <h5 class="mb-0">Add New Class</h5>
                 <span class="text-secondary small">Create a new academic class record</span>
             </div>
+            <?php if (!empty($error)): ?>
+                <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
+            <?php endif; ?>
             <form class="row g-3" method="post">
                 <div class="col-md-4">
                     <label class="form-label">Class Name</label>
@@ -63,58 +98,31 @@ include 'includes/header.php';
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>Grade 1</td>
-                            <td>A</td>
-                            <td>38</td>
-                            <td><span class="status-badge bg-success-subtle text-success">Active</span></td>
-                            <td>
-                                <div class="d-flex gap-2">
-                                    <a href="#" class="text-primary text-decoration-none">View</a>
-                                    <a href="#" class="text-primary text-decoration-none">Edit</a>
-                                    <a href="#" class="text-primary text-decoration-none">Delete</a>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Grade 3</td>
-                            <td>B</td>
-                            <td>41</td>
-                            <td><span class="status-badge bg-warning-subtle text-warning">Pending</span></td>
-                            <td>
-                                <div class="d-flex gap-2">
-                                    <a href="#" class="text-primary text-decoration-none">View</a>
-                                    <a href="#" class="text-primary text-decoration-none">Edit</a>
-                                    <a href="#" class="text-primary text-decoration-none">Delete</a>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Grade 6</td>
-                            <td>C</td>
-                            <td>36</td>
-                            <td><span class="status-badge bg-success-subtle text-success">Active</span></td>
-                            <td>
-                                <div class="d-flex gap-2">
-                                    <a href="#" class="text-primary text-decoration-none">View</a>
-                                    <a href="#" class="text-primary text-decoration-none">Edit</a>
-                                    <a href="#" class="text-primary text-decoration-none">Delete</a>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Grade 9</td>
-                            <td>D</td>
-                            <td>44</td>
-                            <td><span class="status-badge bg-success-subtle text-success">Active</span></td>
-                            <td>
-                                <div class="d-flex gap-2">
-                                    <a href="#" class="text-primary text-decoration-none">View</a>
-                                    <a href="#" class="text-primary text-decoration-none">Edit</a>
-                                    <a href="#" class="text-primary text-decoration-none">Delete</a>
-                                </div>
-                            </td>
-                        </tr>
+<?php if (!empty($sections)): ?>
+    <?php foreach ($sections as $row): ?>
+        <tr>
+            <td><?php echo htmlspecialchars($row['class_name']); ?></td>
+            <td><?php echo htmlspecialchars($row['section']); ?></td>
+            <td><?php echo htmlspecialchars($row['student_capacity']); ?></td>
+            <td>
+                <span class="status-badge <?php echo ($row['status'] === 'Active') ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary'; ?>">
+                    <?php echo htmlspecialchars($row['status']); ?>
+                </span>
+            </td>
+            <td>
+                <div class="d-flex gap-2">
+                    <a href="view_section.php?id=<?php echo urlencode($row['id']); ?>" class="text-primary text-decoration-none">View</a>
+                    <a href="edit_section.php?id=<?php echo urlencode($row['id']); ?>" class="text-primary text-decoration-none">Edit</a>
+                    <a href="delete_section.php?id=<?php echo urlencode($row['id']); ?>" class="text-primary text-decoration-none" onclick="return confirm('Delete this section?')">Delete</a>
+                </div>
+            </td>
+        </tr>
+    <?php endforeach; ?>
+<?php else: ?>
+    <tr>
+        <td colspan="5" class="text-center">No sections found.</td>
+    </tr>
+<?php endif; ?>
                     </tbody>
                 </table>
             </div>
