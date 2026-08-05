@@ -1,12 +1,8 @@
 <?php
-// ====== START OUTPUT BUFFERING ======
 ob_start();
-
 include '../config/config.php';
 include 'includes/auth_check.php'; 
 checkRole(['admin']);
-
-// ====== HANDLE ADD SUBJECT MARKS ======
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_subject_marks'])) {
     $class_id = intval($_POST['class_id'] ?? 0);
     $subject_id = intval($_POST['subject_id'] ?? 0);
@@ -16,26 +12,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_subject_marks']))
     $practical_marks = trim($_POST['practical_marks'] ?? '');
     $exam_type = trim($_POST['exam_type'] ?? '');
     $status = trim($_POST['status'] ?? 'Active');
-
     if ($class_id === 0 || $subject_id === 0 || $total_marks === '' || $passing_marks === '') {
         $error = 'Please fill in all required fields.';
     } else {
         try {
-            // Get class name
             $stmt = $conn->prepare("SELECT class_name FROM classes WHERE id = ?");
             $stmt->execute([$class_id]);
             $class = $stmt->fetch(PDO::FETCH_ASSOC);
             $class_name = $class ? $class['class_name'] : '';
-
-            // Get subject name
             $stmt = $conn->prepare("SELECT subject_name FROM subjects WHERE id = ?");
             $stmt->execute([$subject_id]);
             $subject = $stmt->fetch(PDO::FETCH_ASSOC);
             $subject_name = $subject ? $subject['subject_name'] : '';
-
             $stmt = $conn->prepare("INSERT INTO subject_marks_config (class_id, class_name, subject_id, subject_name, total_marks, passing_marks, theory_marks, practical_marks, exam_type, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$class_id, $class_name, $subject_id, $subject_name, $total_marks, $passing_marks, $theory_marks, $practical_marks, $exam_type, $status]);
-            
+            $stmt->execute([$class_id, $class_name, $subject_id, $subject_name, $total_marks, $passing_marks, $theory_marks, $practical_marks, $exam_type, $status]); 
             $_SESSION['success'] = 'Subject marks configuration added successfully!';
             ob_end_clean();
             header('Location: marks.php');
@@ -45,8 +35,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_subject_marks']))
         }
     }
 }
-
-// ====== HANDLE EDIT SUBJECT MARKS ======
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_subject_marks'])) {
     $id = intval($_POST['id'] ?? 0);
     $class_id = intval($_POST['class_id'] ?? 0);
@@ -57,26 +45,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_subject_marks'])
     $practical_marks = trim($_POST['practical_marks'] ?? '');
     $exam_type = trim($_POST['exam_type'] ?? '');
     $status = trim($_POST['status'] ?? 'Active');
-
     if ($id === 0 || $class_id === 0 || $subject_id === 0 || $total_marks === '' || $passing_marks === '') {
         $error = 'Please fill in all required fields.';
     } else {
         try {
-            // Get class name
             $stmt = $conn->prepare("SELECT class_name FROM classes WHERE id = ?");
             $stmt->execute([$class_id]);
             $class = $stmt->fetch(PDO::FETCH_ASSOC);
             $class_name = $class ? $class['class_name'] : '';
-
-            // Get subject name
             $stmt = $conn->prepare("SELECT subject_name FROM subjects WHERE id = ?");
             $stmt->execute([$subject_id]);
             $subject = $stmt->fetch(PDO::FETCH_ASSOC);
             $subject_name = $subject ? $subject['subject_name'] : '';
-
             $stmt = $conn->prepare("UPDATE subject_marks_config SET class_id = ?, class_name = ?, subject_id = ?, subject_name = ?, total_marks = ?, passing_marks = ?, theory_marks = ?, practical_marks = ?, exam_type = ?, status = ? WHERE id = ?");
-            $stmt->execute([$class_id, $class_name, $subject_id, $subject_name, $total_marks, $passing_marks, $theory_marks, $practical_marks, $exam_type, $status, $id]);
-            
+            $stmt->execute([$class_id, $class_name, $subject_id, $subject_name, $total_marks, $passing_marks, $theory_marks, $practical_marks, $exam_type, $status, $id]);            
             $_SESSION['success'] = 'Subject marks configuration updated successfully!';
             ob_end_clean();
             header('Location: marks.php');
@@ -86,8 +68,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_subject_marks'])
         }
     }
 }
-
-// ====== HANDLE DELETE SUBJECT MARKS ======
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_subject_marks'])) {
     $id = intval($_POST['id'] ?? 0);
     if ($id > 0) {
@@ -103,24 +83,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_subject_marks'
         }
     }
 }
-
-// ====== FETCH ALL CLASSES FOR DROPDOWN ======
 try {
     $stmt = $conn->query("SELECT id, class_name FROM classes WHERE status = 'Active' ORDER BY class_name");
     $classes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (Exception $e) {
     $classes = [];
 }
-
-// ====== FETCH ALL SUBJECTS FOR DROPDOWN ======
 try {
     $stmt = $conn->query("SELECT id, subject_name FROM subjects WHERE status = 'Active' ORDER BY subject_name");
     $subjects = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (Exception $e) {
     $subjects = [];
 }
-
-// ====== FETCH ALL CONFIGURATIONS ======
 try {
     $stmt = $conn->query("SELECT * FROM subject_marks_config ORDER BY id DESC");
     $configs = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -128,8 +102,6 @@ try {
     $configs = [];
     $error = 'Failed to load configurations: ' . $e->getMessage();
 }
-
-// ====== FETCH SINGLE CONFIG FOR EDIT ======
 $edit_config = null;
 if (isset($_GET['edit_id'])) {
     $edit_id = intval($_GET['edit_id']);
@@ -141,15 +113,11 @@ if (isset($_GET['edit_id'])) {
         $error = 'Failed to load configuration details.';
     }
 }
-
-// ====== CALCULATE STATISTICS ======
 $total_configs = count($configs);
 $active_configs = count(array_filter($configs, fn($c) => $c['status'] == 'Active'));
 
 include 'includes/header.php';
 ?>
-
-<!-- ====== PAGE CONTENT ====== -->
 <div class="main-content">
     <!-- Page Header -->
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
@@ -158,8 +126,6 @@ include 'includes/header.php';
             <div class="text-secondary small">Configure marks for each subject per class and exam type.</div>
         </div>
     </div>
-
-    <!-- ====== STATISTICS CARDS ====== -->
     <div class="row g-3 mb-4">
         <div class="col-md-3">
             <div class="card border-0 rounded-4 shadow-sm">
@@ -226,8 +192,6 @@ include 'includes/header.php';
             </div>
         </div>
     </div>
-
-    <!-- ====== SUCCESS/ERROR MESSAGES ====== -->
     <?php if (isset($_SESSION['success'])): ?>
         <div class="alert alert-success alert-dismissible fade show rounded-4" role="alert">
             <i class="fas fa-check-circle me-2"></i><?= htmlspecialchars($_SESSION['success']) ?>
@@ -242,8 +206,6 @@ include 'includes/header.php';
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     <?php endif; ?>
-
-    <!-- ====== ADD / EDIT CONFIGURATION FORM ====== -->
     <div class="card border-0 rounded-4 shadow-sm mb-4">
         <div class="card-body">
             <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
@@ -253,8 +215,7 @@ include 'includes/header.php';
             <form class="row g-3" method="post">
                 <?php if ($edit_config): ?>
                     <input type="hidden" name="id" value="<?= $edit_config['id'] ?>">
-                <?php endif; ?>
-                
+                <?php endif; ?>                
                 <div class="col-md-4">
                     <label class="form-label required">Class</label>
                     <select class="form-select" name="class_id" required>
@@ -266,8 +227,7 @@ include 'includes/header.php';
                             </option>
                         <?php endforeach; ?>
                     </select>
-                </div>
-                
+                </div>                
                 <div class="col-md-4">
                     <label class="form-label required">Subject</label>
                     <select class="form-select" name="subject_id" required>
@@ -279,8 +239,7 @@ include 'includes/header.php';
                             </option>
                         <?php endforeach; ?>
                     </select>
-                </div>
-                
+                </div>                
                 <div class="col-md-4">
                     <label class="form-label required">Exam Type</label>
                     <select class="form-select" name="exam_type" required>
@@ -292,55 +251,48 @@ include 'includes/header.php';
                         <option value="Pre Board Exam" <?= $edit_config && $edit_config['exam_type'] == 'Pre Board Exam' ? 'selected' : '' ?>>Pre Board Exam</option>
                         <option value="Annual Exam" <?= $edit_config && $edit_config['exam_type'] == 'Annual Exam' ? 'selected' : '' ?>>Annual Exam</option>
                     </select>
-                </div>
-                
+                </div>                
                 <div class="col-md-3">
                     <label class="form-label required">Total Marks</label>
                     <input type="number" class="form-control" name="total_marks" 
                            placeholder="100" min="1" 
                            value="<?= $edit_config ? $edit_config['total_marks'] : '' ?>" required>
                     <small class="text-secondary">Maximum marks for this subject</small>
-                </div>
-                
+                </div>                
                 <div class="col-md-3">
                     <label class="form-label required">Passing Marks</label>
                     <input type="number" class="form-control" name="passing_marks" 
                            placeholder="35" min="0" 
                            value="<?= $edit_config ? $edit_config['passing_marks'] : '' ?>" required>
                     <small class="text-secondary">Minimum marks to pass</small>
-                </div>
-                
+                </div>                
                 <div class="col-md-3">
                     <label class="form-label">Theory Marks</label>
                     <input type="number" class="form-control" name="theory_marks" 
                            placeholder="70" min="0" 
                            value="<?= $edit_config ? $edit_config['theory_marks'] : '' ?>">
                     <small class="text-secondary">Theory portion marks</small>
-                </div>
-                
+                </div>                
                 <div class="col-md-3">
                     <label class="form-label">Practical Marks</label>
                     <input type="number" class="form-control" name="practical_marks" 
                            placeholder="30" min="0" 
                            value="<?= $edit_config ? $edit_config['practical_marks'] : '' ?>">
                     <small class="text-secondary">Practical portion marks</small>
-                </div>
-                
+                </div>                
                 <div class="col-md-6">
                     <label class="form-label">Status</label>
                     <select class="form-select" name="status">
                         <option value="Active" <?= $edit_config && $edit_config['status'] == 'Active' ? 'selected' : '' ?>>Active</option>
                         <option value="Inactive" <?= $edit_config && $edit_config['status'] == 'Inactive' ? 'selected' : '' ?>>Inactive</option>
                     </select>
-                </div>
-                
+                </div>                
                 <div class="col-md-6 d-flex align-items-end">
                     <div class="alert alert-info rounded-4 w-100 mb-0">
                         <i class="fas fa-info-circle me-2"></i>
                         <small>Theory + Practical should equal Total Marks</small>
                     </div>
                 </div>
-                
                 <div class="col-12 d-flex justify-content-end gap-2">
                     <?php if ($edit_config): ?>
                         <a href="marks.php" class="btn btn-outline-secondary rounded-pill px-3">Cancel</a>
@@ -357,8 +309,6 @@ include 'includes/header.php';
             </form>
         </div>
     </div>
-
-    <!-- ====== CONFIGURATIONS TABLE ====== -->
     <div class="card border-0 rounded-4 shadow-sm">
         <div class="card-body p-0">
             <div class="table-responsive">
@@ -436,7 +386,6 @@ include 'includes/header.php';
         <?php endif; ?>
     </div>
 </div>
-
 <?php 
 include 'includes/footer.php';
 ob_end_flush();
