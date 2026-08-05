@@ -6,14 +6,11 @@ checkRole(['admin']);
 $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $class_id = trim($_POST['class_id'] ?? '');
-    $class_name = trim($_POST['class_name'] ?? '');
-    $section_input = trim($_POST['section'] ?? '');
-    $student_capacity = trim($_POST['student_capacity'] ?? '');
-    $status = trim($_POST['status'] ?? '');
+    $section_input = trim($_POST['section_name'] ?? '');
 
     // section table has columns: class_id, section_name, room_no
-    if ($class_name === '' && $class_id === '') {
-        $error = 'Please select a class or enter class name.';
+    if ($class_id === '') {
+        $error = 'Please select a class.';
     } elseif ($section_input === '') {
         $error = 'Please provide a section name.';
     } else {
@@ -118,8 +115,8 @@ include 'includes/header.php';
                             <?php foreach ($sections as $row): ?>
                                 <tr>
                                     <td><?php echo htmlspecialchars($row['id'] ?? ''); ?></td>
-                                    <td><?php echo htmlspecialchars($row['class_name'] ?? ($row['class'] ?? '')); ?></td>
-                                    <td><?php echo htmlspecialchars($row['section'] ?? ''); ?></td>
+                                    <td><?php echo htmlspecialchars($row['class_name'] ?? ''); ?></td>
+                                    <td><?php echo htmlspecialchars($row['section_name'] ?? ''); ?></td>
                                     <td><?php echo htmlspecialchars($row['student_capacity'] ?? ''); ?></td>
                                     <td>
                                         <span class="status-badge <?php echo (isset($row['status']) && $row['status'] === 'Active') ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary'; ?>">
