@@ -90,11 +90,8 @@ include 'includes/header.php';
                     <thead class="table-light">
                         <tr>
                             <th>#</th>
+                            <th>Subject Code</th>
                             <th>Subject Name</th>
-                            <th>Code</th>
-                            <th>Teacher</th>
-                            <th>Students</th>
-                            <th>Pass %</th>
                             <th>Status</th>
                             <th>Action</th>
                         </tr>
@@ -102,11 +99,8 @@ include 'includes/header.php';
                     <tbody>
                         <tr>
                             <td>1</td>
-                            <td><strong>Mathematics</strong></td>
                             <td><span class="badge bg-light text-dark">MATH-101</span></td>
-                            <td>Mr. Rajesh Kumar</td>
-                            <td>38</td>
-                            <td>92%</td>
+                            <td><strong>Mathematics</strong></td>
                             <td><span class="status-badge bg-success-subtle text-success">Active</span></td>
                             <td>
                                 <div class="d-flex gap-2">
@@ -118,11 +112,8 @@ include 'includes/header.php';
                         </tr>
                         <tr>
                             <td>2</td>
-                            <td><strong>Physics</strong></td>
                             <td><span class="badge bg-light text-dark">PHY-201</span></td>
-                            <td>Mrs. Priya Sharma</td>
-                            <td>36</td>
-                            <td>88%</td>
+                            <td><strong>Physics</strong></td>
                             <td><span class="status-badge bg-success-subtle text-success">Active</span></td>
                             <td>
                                 <div class="d-flex gap-2">
@@ -134,11 +125,8 @@ include 'includes/header.php';
                         </tr>
                         <tr>
                             <td>3</td>
-                            <td><strong>Chemistry</strong></td>
                             <td><span class="badge bg-light text-dark">CHEM-301</span></td>
-                            <td>Mr. Amit Singh</td>
-                            <td>35</td>
-                            <td>85%</td>
+                            <td><strong>Chemistry</strong></td>
                             <td><span class="status-badge bg-warning-subtle text-warning">Pending</span></td>
                             <td>
                                 <div class="d-flex gap-2">
@@ -150,11 +138,8 @@ include 'includes/header.php';
                         </tr>
                         <tr>
                             <td>4</td>
-                            <td><strong>Biology</strong></td>
                             <td><span class="badge bg-light text-dark">BIO-401</span></td>
-                            <td>Ms. Neha Patel</td>
-                            <td>40</td>
-                            <td>90%</td>
+                            <td><strong>Biology</strong></td>
                             <td><span class="status-badge bg-success-subtle text-success">Active</span></td>
                             <td>
                                 <div class="d-flex gap-2">
@@ -166,11 +151,8 @@ include 'includes/header.php';
                         </tr>
                         <tr>
                             <td>5</td>
-                            <td><strong>English</strong></td>
                             <td><span class="badge bg-light text-dark">ENG-501</span></td>
-                            <td>Mrs. Sangeeta Verma</td>
-                            <td>42</td>
-                            <td>94%</td>
+                            <td><strong>English</strong></td>
                             <td><span class="status-badge bg-success-subtle text-success">Active</span></td>
                             <td>
                                 <div class="d-flex gap-2">
