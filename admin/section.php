@@ -69,8 +69,8 @@ include 'includes/header.php';
             <?php endif; ?>
             <form class="row g-3" method="post">
                  <div class="col-md-4">
-                    <label class="form-label">Select Class (optional)</label>
-                    <select id="class_select" class="form-select" name="class_id">
+                    <label class="form-label">Select Class</label>
+                    <select id="class_select" class="form-select" name="class_id" required>
                         <option value="">-- Select class --</option>
                         <?php foreach ($classes as $c): ?>
                             <option value="<?php echo htmlspecialchars($c['id']); ?>" data-capacity="<?php echo htmlspecialchars($c['student_capacity']); ?>"><?php echo htmlspecialchars($c['class_name']); ?></option>
@@ -78,20 +78,12 @@ include 'includes/header.php';
                     </select>
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label">Class Name</label>
-                    <input id="class_name_input" type="text" class="form-control" name="class_name" placeholder="Grade 10" required>
+                    <label class="form-label">Section Name</label>
+                    <input id="section_name_input" type="text" class="form-control" name="section_name" placeholder="Section A" required>
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label">Section</label>
-                    <select class="form-select" name="section">
-                        <option value="A" selected>A</option>
-                        <option value="B">B</option>
-                        <option value="C">C</option>
-                    </select>
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">Student Capacity</label>
-                    <input id="student_capacity_input" type="number" class="form-control" name="student_capacity" placeholder="40" min="1" required>
+                    <label class="form-label">Class Capacity</label>
+                    <input id="student_capacity_input" type="number" class="form-control" name="student_capacity" placeholder="40" min="1" readonly>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">Status</label>
