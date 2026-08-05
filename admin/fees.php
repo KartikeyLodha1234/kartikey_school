@@ -211,13 +211,13 @@ $total_amount = array_sum(array_column($fees, 'amount'));
                         <option value="">Select Class</option>
                         <?php foreach ($classes as $class): ?>
                             <option value="<?= $class['id'] ?>" 
-                                <?= $edit_fee && $edit_fee['class_id'] == $class['id'] ? 'selected' : '' ?>>
+                                <?= $edit_fee && isset($edit_fee['class_id']) && $edit_fee['class_id'] == $class['id'] ? 'selected' : '' ?>>
                                 <?= htmlspecialchars($class['class_name']) ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
                     <?php if (count($classes) == 0): ?>
-                        <small class="text-danger">No active classes found. Please add a class first.</small>
+                        <small class="text-danger">No active classes found. Please <a href="classes.php">add a class</a> first.</small>
                     <?php endif; ?>
                 </div>
                 
