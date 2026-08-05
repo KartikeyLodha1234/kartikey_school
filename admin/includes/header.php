@@ -73,6 +73,11 @@
                                 <a class="nav-link py-2" href="student_fees.php">
                                     <i class="fas fa-wallet"></i> Student Fees
                                 </a>
+                                <li class="nav-item">
+                <a class="nav-link py-1" href="report_card.php">
+                    <i class="fas fa-file-alt me-2"></i> Report Card
+                </a>
+            </li>
                             </nav>
                         </div>
                     </li>
