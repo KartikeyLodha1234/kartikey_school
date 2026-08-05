@@ -1,4 +1,26 @@
 <?php
+include '../config/config.php';
+include 'includes/auth_check.php';
+checkRole(['admin']);
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_subject'])) {
+    $subject_id = trim($_POST['subject_id'] ?? '');
+    $subject_code = trim($_POST['subject_code'] ?? '');
+    $subject_name = trim($_POST['subject_name'] ?? '');
+    $status = trim($_POST['status'] ?? 'Active');
+
+    if (empty($subject_name)) {
+        $_SESSION['error'] = 'Please provide a subject name.';
+    } else {
+        try {
+            $stmt = $conn->prepare("INSERT INTO subjects (subject_id, subject_code, subject_name, status) VALUES (?, ?, ?, ?)");
+            $stmt->execute([$subject_id, $subject_code, $subject_name, $status]);
+            header('Location: subject.php');
+            exit();
+        } catch (PDOException $e) {
+            $_SESSION['error'] = 'Error: ' . $e->getMessage();
+        }
+    }
+}
 include 'includes/header.php';
 ?>
 <div class="main-content">
@@ -36,7 +58,7 @@ include 'includes/header.php';
                 </div>
                 <div class="col-12 d-flex justify-content-end gap-2">
                     <button type="reset" class="btn btn-outline-secondary rounded-pill px-3">Reset</button>
-                    <button type="submit" class="btn btn-primary rounded-pill px-3">Save Class</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-3">Save Subject</button>
                 </div>
             </form>
         </div>

@@ -66,7 +66,6 @@ $classes = $conn->query("SELECT * FROM classes ORDER BY id ASC")->fetchAll();
 $total_classes = count($classes);
 $active_classes = $conn->query("SELECT COUNT(*) as total FROM classes WHERE status = 'Active'")->fetch()['total'] ?? 0;
 $total_capacity = $conn->query("SELECT SUM(student_capacity) as total FROM classes")->fetch()['total'] ?? 0;
-
 include 'includes/header.php';
 ?>
 
