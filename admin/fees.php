@@ -98,7 +98,7 @@ $total_amount = array_sum(array_column($fees, 'amount'));
     <!-- Page Header -->
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
         <div>
-            <h3 class="mb-1"><i class="fas fa-money-bill-wave text-primary me-2"></i>Fees</h3>
+            <h3 class="mb-1">Fees</h3>
             <div class="text-secondary small">Manage academic fees and their details.</div>
         </div>
     </div>
