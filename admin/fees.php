@@ -6,17 +6,23 @@ include 'includes/header.php';
 
 // ====== HANDLE ADD FEE ======
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_fee'])) {
-    $fee_name = trim($_POST['fee_name'] ?? '');
+    $class_id = intval($_POST['class_id'] ?? 0);
     $fee_type = trim($_POST['fee_type'] ?? '');
     $amount = trim($_POST['amount'] ?? '');
     $status = trim($_POST['status'] ?? 'Active');
 
-    if ($fee_name === '' || $amount === '') {
-        $error = 'Please fill in all required fields.';
+    if ($class_id === 0 || $amount === '') {
+        $error = 'Please select a class and enter amount.';
     } else {
         try {
-            $stmt = $conn->prepare("INSERT INTO fees (fee_name, fee_type, amount, status) VALUES (?, ?, ?, ?)");
-            $stmt->execute([$fee_name, $fee_type, $amount, $status]);
+            // Get class name from classes table
+            $stmt = $conn->prepare("SELECT class_name FROM classes WHERE id = ?");
+            $stmt->execute([$class_id]);
+            $class = $stmt->fetch(PDO::FETCH_ASSOC);
+            $fee_name = $class ? $class['class_name'] : '';
+
+            $stmt = $conn->prepare("INSERT INTO fees (fee_name, class_id, fee_type, amount, status) VALUES (?, ?, ?, ?, ?)");
+            $stmt->execute([$fee_name, $class_id, $fee_type, $amount, $status]);
             $_SESSION['success'] = 'Fee added successfully!';
             header('Location: fees.php');
             exit();
@@ -29,17 +35,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_fee'])) {
 // ====== HANDLE EDIT FEE ======
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_fee'])) {
     $id = intval($_POST['id'] ?? 0);
-    $fee_name = trim($_POST['fee_name'] ?? '');
+    $class_id = intval($_POST['class_id'] ?? 0);
     $fee_type = trim($_POST['fee_type'] ?? '');
     $amount = trim($_POST['amount'] ?? '');
     $status = trim($_POST['status'] ?? 'Active');
 
-    if ($id === 0 || $fee_name === '' || $amount === '') {
-        $error = 'Please fill in all required fields.';
+    if ($id === 0 || $class_id === 0 || $amount === '') {
+        $error = 'Please select a class and enter amount.';
     } else {
         try {
-            $stmt = $conn->prepare("UPDATE fees SET fee_name = ?, fee_type = ?, amount = ?, status = ? WHERE id = ?");
-            $stmt->execute([$fee_name, $fee_type, $amount, $status, $id]);
+            // Get class name from classes table
+            $stmt = $conn->prepare("SELECT class_name FROM classes WHERE id = ?");
+            $stmt->execute([$class_id]);
+            $class = $stmt->fetch(PDO::FETCH_ASSOC);
+            $fee_name = $class ? $class['class_name'] : '';
+
+            $stmt = $conn->prepare("UPDATE fees SET fee_name = ?, class_id = ?, fee_type = ?, amount = ?, status = ? WHERE id = ?");
+            $stmt->execute([$fee_name, $class_id, $fee_type, $amount, $status, $id]);
             $_SESSION['success'] = 'Fee updated successfully!';
             header('Location: fees.php');
             exit();
@@ -63,6 +75,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_fee'])) {
             $error = 'Database error: ' . $e->getMessage();
         }
     }
+}
+
+// ====== FETCH ALL CLASSES FOR DROPDOWN ======
+try {
+    $stmt = $conn->query("SELECT id, class_name FROM classes WHERE status = 'Active' ORDER BY class_name");
+    $classes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (Exception $e) {
+    $classes = [];
+    $error = 'Failed to load classes: ' . $e->getMessage();
 }
 
 // ====== FETCH ALL FEES ======
@@ -98,7 +119,7 @@ $total_amount = array_sum(array_column($fees, 'amount'));
     <!-- Page Header -->
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
         <div>
-            <h3 class="mb-1">Fees</h3>
+            <h3 class="mb-1"><i class="fas fa-money-bill-wave text-primary me-2"></i>Fees</h3>
             <div class="text-secondary small">Manage academic fees and their details.</div>
         </div>
     </div>
@@ -183,12 +204,21 @@ $total_amount = array_sum(array_column($fees, 'amount'));
                     <input type="hidden" name="id" value="<?= $edit_fee['id'] ?>">
                 <?php endif; ?>
                 
-                <!-- CHANGED: Fee Name to Class Name -->
+                <!-- Class Name Dropdown from Database -->
                 <div class="col-md-6">
                     <label class="form-label required">Class Name</label>
-                    <input type="text" class="form-control" name="fee_name" 
-                           placeholder="e.g., Grade 1, Class 10A" 
-                           value="<?= $edit_fee ? htmlspecialchars($edit_fee['fee_name']) : '' ?>" required>
+                    <select class="form-select" name="class_id" required>
+                        <option value="">Select Class</option>
+                        <?php foreach ($classes as $class): ?>
+                            <option value="<?= $class['id'] ?>" 
+                                <?= $edit_fee && $edit_fee['class_id'] == $class['id'] ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($class['class_name']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <?php if (count($classes) == 0): ?>
+                        <small class="text-danger">No active classes found. Please add a class first.</small>
+                    <?php endif; ?>
                 </div>
                 
                 <div class="col-md-6">
@@ -243,7 +273,6 @@ $total_amount = array_sum(array_column($fees, 'amount'));
                     <thead class="table-light">
                         <tr>
                             <th>#</th>
-                            <!-- CHANGED: Fee Name to Class Name -->
                             <th>Class Name</th>
                             <th>Fee Type</th>
                             <th>Amount (₹)</th>
@@ -256,7 +285,6 @@ $total_amount = array_sum(array_column($fees, 'amount'));
                             <?php $i = 1; foreach ($fees as $fee): ?>
                                 <tr>
                                     <td><?= $i++ ?></td>
-                                    <!-- CHANGED: Shows Class Name -->
                                     <td><strong><?= htmlspecialchars($fee['fee_name']) ?></strong></td>
                                     <td>
                                         <?php if ($fee['fee_type']): ?>

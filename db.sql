@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 05, 2026 at 07:18 AM
+-- Generation Time: Aug 05, 2026 at 10:12 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -40,18 +40,7 @@ CREATE TABLE `classes` (
 --
 
 INSERT INTO `classes` (`id`, `class_name`, `student_capacity`, `status`, `created_at`) VALUES
-(1, 'Grade 1', 30, 'Active', '2026-08-04 14:05:21'),
-(2, 'Grade 2', 35, 'Active', '2026-08-04 14:05:21'),
-(3, 'Grade 3', 32, 'Active', '2026-08-04 14:05:21'),
-(4, 'Grade 4', 30, 'Active', '2026-08-04 14:05:21'),
-(5, 'Grade 5', 35, 'Active', '2026-08-04 14:05:21'),
-(6, 'Grade 6', 40, 'Active', '2026-08-04 14:05:21'),
-(7, 'Grade 7', 40, 'Active', '2026-08-04 14:05:21'),
-(8, 'Grade 8', 42, 'Active', '2026-08-04 14:05:21'),
-(9, 'Grade 9', 45, 'Active', '2026-08-04 14:05:21'),
-(10, 'Grade 10', 45, 'Active', '2026-08-04 14:05:21'),
-(11, 'Grade 11', 50, 'Inactive', '2026-08-04 14:05:21'),
-(12, 'Grade 12', 50, 'Inactive', '2026-08-04 14:05:21');
+(13, 'class1', 12, 'Active', '2026-08-05 05:23:28');
 
 -- --------------------------------------------------------
 
@@ -107,6 +96,24 @@ CREATE TABLE `fees` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `report_cards`
+--
+
+CREATE TABLE `report_cards` (
+  `id` int(11) NOT NULL,
+  `student_id` int(11) NOT NULL,
+  `class_id` int(11) NOT NULL,
+  `subject_id` int(11) NOT NULL,
+  `exam_type` enum('Unit Test','Monthly Test','Quarterly Exam','Half Yearly Exam','Pre Board Exam','Annual Exam') NOT NULL DEFAULT 'Unit Test',
+  `marks` int(11) NOT NULL DEFAULT 0,
+  `total_marks` int(11) NOT NULL DEFAULT 100,
+  `remarks` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `routes`
 --
 
@@ -134,6 +141,13 @@ CREATE TABLE `sections` (
   `section_name` varchar(20) NOT NULL,
   `room_no` varchar(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `sections`
+--
+
+INSERT INTO `sections` (`id`, `class_id`, `section_name`, `room_no`) VALUES
+(1, 13, 'a', '1');
 
 -- --------------------------------------------------------
 
@@ -316,6 +330,12 @@ ALTER TABLE `fees`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `report_cards`
+--
+ALTER TABLE `report_cards`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `routes`
 --
 ALTER TABLE `routes`
@@ -398,7 +418,7 @@ ALTER TABLE `vehicles`
 -- AUTO_INCREMENT for table `classes`
 --
 ALTER TABLE `classes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `drivers`
@@ -419,6 +439,12 @@ ALTER TABLE `fees`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `report_cards`
+--
+ALTER TABLE `report_cards`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `routes`
 --
 ALTER TABLE `routes`
@@ -428,7 +454,7 @@ ALTER TABLE `routes`
 -- AUTO_INCREMENT for table `sections`
 --
 ALTER TABLE `sections`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `staff`
