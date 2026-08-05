@@ -135,7 +135,6 @@ include 'includes/header.php';
             </form>
         </div>
     </div>
-    </div>
     <div class="card border-0 rounded-4 shadow-sm">
         <div class="card-header bg-transparent border-bottom-0 p-3">
             <div class="d-flex justify-content-between align-items-center">
