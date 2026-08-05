@@ -211,7 +211,6 @@ CREATE TABLE `subjects` (
   `subject_name` varchar(100) NOT NULL,
   `subject_code` varchar(20) DEFAULT NULL,
   `class_id` int(11) DEFAULT NULL,
-  `teacher_id` int(11) DEFAULT NULL,
   `status` enum('Active','Inactive') DEFAULT 'Active'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
