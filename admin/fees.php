@@ -1,16 +1,14 @@
 <?php
+ob_start();
 include '../config/config.php';
 include 'includes/auth_check.php'; 
 checkRole(['admin']);
 include 'includes/header.php';
-
-// ====== HANDLE ADD FEE ======
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_fee'])) {
     $class_id = intval($_POST['class_id'] ?? 0);
     $fee_type = trim($_POST['fee_type'] ?? '');
     $amount = trim($_POST['amount'] ?? '');
     $status = trim($_POST['status'] ?? 'Active');
-
     if ($class_id === 0 || $amount === '') {
         $error = 'Please select a class and enter amount.';
     } else {
@@ -24,6 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_fee'])) {
             $stmt = $conn->prepare("INSERT INTO fees (fee_name, class_id, fee_type, amount, status) VALUES (?, ?, ?, ?, ?)");
             $stmt->execute([$fee_name, $class_id, $fee_type, $amount, $status]);
             $_SESSION['success'] = 'Fee added successfully!';
+            ob_end_clean();
             header('Location: fees.php');
             exit();
         } catch (Exception $e) {
@@ -31,28 +30,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_fee'])) {
         }
     }
 }
-
-// ====== HANDLE EDIT FEE ======
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_fee'])) {
     $id = intval($_POST['id'] ?? 0);
     $class_id = intval($_POST['class_id'] ?? 0);
     $fee_type = trim($_POST['fee_type'] ?? '');
     $amount = trim($_POST['amount'] ?? '');
     $status = trim($_POST['status'] ?? 'Active');
-
     if ($id === 0 || $class_id === 0 || $amount === '') {
         $error = 'Please select a class and enter amount.';
     } else {
         try {
-            // Get class name from classes table
             $stmt = $conn->prepare("SELECT class_name FROM classes WHERE id = ?");
             $stmt->execute([$class_id]);
             $class = $stmt->fetch(PDO::FETCH_ASSOC);
             $fee_name = $class ? $class['class_name'] : '';
-
             $stmt = $conn->prepare("UPDATE fees SET fee_name = ?, class_id = ?, fee_type = ?, amount = ?, status = ? WHERE id = ?");
             $stmt->execute([$fee_name, $class_id, $fee_type, $amount, $status, $id]);
             $_SESSION['success'] = 'Fee updated successfully!';
+            ob_end_clean();
             header('Location: fees.php');
             exit();
         } catch (Exception $e) {
@@ -60,8 +55,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_fee'])) {
         }
     }
 }
-
-// ====== HANDLE DELETE FEE ======
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_fee'])) {
     $id = intval($_POST['id'] ?? 0);
     if ($id > 0) {
@@ -69,6 +62,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_fee'])) {
             $stmt = $conn->prepare("DELETE FROM fees WHERE id = ?");
             $stmt->execute([$id]);
             $_SESSION['success'] = 'Fee deleted successfully!';
+            
+            // ====== CLEAN OUTPUT BUFFER BEFORE REDIRECT ======
+            ob_end_clean();
             header('Location: fees.php');
             exit();
         } catch (Exception $e) {
@@ -76,8 +72,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_fee'])) {
         }
     }
 }
-
-// ====== FETCH ALL CLASSES FOR DROPDOWN ======
 try {
     $stmt = $conn->query("SELECT id, class_name FROM classes WHERE status = 'Active' ORDER BY class_name");
     $classes = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -85,8 +79,6 @@ try {
     $classes = [];
     $error = 'Failed to load classes: ' . $e->getMessage();
 }
-
-// ====== FETCH ALL FEES ======
 try {
     $stmt = $conn->query("SELECT * FROM fees ORDER BY id DESC");
     $fees = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -94,8 +86,6 @@ try {
     $fees = [];
     $error = 'Failed to load fees: ' . $e->getMessage();
 }
-
-// ====== FETCH SINGLE FEE FOR EDIT ======
 $edit_fee = null;
 if (isset($_GET['edit_id'])) {
     $edit_id = intval($_GET['edit_id']);
@@ -107,24 +97,17 @@ if (isset($_GET['edit_id'])) {
         $error = 'Failed to load fee details.';
     }
 }
-
-// ====== CALCULATE STATISTICS ======
 $total_fees = count($fees);
 $active_fees = count(array_filter($fees, fn($f) => $f['status'] == 'Active'));
 $total_amount = array_sum(array_column($fees, 'amount'));
 ?>
-
-<!-- ====== PAGE CONTENT ====== -->
 <div class="main-content">
-    <!-- Page Header -->
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
         <div>
             <h3 class="mb-1"><i class="fas fa-money-bill-wave text-primary me-2"></i>Fees</h3>
             <div class="text-secondary small">Manage academic fees and their details.</div>
         </div>
     </div>
-
-    <!-- ====== STATISTICS CARDS ====== -->
     <div class="row g-3 mb-4">
         <div class="col-md-4">
             <div class="card border-0 rounded-4 shadow-sm">
@@ -175,8 +158,6 @@ $total_amount = array_sum(array_column($fees, 'amount'));
             </div>
         </div>
     </div>
-
-    <!-- ====== SUCCESS/ERROR MESSAGES ====== -->
     <?php if (isset($_SESSION['success'])): ?>
         <div class="alert alert-success alert-dismissible fade show rounded-4" role="alert">
             <i class="fas fa-check-circle me-2"></i><?= htmlspecialchars($_SESSION['success']) ?>
@@ -191,8 +172,6 @@ $total_amount = array_sum(array_column($fees, 'amount'));
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     <?php endif; ?>
-
-    <!-- ====== ADD / EDIT FEE FORM ====== -->
     <div class="card border-0 rounded-4 shadow-sm mb-4">
         <div class="card-body">
             <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
@@ -264,8 +243,6 @@ $total_amount = array_sum(array_column($fees, 'amount'));
             </form>
         </div>
     </div>
-
-    <!-- ====== FEES TABLE ====== -->
     <div class="card border-0 rounded-4 shadow-sm">
         <div class="card-body p-0">
             <div class="table-responsive">
@@ -337,5 +314,7 @@ $total_amount = array_sum(array_column($fees, 'amount'));
         <?php endif; ?>
     </div>
 </div>
-
-<?php include 'includes/footer.php'; ?>
+<?php 
+include 'includes/footer.php';
+ob_end_flush();
+?>
