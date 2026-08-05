@@ -19,13 +19,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         try {
             if (isset($_POST['add_subject'])) {
-                            $stmt = $conn->prepare("INSERT INTO subjects (subject_code, subject_name, class_id, status) VALUES (?, ?, ?, ?)");
-                            $stmt->execute([$subject_code, $subject_name, $class_id, $status]);
-                            $_SESSION['success'] = 'Subject added successfully!';
-                        } elseif (isset($_POST['edit_subject'])) {
-                            $id = (int)($_POST['edit_id'] ?? 0);
-                            $stmt = $conn->prepare("UPDATE subjects SET subject_code = ?, subject_name = ?, class_id = ?, status = ? WHERE id = ?");
-                            $stmt->execute([$subject_code, $subject_name, $class_id, $status, $id]);
+                $stmt = $conn->prepare("INSERT INTO subjects (subject_code, subject_name, class_id, status) VALUES (?, ?, ?, ?)");
+                $stmt->execute([$subject_code, $subject_name, $class_id, $status]);
+                $_SESSION['success'] = 'Subject added successfully!';
+            } elseif (isset($_POST['edit_subject'])) {
+                $id = (int)($_POST['edit_id'] ?? 0);
+                $stmt = $conn->prepare("UPDATE subjects SET subject_code = ?, subject_name = ?, class_id = ?, status = ? WHERE id = ?");
+                $stmt->execute([$subject_code, $subject_name, $class_id, $status, $id]);
+                $_SESSION['success'] = 'Subject updated successfully!';
+            }
+
+            header('Location: subject.php');
+            exit();
+        } catch (PDOException $e) {
+            $_SESSION['error'] = 'Error: ' . $e->getMessage();
+        }
+    }
+}
+
+if (isset($_GET['delete'])) {
+    $id = (int)$_GET['delete'];
     try {
         $stmt = $conn->prepare('DELETE FROM subjects WHERE id = ?');
         $stmt->execute([$id]);
@@ -178,7 +191,6 @@ include 'includes/header.php';
                             <th>Code</th>
                             <th>Subject</th>
                             <th>Class</th>
-                            <th>Teacher</th>
                             <th>Status</th>
                             <th>Action</th>
                         </tr>
