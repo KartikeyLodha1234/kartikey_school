@@ -198,7 +198,7 @@ include 'includes/header.php';
                     <tbody>
                         <?php if (empty($subjects)): ?>
                         <tr>
-                            <td colspan="7" class="text-center text-secondary">No subjects found.</td>
+                            <td colspan="6" class="text-center text-secondary">No subjects found.</td>
                         </tr>
                         <?php else: ?>
                         <?php foreach ($subjects as $index => $subject): ?>
