@@ -22,6 +22,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_fee'])) {
         }
     }
 }
+if  ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_fee'])) {
+    $fee_id = trim($_POST['fee_id'] ?? '');
+    $fee_name = trim($_POST['fee_name'] ?? '');
+    $fee_amount = trim($_POST['fee_amount'] ?? '');
+    $status = trim($_POST['status'] ?? '');
+
+    if ($fee_id === '' || $fee_name === '' || $fee_amount === '') {
+        $error = 'Please fill in all required fields.';
+    } else {
+        try {
+            $stmt = $conn->prepare("UPDATE fees SET fee_name = ?, fee_amount = ?, status = ? WHERE fee_id = ?");
+            $stmt->execute([$fee_name, $fee_amount, $status, $fee_id]);
+            header('Location: fees.php');
+            exit();
+        } catch (Exception $e) {
+            $error = 'Database error: ' . $e->getMessage();
+        }
+    }
+}
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_fee'])) {
+    $fee_id = trim($_POST['fee_id'] ?? '');
+    if ($fee_id !== '') {
+        try {
+            $stmt = $conn->prepare("DELETE FROM fees WHERE fee_id = ?");
+            $stmt->execute([$fee_id]);
+            header('Location: fees.php');
+            exit();
+        } catch (Exception $e) {
+            $error = 'Database error: ' . $e->getMessage();
+        }
+    }
+    try {
+    $stmt = $conn->query("SELECT * FROM fees ORDER BY fee_id DESC");
+    $fees = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (Exception $e) {
+    $fees = [];
+    if ($error === '') $error = 'Failed to load fees.';
+}
+}
+   
 ?>
 <div class="main-content">
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
