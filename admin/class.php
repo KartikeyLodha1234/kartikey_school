@@ -76,7 +76,7 @@ include 'includes/header.php';
 <div class="main-content">
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
         <div>
-            <h3 class="mb-1"><i class="fas fa-school text-primary me-2"></i>Classes</h3>
+            <h3 class="mb-1">Classes</h3>
             <div class="text-secondary small">Manage academic classes with student capacity.</div>
         </div>
     </div>

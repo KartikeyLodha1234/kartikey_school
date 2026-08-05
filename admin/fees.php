@@ -101,30 +101,9 @@ $total_amount = array_sum(array_column($fees, 'amount'));
             <h3 class="mb-1"><i class="fas fa-money-bill-wave text-primary me-2"></i>Fees</h3>
             <div class="text-secondary small">Manage academic fees and their details.</div>
         </div>
-        <div>
-            <a href="#addFeeModal" class="btn btn-primary rounded-pill" data-bs-toggle="modal">
-                <i class="fas fa-plus me-2"></i>Add New Fee
-            </a>
-        </div>
     </div>
 
-    <!-- ====== SUCCESS/ERROR MESSAGES ====== -->
-    <?php if (isset($_SESSION['success'])): ?>
-        <div class="alert alert-success alert-dismissible fade show rounded-4" role="alert">
-            <i class="fas fa-check-circle me-2"></i><?= htmlspecialchars($_SESSION['success']) ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-        <?php unset($_SESSION['success']); ?>
-    <?php endif; ?>
-
-    <?php if (isset($error)): ?>
-        <div class="alert alert-danger alert-dismissible fade show rounded-4" role="alert">
-            <i class="fas fa-exclamation-circle me-2"></i><?= htmlspecialchars($error) ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    <?php endif; ?>
-
-    <!-- ====== STATISTICS CARDS (Like Class Management) ====== -->
+    <!-- ====== STATISTICS CARDS ====== -->
     <div class="row g-3 mb-4">
         <div class="col-md-4">
             <div class="card border-0 rounded-4 shadow-sm">
@@ -176,114 +155,85 @@ $total_amount = array_sum(array_column($fees, 'amount'));
         </div>
     </div>
 
-    <!-- ====== ADD FEE MODAL ====== -->
-    <div class="modal fade" id="addFeeModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content rounded-4 border-0 shadow">
-                <div class="modal-header border-0">
-                    <h5 class="modal-title"><i class="fas fa-plus-circle text-primary me-2"></i>Add New Fee</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <form method="post">
-                    <div class="modal-body">
-                        <div class="row g-3">
-                            <div class="col-md-12">
-                                <label class="form-label required">Fee Name</label>
-                                <input type="text" class="form-control" name="fee_name" placeholder="e.g., Tuition Fee" required>
-                            </div>
-                            <div class="col-md-12">
-                                <label class="form-label">Fee Type</label>
-                                <select class="form-select" name="fee_type">
-                                    <option value="">Select Fee Type</option>
-                                    <option value="Tuition">Tuition</option>
-                                    <option value="Exam">Exam</option>
-                                    <option value="Library">Library</option>
-                                    <option value="Sports">Sports</option>
-                                    <option value="Lab">Lab</option>
-                                    <option value="Transport">Transport</option>
-                                    <option value="Hostel">Hostel</option>
-                                    <option value="Other">Other</option>
-                                </select>
-                            </div>
-                            <div class="col-md-12">
-                                <label class="form-label required">Amount (₹)</label>
-                                <input type="number" class="form-control" name="amount" placeholder="1000.00" min="0" step="0.01" required>
-                            </div>
-                            <div class="col-md-12">
-                                <label class="form-label">Status</label>
-                                <select class="form-select" name="status">
-                                    <option value="Active" selected>Active</option>
-                                    <option value="Inactive">Inactive</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer border-0">
-                        <button type="button" class="btn btn-outline-secondary rounded-pill" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" name="add_fee" class="btn btn-primary rounded-pill">
-                            <i class="fas fa-save me-2"></i>Save Fee
-                        </button>
-                    </div>
-                </form>
-            </div>
+    <!-- ====== SUCCESS/ERROR MESSAGES ====== -->
+    <?php if (isset($_SESSION['success'])): ?>
+        <div class="alert alert-success alert-dismissible fade show rounded-4" role="alert">
+            <i class="fas fa-check-circle me-2"></i><?= htmlspecialchars($_SESSION['success']) ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
-    </div>
-
-    <!-- ====== EDIT FEE MODAL ====== -->
-    <?php if ($edit_fee): ?>
-    <div class="modal fade show" id="editFeeModal" tabindex="-1" style="display: block; background: rgba(0,0,0,0.5);">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content rounded-4 border-0 shadow">
-                <div class="modal-header border-0">
-                    <h5 class="modal-title"><i class="fas fa-edit text-warning me-2"></i>Edit Fee</h5>
-                    <button type="button" class="btn-close" onclick="window.location.href='fees.php'"></button>
-                </div>
-                <form method="post">
-                    <div class="modal-body">
-                        <div class="row g-3">
-                            <input type="hidden" name="id" value="<?= $edit_fee['id'] ?>">
-                            <div class="col-md-12">
-                                <label class="form-label required">Fee Name</label>
-                                <input type="text" class="form-control" name="fee_name" value="<?= htmlspecialchars($edit_fee['fee_name']) ?>" required>
-                            </div>
-                            <div class="col-md-12">
-                                <label class="form-label">Fee Type</label>
-                                <select class="form-select" name="fee_type">
-                                    <option value="">Select Fee Type</option>
-                                    <option value="Tuition" <?= $edit_fee['fee_type'] == 'Tuition' ? 'selected' : '' ?>>Tuition</option>
-                                    <option value="Exam" <?= $edit_fee['fee_type'] == 'Exam' ? 'selected' : '' ?>>Exam</option>
-                                    <option value="Library" <?= $edit_fee['fee_type'] == 'Library' ? 'selected' : '' ?>>Library</option>
-                                    <option value="Sports" <?= $edit_fee['fee_type'] == 'Sports' ? 'selected' : '' ?>>Sports</option>
-                                    <option value="Lab" <?= $edit_fee['fee_type'] == 'Lab' ? 'selected' : '' ?>>Lab</option>
-                                    <option value="Transport" <?= $edit_fee['fee_type'] == 'Transport' ? 'selected' : '' ?>>Transport</option>
-                                    <option value="Hostel" <?= $edit_fee['fee_type'] == 'Hostel' ? 'selected' : '' ?>>Hostel</option>
-                                    <option value="Other" <?= $edit_fee['fee_type'] == 'Other' ? 'selected' : '' ?>>Other</option>
-                                </select>
-                            </div>
-                            <div class="col-md-12">
-                                <label class="form-label required">Amount (₹)</label>
-                                <input type="number" class="form-control" name="amount" value="<?= $edit_fee['amount'] ?>" min="0" step="0.01" required>
-                            </div>
-                            <div class="col-md-12">
-                                <label class="form-label">Status</label>
-                                <select class="form-select" name="status">
-                                    <option value="Active" <?= $edit_fee['status'] == 'Active' ? 'selected' : '' ?>>Active</option>
-                                    <option value="Inactive" <?= $edit_fee['status'] == 'Inactive' ? 'selected' : '' ?>>Inactive</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer border-0">
-                        <button type="button" class="btn btn-outline-secondary rounded-pill" onclick="window.location.href='fees.php'">Cancel</button>
-                        <button type="submit" name="edit_fee" class="btn btn-warning rounded-pill">
-                            <i class="fas fa-edit me-2"></i>Update Fee
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
+        <?php unset($_SESSION['success']); ?>
     <?php endif; ?>
+
+    <?php if (isset($error)): ?>
+        <div class="alert alert-danger alert-dismissible fade show rounded-4" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i><?= htmlspecialchars($error) ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    <?php endif; ?>
+
+    <!-- ====== ADD / EDIT FEE FORM ====== -->
+    <div class="card border-0 rounded-4 shadow-sm mb-4">
+        <div class="card-body">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+                <h5 class="mb-0"><?= $edit_fee ? 'Edit Fee' : 'Add New Fee' ?></h5>
+                <span class="text-secondary small"><?= $edit_fee ? 'Update fee details' : 'Create a new academic fee record' ?></span>
+            </div>
+            <form class="row g-3" method="post">
+                <?php if ($edit_fee): ?>
+                    <input type="hidden" name="id" value="<?= $edit_fee['id'] ?>">
+                <?php endif; ?>
+                
+                <!-- CHANGED: Fee Name to Class Name -->
+                <div class="col-md-6">
+                    <label class="form-label required">Class Name</label>
+                    <input type="text" class="form-control" name="fee_name" 
+                           placeholder="e.g., Grade 1, Class 10A" 
+                           value="<?= $edit_fee ? htmlspecialchars($edit_fee['fee_name']) : '' ?>" required>
+                </div>
+                
+                <div class="col-md-6">
+                    <label class="form-label">Fee Type</label>
+                    <select class="form-select" name="fee_type">
+                        <option value="">Select Fee Type</option>
+                        <option value="Tuition" <?= $edit_fee && $edit_fee['fee_type'] == 'Tuition' ? 'selected' : '' ?>>Tuition</option>
+                        <option value="Exam" <?= $edit_fee && $edit_fee['fee_type'] == 'Exam' ? 'selected' : '' ?>>Exam</option>
+                        <option value="Library" <?= $edit_fee && $edit_fee['fee_type'] == 'Library' ? 'selected' : '' ?>>Library</option>
+                        <option value="Sports" <?= $edit_fee && $edit_fee['fee_type'] == 'Sports' ? 'selected' : '' ?>>Sports</option>
+                        <option value="Lab" <?= $edit_fee && $edit_fee['fee_type'] == 'Lab' ? 'selected' : '' ?>>Lab</option>
+                        <option value="Transport" <?= $edit_fee && $edit_fee['fee_type'] == 'Transport' ? 'selected' : '' ?>>Transport</option>
+                        <option value="Hostel" <?= $edit_fee && $edit_fee['fee_type'] == 'Hostel' ? 'selected' : '' ?>>Hostel</option>
+                        <option value="Other" <?= $edit_fee && $edit_fee['fee_type'] == 'Other' ? 'selected' : '' ?>>Other</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label required">Amount (₹)</label>
+                    <input type="number" class="form-control" name="amount" 
+                           placeholder="1000.00" min="0" step="0.01"
+                           value="<?= $edit_fee ? $edit_fee['amount'] : '' ?>" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Status</label>
+                    <select class="form-select" name="status">
+                        <option value="Active" <?= $edit_fee && $edit_fee['status'] == 'Active' ? 'selected' : '' ?>>Active</option>
+                        <option value="Inactive" <?= $edit_fee && $edit_fee['status'] == 'Inactive' ? 'selected' : '' ?>>Inactive</option>
+                    </select>
+                </div>
+                <div class="col-12 d-flex justify-content-end gap-2">
+                    <?php if ($edit_fee): ?>
+                        <a href="fees.php" class="btn btn-outline-secondary rounded-pill px-3">Cancel</a>
+                        <button type="submit" name="edit_fee" class="btn btn-warning rounded-pill px-3">
+                            <i class="fas fa-edit me-1"></i>Update Fee
+                        </button>
+                    <?php else: ?>
+                        <button type="reset" class="btn btn-outline-secondary rounded-pill px-3">Reset</button>
+                        <button type="submit" name="add_fee" class="btn btn-primary rounded-pill px-3">
+                            <i class="fas fa-save me-1"></i>Save Fee
+                        </button>
+                    <?php endif; ?>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <!-- ====== FEES TABLE ====== -->
     <div class="card border-0 rounded-4 shadow-sm">
@@ -293,7 +243,8 @@ $total_amount = array_sum(array_column($fees, 'amount'));
                     <thead class="table-light">
                         <tr>
                             <th>#</th>
-                            <th>Fee Name</th>
+                            <!-- CHANGED: Fee Name to Class Name -->
+                            <th>Class Name</th>
                             <th>Fee Type</th>
                             <th>Amount (₹)</th>
                             <th>Status</th>
@@ -305,12 +256,13 @@ $total_amount = array_sum(array_column($fees, 'amount'));
                             <?php $i = 1; foreach ($fees as $fee): ?>
                                 <tr>
                                     <td><?= $i++ ?></td>
+                                    <!-- CHANGED: Shows Class Name -->
                                     <td><strong><?= htmlspecialchars($fee['fee_name']) ?></strong></td>
                                     <td>
                                         <?php if ($fee['fee_type']): ?>
                                             <span class="badge bg-info text-dark"><?= htmlspecialchars($fee['fee_type']) ?></span>
                                         <?php else: ?>
-                                            <span class="text-secondary small">Not specified</span>
+                                            <span class="text-secondary small">—</span>
                                         <?php endif; ?>
                                     </td>
                                     <td>₹ <?= number_format($fee['amount'], 2) ?></td>
@@ -340,7 +292,7 @@ $total_amount = array_sum(array_column($fees, 'amount'));
                             <tr>
                                 <td colspan="6" class="text-center py-4 text-secondary">
                                     <i class="fas fa-inbox fa-3x d-block mb-2 text-muted"></i>
-                                    No fees found. Click "Add New Fee" to create one.
+                                    No fees found. Fill the form above to add one.
                                 </td>
                             </tr>
                         <?php endif; ?>
@@ -350,21 +302,8 @@ $total_amount = array_sum(array_column($fees, 'amount'));
         </div>
         <?php if (count($fees) > 0): ?>
             <div class="card-footer bg-transparent border-top-0 p-3">
-                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                    <div class="text-secondary small">
-                        <i class="fas fa-list me-1"></i>Total: <?= count($fees) ?> fees
-                    </div>
-                    <div class="d-flex gap-3">
-                        <span class="badge bg-success-subtle text-success">
-                            <i class="fas fa-check-circle me-1"></i>Active: <?= $active_fees ?>
-                        </span>
-                        <span class="badge bg-danger-subtle text-danger">
-                            <i class="fas fa-times-circle me-1"></i>Inactive: <?= $total_fees - $active_fees ?>
-                        </span>
-                        <span class="badge bg-warning-subtle text-warning">
-                            <i class="fas fa-rupee-sign me-1"></i>Total: ₹<?= number_format($total_amount, 0) ?>
-                        </span>
-                    </div>
+                <div class="text-secondary small">
+                    <i class="fas fa-list me-1"></i>Total: <?= count($fees) ?> fees
                 </div>
             </div>
         <?php endif; ?>
