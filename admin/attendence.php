@@ -1,47 +1,32 @@
 <?php
-// ====== START OUTPUT BUFFERING ======
 ob_start();
-
 include '../config/config.php';
 include 'includes/auth_check.php'; 
 checkRole(['admin']);
-
-// ====== HANDLE MARK ATTENDANCE ======
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_attendance'])) {
     $class_id = intval($_POST['class_id'] ?? 0);
     $date = trim($_POST['attendance_date'] ?? '');
     $status = $_POST['status'] ?? [];
     $student_ids = $_POST['student_ids'] ?? [];
-
     if ($class_id === 0 || $date === '' || empty($student_ids)) {
         $error = 'Please select a class and date.';
     } else {
         try {
-            // Get class name
             $stmt = $conn->prepare("SELECT class_name FROM classes WHERE id = ?");
             $stmt->execute([$class_id]);
             $class = $stmt->fetch(PDO::FETCH_ASSOC);
             $class_name = $class ? $class['class_name'] : '';
-
-            // Delete existing attendance for this class and date
             $stmt = $conn->prepare("DELETE FROM attendance WHERE class_id = ? AND attendance_date = ?");
             $stmt->execute([$class_id, $date]);
-
-            // Insert new attendance records
             $stmt = $conn->prepare("INSERT INTO attendance (class_id, class_name, student_id, student_name, attendance_date, status, marked_by) VALUES (?, ?, ?, ?, ?, ?, ?)");
-            
             foreach ($student_ids as $student_id) {
                 $attendance_status = $status[$student_id] ?? 'Present';
-                
-                // Get student name
-                $stmt2 = $conn->prepare("SELECT first_name, last_name FROM students WHERE id = ?");
+                $stmt2 = $conn->prepare("SELECT name FROM students WHERE id = ?");
                 $stmt2->execute([$student_id]);
                 $student = $stmt2->fetch(PDO::FETCH_ASSOC);
-                $student_name = $student ? $student['first_name'] . ' ' . $student['last_name'] : '';
-                
+                $student_name = $student ? $student['name'] : '';                
                 $stmt->execute([$class_id, $class_name, $student_id, $student_name, $date, $attendance_status, $_SESSION['user_id'] ?? 1]);
-            }
-            
+            }            
             $_SESSION['success'] = 'Attendance marked successfully for ' . date('d M Y', strtotime($date));
             ob_end_clean();
             header('Location: student_attendance.php');
@@ -51,31 +36,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_attendance'])) {
         }
     }
 }
-
-// ====== FETCH ALL CLASSES FOR DROPDOWN ======
 try {
     $stmt = $conn->query("SELECT id, class_name FROM classes WHERE status = 'Active' ORDER BY class_name");
     $classes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (Exception $e) {
     $classes = [];
 }
-
-// ====== FETCH STUDENTS FOR SELECTED CLASS ======
 $students = [];
 $selected_class_id = intval($_GET['class_id'] ?? 0);
 $selected_date = $_GET['attendance_date'] ?? date('Y-m-d');
-
 if ($selected_class_id > 0) {
     try {
-        $stmt = $conn->prepare("SELECT id, first_name, last_name, roll_no FROM students WHERE class_id = ? AND status = 'Active' ORDER BY roll_no");
+        $stmt = $conn->prepare("SELECT id, name FROM students WHERE class_id = ? AND status = 'Active' ORDER BY name");
         $stmt->execute([$selected_class_id]);
         $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch (Exception $e) {
         $students = [];
+        $error = 'Failed to load students: ' . $e->getMessage();
     }
 }
-
-// ====== FETCH EXISTING ATTENDANCE FOR EDIT ======
 $attendance_data = [];
 if ($selected_class_id > 0 && $selected_date) {
     try {
@@ -86,27 +65,24 @@ if ($selected_class_id > 0 && $selected_date) {
         $attendance_data = [];
     }
 }
-
-// ====== FETCH TODAY'S ATTENDANCE SUMMARY ======
 $today = date('Y-m-d');
 $today_present = 0;
 $today_absent = 0;
+$today_leave = 0;
 $today_total = 0;
-
 try {
     $stmt = $conn->prepare("SELECT status, COUNT(*) as count FROM attendance WHERE attendance_date = ? GROUP BY status");
     $stmt->execute([$today]);
     $today_stats = $stmt->fetchAll(PDO::FETCH_ASSOC);
     foreach ($today_stats as $stat) {
         if ($stat['status'] == 'Present') $today_present = $stat['count'];
-        if ($stat['status'] == 'Absent') $today_absent = $stat['count'];
+        elseif ($stat['status'] == 'Absent') $today_absent = $stat['count'];
+        elseif ($stat['status'] == 'Leave') $today_leave = $stat['count'];
     }
-    $today_total = $today_present + $today_absent;
+    $today_total = $today_present + $today_absent + $today_leave;
 } catch (Exception $e) {
-    // Ignore
-}
 
-// ====== FETCH MONTHLY ATTENDANCE SUMMARY ======
+}
 $month = date('Y-m');
 $monthly_present = 0;
 $monthly_absent = 0;
@@ -127,17 +103,14 @@ try {
 
 include 'includes/header.php';
 ?>
-
-<!-- ====== PAGE CONTENT ====== -->
 <div class="main-content">
-    <!-- Page Header -->
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
         <div>
             <h3 class="mb-1"><i class="fas fa-clipboard-check text-primary me-2"></i>Student Attendance</h3>
             <div class="text-secondary small">Manage student attendance and track daily presence.</div>
         </div>
         <div class="d-flex gap-2">
-            <a href="attendance_report.php" class="btn btn-outline-primary rounded-pill px-3">
+            <a href="attendence.php" class="btn btn-outline-primary rounded-pill px-3">
                 <i class="fas fa-chart-bar me-2"></i>Reports
             </a>
             <button class="btn btn-outline-success rounded-pill px-3" onclick="window.print()">
@@ -145,8 +118,6 @@ include 'includes/header.php';
             </button>
         </div>
     </div>
-
-    <!-- ====== STATISTICS CARDS ====== -->
     <div class="row g-3 mb-4">
         <div class="col-md-3">
             <div class="card border-0 rounded-4 shadow-sm">
@@ -155,7 +126,7 @@ include 'includes/header.php';
                         <div>
                             <div class="text-secondary small">Today's Total</div>
                             <h3 class="mb-0 fw-bold"><?= $today_total ?></h3>
-                            <div class="text-secondary small">Students present today</div>
+                            <div class="text-secondary small">Total students today</div>
                         </div>
                         <div class="bg-primary bg-opacity-10 rounded-circle p-3">
                             <i class="fas fa-users text-primary fs-4"></i>
@@ -213,8 +184,6 @@ include 'includes/header.php';
             </div>
         </div>
     </div>
-
-    <!-- ====== SUCCESS/ERROR MESSAGES ====== -->
     <?php if (isset($_SESSION['success'])): ?>
         <div class="alert alert-success alert-dismissible fade show rounded-4" role="alert">
             <i class="fas fa-check-circle me-2"></i><?= htmlspecialchars($_SESSION['success']) ?>
@@ -222,22 +191,18 @@ include 'includes/header.php';
         </div>
         <?php unset($_SESSION['success']); ?>
     <?php endif; ?>
-
     <?php if (isset($error)): ?>
         <div class="alert alert-danger alert-dismissible fade show rounded-4" role="alert">
             <i class="fas fa-exclamation-circle me-2"></i><?= htmlspecialchars($error) ?>
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     <?php endif; ?>
-
-    <!-- ====== ATTENDANCE MARKING FORM ====== -->
     <div class="card border-0 rounded-4 shadow-sm mb-4">
         <div class="card-body">
             <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
                 <h5 class="mb-0"><i class="fas fa-clipboard-check text-primary me-2"></i>Mark Attendance</h5>
                 <span class="text-secondary small">Select class and date to mark attendance</span>
-            </div>
-            
+            </div>            
             <form method="get" class="row g-3 mb-4" id="attendanceFilterForm">
                 <div class="col-md-4">
                     <label class="form-label fw-semibold">Select Class <span class="text-danger">*</span></label>
@@ -260,27 +225,27 @@ include 'includes/header.php';
                     </button>
                 </div>
             </form>
-
             <?php if ($selected_class_id > 0 && count($students) > 0): ?>
                 <form method="post" class="row g-3">
                     <input type="hidden" name="class_id" value="<?= $selected_class_id ?>">
-                    <input type="hidden" name="attendance_date" value="<?= $selected_date ?>">
-                    
+                    <input type="hidden" name="attendance_date" value="<?= $selected_date ?>">                    
                     <div class="col-12">
                         <div class="table-responsive">
                             <table class="table table-custom align-middle">
                                 <thead class="table-light">
                                     <tr>
                                         <th>#</th>
-                                        <th>Roll No</th>
                                         <th>Student Name</th>
                                         <th>
-                                            <div class="d-flex gap-3">
+                                            <div class="d-flex gap-2 flex-wrap">
                                                 <button type="button" class="btn btn-sm btn-success" onclick="markAll('Present')">
                                                     <i class="fas fa-check me-1"></i>All Present
                                                 </button>
                                                 <button type="button" class="btn btn-sm btn-danger" onclick="markAll('Absent')">
                                                     <i class="fas fa-times me-1"></i>All Absent
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-warning" onclick="markAll('Leave')">
+                                                    <i class="fas fa-clock me-1"></i>All Leave
                                                 </button>
                                             </div>
                                         </th>
@@ -290,29 +255,27 @@ include 'includes/header.php';
                                     <?php $i = 1; foreach ($students as $student): ?>
                                         <tr>
                                             <td><?= $i++ ?></td>
-                                            <td><strong><?= $student['roll_no'] ?: '—' ?></strong></td>
-                                            <td><?= htmlspecialchars($student['first_name'] . ' ' . $student['last_name']) ?></td>
+                                            <td><strong><?= htmlspecialchars($student['name']) ?></strong></td>
                                             <td>
                                                 <input type="hidden" name="student_ids[]" value="<?= $student['id'] ?>">
                                                 <div class="btn-group" role="group">
                                                     <input type="radio" class="btn-check" name="status[<?= $student['id'] ?>]" 
                                                            id="present_<?= $student['id'] ?>" value="Present" 
                                                            <?= (isset($attendance_data[$student['id']]) && $attendance_data[$student['id']] == 'Present') || !isset($attendance_data[$student['id']]) ? 'checked' : '' ?>>
-                                                    <label class="btn btn-outline-success" for="present_<?= $student['id'] ?>">
+                                                    <label class="btn btn-outline-success btn-sm" for="present_<?= $student['id'] ?>">
                                                         <i class="fas fa-check"></i> Present
                                                     </label>
                                                     
                                                     <input type="radio" class="btn-check" name="status[<?= $student['id'] ?>]" 
                                                            id="absent_<?= $student['id'] ?>" value="Absent"
                                                            <?= isset($attendance_data[$student['id']]) && $attendance_data[$student['id']] == 'Absent' ? 'checked' : '' ?>>
-                                                    <label class="btn btn-outline-danger" for="absent_<?= $student['id'] ?>">
+                                                    <label class="btn btn-outline-danger btn-sm" for="absent_<?= $student['id'] ?>">
                                                         <i class="fas fa-times"></i> Absent
-                                                    </label>
-                                                    
+                                                    </label>                                                    
                                                     <input type="radio" class="btn-check" name="status[<?= $student['id'] ?>]" 
                                                            id="leave_<?= $student['id'] ?>" value="Leave"
                                                            <?= isset($attendance_data[$student['id']]) && $attendance_data[$student['id']] == 'Leave' ? 'checked' : '' ?>>
-                                                    <label class="btn btn-outline-warning" for="leave_<?= $student['id'] ?>">
+                                                    <label class="btn btn-outline-warning btn-sm" for="leave_<?= $student['id'] ?>">
                                                         <i class="fas fa-clock"></i> Leave
                                                     </label>
                                                 </div>
@@ -322,8 +285,7 @@ include 'includes/header.php';
                                 </tbody>
                             </table>
                         </div>
-                    </div>
-                    
+                    </div>                    
                     <div class="col-12 d-flex justify-content-end gap-2">
                         <button type="reset" class="btn btn-outline-secondary rounded-pill px-4">
                             <i class="fas fa-undo me-2"></i>Reset
@@ -341,13 +303,11 @@ include 'includes/header.php';
             <?php endif; ?>
         </div>
     </div>
-
-    <!-- ====== RECENT ATTENDANCE TABLE ====== -->
     <div class="card border-0 rounded-4 shadow-sm">
         <div class="card-header bg-transparent border-bottom-0 p-3">
             <div class="d-flex justify-content-between align-items-center">
                 <h6 class="mb-0 fw-bold"><i class="fas fa-history text-primary me-2"></i>Recent Attendance Records</h6>
-                <span class="text-secondary small">Last 5 days</span>
+                <span class="text-secondary small">Last 10 records</span>
             </div>
         </div>
         <div class="card-body p-0">
@@ -365,9 +325,8 @@ include 'includes/header.php';
                     </thead>
                     <tbody>
                         <?php
-                        // Fetch recent attendance records
                         try {
-                            $stmt = $conn->query("SELECT a.*, u.username as marked_by_name 
+                            $stmt = $conn->query("SELECT a.*, u.name as marked_by_name 
                                                   FROM attendance a 
                                                   LEFT JOIN users u ON a.marked_by = u.id 
                                                   ORDER BY a.attendance_date DESC, a.id DESC 
@@ -377,7 +336,6 @@ include 'includes/header.php';
                             $recent_attendance = [];
                         }
                         ?>
-                        
                         <?php if (count($recent_attendance) > 0): ?>
                             <?php $i = 1; foreach ($recent_attendance as $record): ?>
                                 <tr>
@@ -424,10 +382,7 @@ include 'includes/header.php';
         <?php endif; ?>
     </div>
 </div>
-
-<!-- ====== JAVASCRIPT ====== -->
 <script>
-    // Mark all students as Present or Absent
     function markAll(status) {
         const radios = document.querySelectorAll('input[type="radio"][name^="status["]');
         radios.forEach(radio => {
@@ -437,7 +392,6 @@ include 'includes/header.php';
         });
     }
 </script>
-
 <?php 
 include 'includes/footer.php';
 ob_end_flush();
