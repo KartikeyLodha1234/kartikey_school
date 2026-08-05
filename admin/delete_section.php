@@ -1,6 +1,6 @@
 <?php
 include '../config/config.php';
-include '../includes/auth_check.php';
+include 'includes/auth_check.php';
 checkRole(['admin']);
 
 $id = $_GET['id'] ?? '';

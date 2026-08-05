@@ -2,6 +2,53 @@
 include '../config/config.php';
 include 'includes/auth_check.php'; 
 checkRole(['admin']);
+
+$error = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $class_id = trim($_POST['class_id'] ?? '');
+    $class_name = trim($_POST['class_name'] ?? '');
+    $section_input = trim($_POST['section'] ?? '');
+    $student_capacity = trim($_POST['student_capacity'] ?? '');
+    $status = trim($_POST['status'] ?? '');
+
+    // section table has columns: class_id, section_name, room_no
+    if ($class_name === '' && $class_id === '') {
+        $error = 'Please select a class or enter class name.';
+    } elseif ($section_input === '') {
+        $error = 'Please provide a section name.';
+    } else {
+        try {
+            // Insert into sections using actual columns: class_id, section_name, room_no
+            $insertClassId = ($class_id !== '') ? $class_id : null;
+            $room_no = ''; // optional, not in form currently
+            $stmt = $conn->prepare("INSERT INTO sections (class_id, section_name, room_no) VALUES (?, ?, ?)");
+            $stmt->execute([$insertClassId, $section_input, $room_no]);
+
+            header('Location: section.php');
+            exit();
+        } catch (Exception $e) {
+            $error = 'Database error: ' . $e->getMessage();
+        }
+    }
+}
+
+// Load existing sections (join with classes to get class name and capacity)
+try {
+    $stmt = $conn->query("SELECT s.*, c.class_name, c.student_capacity FROM sections s LEFT JOIN classes c ON s.class_id = c.id ORDER BY s.id DESC");
+    $sections = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (Exception $e) {
+    $sections = [];
+    if ($error === '') $error = 'Failed to load sections.';
+}
+
+// Load classes for selection
+try {
+    $classStmt = $conn->query("SELECT id, class_name, student_capacity FROM classes ORDER BY class_name ASC");
+    $classes = $classStmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (Exception $e) {
+    $classes = [];
+}
+
 include 'includes/header.php';
 ?>
 <div class="main-content">
@@ -17,14 +64,22 @@ include 'includes/header.php';
                 <h5 class="mb-0">Add New Section</h5>
                 <span class="text-secondary small">Create a new academic section record</span>
             </div>
+            <?php if (!empty($error)): ?>
+                <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
+            <?php endif; ?>
             <form class="row g-3" method="post">
                  <div class="col-md-4">
-                    <label class="form-label">Class id</label>
-                    <input type="text" class="form-control" name="class_id" placeholder="Class ID" required>
+                    <label class="form-label">Select Class (optional)</label>
+                    <select id="class_select" class="form-select" name="class_id">
+                        <option value="">-- Select class --</option>
+                        <?php foreach ($classes as $c): ?>
+                            <option value="<?php echo htmlspecialchars($c['id']); ?>" data-capacity="<?php echo htmlspecialchars($c['student_capacity']); ?>"><?php echo htmlspecialchars($c['class_name']); ?></option>
+                        <?php endforeach; ?>
+                    </select>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">Class Name</label>
-                    <input type="text" class="form-control" name="class_name" placeholder="Grade 10" required>
+                    <input id="class_name_input" type="text" class="form-control" name="class_name" placeholder="Grade 10" required>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">Section</label>
@@ -36,7 +91,7 @@ include 'includes/header.php';
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">Student Capacity</label>
-                    <input type="number" class="form-control" name="student_capacity" placeholder="40" min="1" required>
+                    <input id="student_capacity_input" type="number" class="form-control" name="student_capacity" placeholder="40" min="1" required>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">Status</label>
@@ -67,62 +122,32 @@ include 'includes/header.php';
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>Grade 1</td>
-                            <td>A</td>
-                            <td>38</td>
-                            <td><span class="status-badge bg-success-subtle text-success">Active</span></td>
-                            <td>
-                                <div class="d-flex gap-2">
-                                    <a href="#" class="text-primary text-decoration-none">View</a>
-                                    <a href="#" class="text-primary text-decoration-none">Edit</a>
-                                    <a href="#" class="text-primary text-decoration-none">Delete</a>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>Grade 3</td>
-                            <td>B</td>
-                            <td>41</td>
-                            <td><span class="status-badge bg-warning-subtle text-warning">Pending</span></td>
-                            <td>
-                                <div class="d-flex gap-2">
-                                    <a href="#" class="text-primary text-decoration-none">View</a>
-                                    <a href="#" class="text-primary text-decoration-none">Edit</a>
-                                    <a href="#" class="text-primary text-decoration-none">Delete</a>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                        <td>3</td>
-                            <td>Grade 6</td>
-                            <td>C</td>
-                            <td>36</td>
-                            <td><span class="status-badge bg-success-subtle text-success">Active</span></td>
-                            <td>
-                                <div class="d-flex gap-2">
-                                    <a href="#" class="text-primary text-decoration-none">View</a>
-                                    <a href="#" class="text-primary text-decoration-none">Edit</a>
-                                    <a href="#" class="text-primary text-decoration-none">Delete</a>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>4</td>
-                            <td>Grade 9</td>
-                            <td>D</td>
-                            <td>44</td>
-                            <td><span class="status-badge bg-success-subtle text-success">Active</span></td>
-                            <td>
-                                <div class="d-flex gap-2">
-                                    <a href="#" class="text-primary text-decoration-none">View</a>
-                                    <a href="#" class="text-primary text-decoration-none">Edit</a>
-                                    <a href="#" class="text-primary text-decoration-none">Delete</a>
-                                </div>
-                            </td>
-                        </tr>
+                        <?php if (!empty($sections)): ?>
+                            <?php foreach ($sections as $row): ?>
+                                <tr>
+                                    <td><?php echo htmlspecialchars($row['id'] ?? ''); ?></td>
+                                    <td><?php echo htmlspecialchars($row['class_name'] ?? ($row['class'] ?? '')); ?></td>
+                                    <td><?php echo htmlspecialchars($row['section'] ?? ''); ?></td>
+                                    <td><?php echo htmlspecialchars($row['student_capacity'] ?? ''); ?></td>
+                                    <td>
+                                        <span class="status-badge <?php echo (isset($row['status']) && $row['status'] === 'Active') ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary'; ?>">
+                                            <?php echo htmlspecialchars($row['status'] ?? ''); ?>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex gap-2">
+                                            <a href="view_section.php?id=<?php echo urlencode($row['id']); ?>" class="text-primary text-decoration-none">View</a>
+                                            <a href="edit_section.php?id=<?php echo urlencode($row['id']); ?>" class="text-primary text-decoration-none">Edit</a>
+                                            <a href="delete_section.php?id=<?php echo urlencode($row['id']); ?>" class="text-primary text-decoration-none" onclick="return confirm('Delete this section?')">Delete</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="6" class="text-center">No sections found.</td>
+                            </tr>
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>
@@ -132,3 +157,24 @@ include 'includes/header.php';
 <?php
 include 'includes/footer.php';
 ?>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+    var classSelect = document.getElementById('class_select');
+    var capacityInput = document.getElementById('student_capacity_input');
+    var classNameInput = document.getElementById('class_name_input');
+    if (!classSelect) return;
+    classSelect.addEventListener('change', function(){
+        var opt = this.options[this.selectedIndex];
+        var cap = opt ? opt.dataset.capacity : '';
+        var name = opt ? opt.text : '';
+        if (this.value) {
+            if (cap !== undefined) capacityInput.value = cap;
+            if (name) classNameInput.value = name;
+        } else {
+            // if user deselects, clear capacity but leave class name
+            capacityInput.value = '';
+        }
+    });
+});
+</script>

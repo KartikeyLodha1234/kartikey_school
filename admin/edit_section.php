@@ -1,5 +1,5 @@
 <?php
-include 'includes/config.php';
+include '../config/config.php';
 include 'includes/auth_check.php';
 checkRole(['admin']);
 
@@ -11,19 +11,16 @@ if (!ctype_digit($id)) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $class_name = trim($_POST['class_name'] ?? '');
-    $section = trim($_POST['section'] ?? '');
-    $student_capacity = trim($_POST['student_capacity'] ?? '');
-    $status = trim($_POST['status'] ?? '');
+    $class_id = trim($_POST['class_id'] ?? '');
+    $section_name = trim($_POST['section_name'] ?? '');
+    $room_no = trim($_POST['room_no'] ?? '');
 
-    if ($class_name === '' || $section === '' || $student_capacity === '' || $status === '') {
-        $error = 'Please fill all fields.';
-    } elseif (!ctype_digit($student_capacity) || (int)$student_capacity < 1) {
-        $error = 'Student capacity must be a positive integer.';
+    if ($section_name === '') {
+        $error = 'Please provide a section name.';
     } else {
         try {
-            $stmt = $conn->prepare('UPDATE sections SET class_name = ?, section = ?, student_capacity = ?, status = ? WHERE id = ?');
-            $stmt->execute([$class_name, $section, (int)$student_capacity, $status, $id]);
+            $stmt = $conn->prepare('UPDATE sections SET class_id = ?, section_name = ?, room_no = ? WHERE id = ?');
+            $stmt->execute([$class_id !== '' ? $class_id : null, $section_name, $room_no, $id]);
             header('Location: section.php');
             exit();
         } catch (Exception $e) {
@@ -32,9 +29,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Load current values
+// Load current values (with class info)
 try {
-    $stmt = $conn->prepare('SELECT * FROM sections WHERE id = ?');
+    $stmt = $conn->prepare('SELECT s.*, c.class_name, c.student_capacity FROM sections s LEFT JOIN classes c ON s.class_id = c.id WHERE s.id = ?');
     $stmt->execute([$id]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
     if (!$row) {
@@ -44,6 +41,14 @@ try {
 } catch (Exception $e) {
     header('Location: section.php');
     exit();
+}
+
+// Load classes for select
+try {
+    $classStmt = $conn->query("SELECT id, class_name, student_capacity FROM classes ORDER BY class_name ASC");
+    $classes = $classStmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (Exception $e) {
+    $classes = [];
 }
 
 include 'includes/header.php';
@@ -58,23 +63,21 @@ include 'includes/header.php';
             <form method="post" class="row g-3">
                 <input type="hidden" name="id" value="<?php echo htmlspecialchars($row['id']); ?>">
                 <div class="col-md-4">
-                    <label class="form-label">Class Name</label>
-                    <input type="text" class="form-control" name="class_name" value="<?php echo htmlspecialchars($row['class_name']); ?>" required>
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">Section</label>
-                    <input type="text" class="form-control" name="section" value="<?php echo htmlspecialchars($row['section']); ?>" required>
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">Student Capacity</label>
-                    <input type="number" class="form-control" name="student_capacity" min="1" value="<?php echo htmlspecialchars($row['student_capacity']); ?>" required>
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">Status</label>
-                    <select class="form-select" name="status">
-                        <option value="Active" <?php echo ($row['status'] === 'Active') ? 'selected' : ''; ?>>Active</option>
-                        <option value="Inactive" <?php echo ($row['status'] === 'Inactive') ? 'selected' : ''; ?>>Inactive</option>
+                    <label class="form-label">Select Class (optional)</label>
+                    <select class="form-select" name="class_id">
+                        <option value="">-- Select class --</option>
+                        <?php foreach ($classes as $c): ?>
+                            <option value="<?php echo htmlspecialchars($c['id']); ?>" data-capacity="<?php echo htmlspecialchars($c['student_capacity']); ?>" <?php echo ($row['class_id'] == $c['id']) ? 'selected' : ''; ?>><?php echo htmlspecialchars($c['class_name']); ?></option>
+                        <?php endforeach; ?>
                     </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Section Name</label>
+                    <input type="text" class="form-control" name="section_name" value="<?php echo htmlspecialchars($row['section_name']); ?>" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Room No (optional)</label>
+                    <input type="text" class="form-control" name="room_no" value="<?php echo htmlspecialchars($row['room_no'] ?? ''); ?>">
                 </div>
                 <div class="col-12 d-flex justify-content-end gap-2">
                     <a href="section.php" class="btn btn-outline-secondary">Cancel</a>
