@@ -1,7 +1,4 @@
 <?php
-// ============================================
-// DATABASE CONFIGURATION
-// ============================================
 $servername = "localhost";
 $username = "root";
 $password = "";
