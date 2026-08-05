@@ -21,6 +21,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_subject'])) {
         }
     }
 }
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['edit_subject'])) {
+    $id = (int)$_POST['edit_id'];
+    $subject_id = trim($_POST['edit_subject_id'] ?? '');
+    $subject_code = trim($_POST['edit_subject_code'] ?? '');
+    $subject_name = trim($_POST['edit_subject_name'] ?? '');
+    $status = $_POST['edit_status'];
+    
+    try {
+        $stmt = $conn->prepare("UPDATE subjects SET subject_id = ?, subject_code = ?, subject_name = ?, status = ? WHERE id = ?");
+        $stmt->execute([$subject_id, $subject_code, $subject_name, $status, $id]);
+        $_SESSION['success'] = "Subject updated successfully!";
+        header("Location: subject.php");
+        exit();
+    } catch(PDOException $e) {
+        $_SESSION['error'] = "Error: " . $e->getMessage();
+    }
+}
+if (isset($_GET['delete'])) {
+    $id = (int)$_GET['delete'];
+    try {
+        $stmt = $conn->prepare("DELETE FROM subjects WHERE id = ?");
+        $stmt->execute([$id]);
+        $_SESSION['success'] = "Subject deleted successfully!";
+        header("Location: subject.php");
+        exit();
+    } catch(PDOException $e) {
+        $_SESSION['error'] = "Error: " . $e->getMessage();
+    }
+}
+$edit_data = null;
+if (isset($_GET['edit'])) {
+    $id = (int)$_GET['edit'];
+    $stmt = $conn->prepare("SELECT * FROM subjects WHERE id = ?");
+    $stmt->execute([$id]);
+    $edit_data = $stmt->fetch();
+    
+    if (!$edit_data) {
+        $_SESSION['error'] = "Subject not found!";
+        header("Location: subject.php");
+        exit();
+    }
+}
+$subjects = $conn->query("SELECT * FROM subjects ORDER BY id ASC")->fetchAll();
+$total_subjects = count($subjects);
+$active_subjects = $conn->query("SELECT COUNT(*) as total FROM subjects WHERE status = 'Active'")->fetch()['total'] ?? 0;
+$total_capacity = $conn->query("SELECT SUM(student_capacity) as total FROM classes")->fetch()['total'] ?? 0;
 include 'includes/header.php';
 ?>
 <div class="main-content">
