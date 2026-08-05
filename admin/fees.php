@@ -3,6 +3,25 @@ include '../config/config.php';
 include 'includes/auth_check.php'; 
 checkRole(['admin']);
 include 'includes/header.php';
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_fee'])) {
+    $fee_id = trim($_POST['fee_id'] ?? '');
+    $fee_name = trim($_POST['fee_name'] ?? '');
+    $fee_amount = trim($_POST['fee_amount'] ?? '');
+    $status = trim($_POST['status'] ?? '');
+
+    if ($fee_id === '' || $fee_name === '' || $fee_amount === '') {
+        $error = 'Please fill in all required fields.';
+    } else {
+        try {
+            $stmt = $conn->prepare("INSERT INTO fees (fee_id, fee_name, fee_amount, status) VALUES (?, ?, ?, ?)");
+            $stmt->execute([$fee_id, $fee_name, $fee_amount, $status]);
+            header('Location: fees.php');
+            exit();
+        } catch (Exception $e) {
+            $error = 'Database error: ' . $e->getMessage();
+        }
+    }
+}
 ?>
 <div class="main-content">
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
@@ -58,6 +77,7 @@ include 'includes/header.php';
                             <th>ID</th>
                             <th>Fee Name</th>
                             <th>Fee Amount</th>
+                            <th>Status</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -65,6 +85,7 @@ include 'includes/header.php';
                         <tr>
                             <td>Grade 1</td>
                             <td>38</td>
+                            <td>8000</td>
                             <td><span class="status-badge bg-success-subtle text-success">Active</span></td>
                             <td>
                                 <div class="d-flex gap-2">
@@ -77,6 +98,7 @@ include 'includes/header.php';
                         <tr>
                             <td>Grade 3</td>
                             <td>41</td>
+                            <td>80000</td>
                             <td><span class="status-badge bg-warning-subtle text-warning">Pending</span></td>
                             <td>
                                 <div class="d-flex gap-2">
@@ -89,6 +111,7 @@ include 'includes/header.php';
                         <tr>
                             <td>Grade 6</td>
                             <td>36</td>
+                            <td>800000</td>
                             <td><span class="status-badge bg-success-subtle text-success">Active</span></td>
                             <td>
                                 <div class="d-flex gap-2">
@@ -101,6 +124,7 @@ include 'includes/header.php';
                         <tr>
                             <td>Grade 9</td>
                             <td>44</td>
+                            <td>80000</td>
                             <td><span class="status-badge bg-success-subtle text-success">Active</span></td>
                             <td>
                                 <div class="d-flex gap-2">
