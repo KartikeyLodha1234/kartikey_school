@@ -79,9 +79,6 @@ include 'includes/header.php';
             <button class="btn btn-outline-primary rounded-pill px-3">
                 <i class="fas fa-file-pdf me-2"></i>Report
             </button>
-            <a href="class.php" class="btn btn-primary rounded-pill px-3">
-                <i class="fas fa-plus me-2"></i>Add Class
-            </a>
         </div>
     </div>
     <div class="row g-3 mb-4">
