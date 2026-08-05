@@ -5,13 +5,11 @@ checkRole(['admin']);
 
 // Fetch lookup data for subject form
 $classes = $conn->query("SELECT id, class_name FROM classes WHERE status = 'Active' ORDER BY class_name")->fetchAll();
-$teachers = $conn->query("SELECT id, name FROM staff WHERE status = 'Active' ORDER BY name")->fetchAll();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $subject_code = trim($_POST['subject_code'] ?? '');
     $subject_name = trim($_POST['subject_name'] ?? '');
     $class_id = $_POST['class_id'] !== '' ? (int)$_POST['class_id'] : null;
-    $teacher_id = $_POST['teacher_id'] !== '' ? (int)$_POST['teacher_id'] : null;
     $status = trim($_POST['status'] ?? 'Active');
 
     if (empty($subject_name)) {
@@ -21,26 +19,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         try {
             if (isset($_POST['add_subject'])) {
-                $stmt = $conn->prepare("INSERT INTO subjects (subject_code, subject_name, class_id, teacher_id, status) VALUES (?, ?, ?, ?, ?)");
-                $stmt->execute([$subject_code, $subject_name, $class_id, $teacher_id, $status]);
-                $_SESSION['success'] = 'Subject added successfully!';
-            } elseif (isset($_POST['edit_subject'])) {
-                $id = (int)($_POST['edit_id'] ?? 0);
-                $stmt = $conn->prepare("UPDATE subjects SET subject_code = ?, subject_name = ?, class_id = ?, teacher_id = ?, status = ? WHERE id = ?");
-                $stmt->execute([$subject_code, $subject_name, $class_id, $teacher_id, $status, $id]);
-                $_SESSION['success'] = 'Subject updated successfully!';
-            }
-
-            header('Location: subject.php');
-            exit();
-        } catch (PDOException $e) {
-            $_SESSION['error'] = 'Error: ' . $e->getMessage();
-        }
-    }
-}
-
-if (isset($_GET['delete'])) {
-    $id = (int)$_GET['delete'];
+                            $stmt = $conn->prepare("INSERT INTO subjects (subject_code, subject_name, class_id, status) VALUES (?, ?, ?, ?)");
+                            $stmt->execute([$subject_code, $subject_name, $class_id, $status]);
+                            $_SESSION['success'] = 'Subject added successfully!';
+                        } elseif (isset($_POST['edit_subject'])) {
+                            $id = (int)($_POST['edit_id'] ?? 0);
+                            $stmt = $conn->prepare("UPDATE subjects SET subject_code = ?, subject_name = ?, class_id = ?, status = ? WHERE id = ?");
+                            $stmt->execute([$subject_code, $subject_name, $class_id, $status, $id]);
     try {
         $stmt = $conn->prepare('DELETE FROM subjects WHERE id = ?');
         $stmt->execute([$id]);
@@ -66,7 +51,7 @@ if (isset($_GET['edit'])) {
     }
 }
 
-$subjects = $conn->query("SELECT s.*, c.class_name AS class_name, st.name AS teacher_name FROM subjects s LEFT JOIN classes c ON s.class_id = c.id LEFT JOIN staff st ON s.teacher_id = st.id ORDER BY s.id ASC")->fetchAll();
+$subjects = $conn->query("SELECT s.*, c.class_name AS class_name FROM subjects s LEFT JOIN classes c ON s.class_id = c.id ORDER BY s.id ASC")->fetchAll();
 $total_subjects = count($subjects);
 $active_subjects = $conn->query("SELECT COUNT(*) as total FROM subjects WHERE status = 'Active'")->fetch()['total'] ?? 0;
 $total_capacity = $conn->query("SELECT SUM(student_capacity) as total FROM classes")->fetch()['total'] ?? 0;
@@ -81,38 +66,41 @@ include 'includes/header.php';
     </div>
 
     <?php if (isset($_SESSION['success'])): ?>
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="fas fa-check-circle me-2"></i><?php echo $_SESSION['success']; unset($_SESSION['success']); ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i><?php echo $_SESSION['success']; unset($_SESSION['success']); ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
     <?php endif; ?>
 
     <?php if (isset($_SESSION['error'])): ?>
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="fas fa-exclamation-circle me-2"></i><?php echo $_SESSION['error']; unset($_SESSION['error']); ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i><?php echo $_SESSION['error']; unset($_SESSION['error']); ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
     <?php endif; ?>
 
     <div class="card border-0 rounded-4 shadow-sm mb-4">
         <div class="card-body">
             <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
                 <h5 class="mb-0"><?php echo isset($edit_data) ? 'Edit Subject' : 'Add New Subject'; ?></h5>
-                <span class="text-secondary small"><?php echo isset($edit_data) ? 'Update the selected subject details' : 'Create a new academic subject record'; ?></span>
+                <span
+                    class="text-secondary small"><?php echo isset($edit_data) ? 'Update the selected subject details' : 'Create a new academic subject record'; ?></span>
             </div>
             <form class="row g-3" method="post">
                 <?php if (isset($edit_data)): ?>
-                    <input type="hidden" name="edit_id" value="<?php echo htmlspecialchars($edit_data['id']); ?>">
+                <input type="hidden" name="edit_id" value="<?php echo htmlspecialchars($edit_data['id']); ?>">
                 <?php endif; ?>
 
                 <div class="col-md-4">
                     <label class="form-label">Subject Code</label>
-                    <input type="text" class="form-control" name="subject_code" placeholder="MATH-101" value="<?php echo htmlspecialchars($edit_data['subject_code'] ?? ''); ?>" required>
+                    <input type="text" class="form-control" name="subject_code" placeholder="MATH-101"
+                        value="<?php echo htmlspecialchars($edit_data['subject_code'] ?? ''); ?>" required>
                 </div>
 
                 <div class="col-md-4">
                     <label class="form-label">Subject Name</label>
-                    <input type="text" class="form-control" name="subject_name" placeholder="Mathematics" value="<?php echo htmlspecialchars($edit_data['subject_name'] ?? ''); ?>" required>
+                    <input type="text" class="form-control" name="subject_name" placeholder="Mathematics"
+                        value="<?php echo htmlspecialchars($edit_data['subject_name'] ?? ''); ?>" required>
                 </div>
 
                 <div class="col-md-4">
@@ -120,17 +108,9 @@ include 'includes/header.php';
                     <select class="form-select" name="class_id">
                         <option value="">Select class</option>
                         <?php foreach ($classes as $class): ?>
-                            <option value="<?php echo $class['id']; ?>" <?php echo (isset($edit_data['class_id']) && $edit_data['class_id'] == $class['id']) ? 'selected' : ''; ?>><?php echo htmlspecialchars($class['class_name']); ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-
-                <div class="col-md-4">
-                    <label class="form-label">Teacher</label>
-                    <select class="form-select" name="teacher_id">
-                        <option value="">Select teacher</option>
-                        <?php foreach ($teachers as $teacher): ?>
-                            <option value="<?php echo $teacher['id']; ?>" <?php echo (isset($edit_data['teacher_id']) && $edit_data['teacher_id'] == $teacher['id']) ? 'selected' : ''; ?>><?php echo htmlspecialchars($teacher['name']); ?></option>
+                        <option value="<?php echo $class['id']; ?>"
+                            <?php echo (isset($edit_data['class_id']) && $edit_data['class_id'] == $class['id']) ? 'selected' : ''; ?>>
+                            <?php echo htmlspecialchars($class['class_name']); ?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>
@@ -138,18 +118,24 @@ include 'includes/header.php';
                 <div class="col-md-4">
                     <label class="form-label">Status</label>
                     <select class="form-select" name="status">
-                        <option value="Active" <?php echo (isset($edit_data['status']) && $edit_data['status'] === 'Active') ? 'selected' : ''; ?>>Active</option>
-                        <option value="Inactive" <?php echo (isset($edit_data['status']) && $edit_data['status'] === 'Inactive') ? 'selected' : ''; ?>>Inactive</option>
+                        <option value="Active"
+                            <?php echo (isset($edit_data['status']) && $edit_data['status'] === 'Active') ? 'selected' : ''; ?>>
+                            Active</option>
+                        <option value="Inactive"
+                            <?php echo (isset($edit_data['status']) && $edit_data['status'] === 'Inactive') ? 'selected' : ''; ?>>
+                            Inactive</option>
                     </select>
                 </div>
 
                 <div class="col-12 d-flex justify-content-end gap-2">
                     <?php if (isset($edit_data)): ?>
-                        <a href="subject.php" class="btn btn-outline-secondary rounded-pill px-3">Cancel</a>
-                        <button type="submit" name="edit_subject" class="btn btn-primary rounded-pill px-3">Update Subject</button>
+                    <a href="subject.php" class="btn btn-outline-secondary rounded-pill px-3">Cancel</a>
+                    <button type="submit" name="edit_subject" class="btn btn-primary rounded-pill px-3">Update
+                        Subject</button>
                     <?php else: ?>
-                        <button type="reset" class="btn btn-outline-secondary rounded-pill px-3">Reset</button>
-                        <button type="submit" name="add_subject" class="btn btn-primary rounded-pill px-3">Save Subject</button>
+                    <button type="reset" class="btn btn-outline-secondary rounded-pill px-3">Reset</button>
+                    <button type="submit" name="add_subject" class="btn btn-primary rounded-pill px-3">Save
+                        Subject</button>
                     <?php endif; ?>
                 </div>
             </form>
@@ -161,7 +147,8 @@ include 'includes/header.php';
             <div class="row g-3">
                 <div class="col-md-4">
                     <div class="input-group">
-                        <span class="input-group-text bg-transparent border-end-0"><i class="fas fa-search text-secondary"></i></span>
+                        <span class="input-group-text bg-transparent border-end-0"><i
+                                class="fas fa-search text-secondary"></i></span>
                         <input type="text" class="form-control border-start-0" placeholder="Search subjects..." />
                     </div>
                 </div>
@@ -169,15 +156,8 @@ include 'includes/header.php';
                     <select class="form-select">
                         <option value="">All Classes</option>
                         <?php foreach ($classes as $class): ?>
-                            <option value="<?php echo $class['id']; ?>"><?php echo htmlspecialchars($class['class_name']); ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <select class="form-select">
-                        <option value="">All Teachers</option>
-                        <?php foreach ($teachers as $teacher): ?>
-                            <option value="<?php echo $teacher['id']; ?>"><?php echo htmlspecialchars($teacher['name']); ?></option>
+                        <option value="<?php echo $class['id']; ?>">
+                            <?php echo htmlspecialchars($class['class_name']); ?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>
@@ -205,30 +185,35 @@ include 'includes/header.php';
                     </thead>
                     <tbody>
                         <?php if (empty($subjects)): ?>
-                            <tr>
-                                <td colspan="7" class="text-center text-secondary">No subjects found.</td>
-                            </tr>
+                        <tr>
+                            <td colspan="7" class="text-center text-secondary">No subjects found.</td>
+                        </tr>
                         <?php else: ?>
-                            <?php foreach ($subjects as $index => $subject): ?>
-                                <tr>
-                                    <td><?php echo $index + 1; ?></td>
-                                    <td><span class="badge bg-light text-dark"><?php echo htmlspecialchars($subject['subject_code'] ?? ''); ?></span></td>
-                                    <td><strong><?php echo htmlspecialchars($subject['subject_name']); ?></strong></td>
-                                    <td><?php echo htmlspecialchars($subject['class_name'] ?? '—'); ?></td>
-                                    <td><?php echo htmlspecialchars($subject['teacher_name'] ?? '—'); ?></td>
-                                    <td>
-                                        <span class="status-badge <?php echo $subject['status'] === 'Active' ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary'; ?>">
-                                            <?php echo htmlspecialchars($subject['status']); ?>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div class="d-flex gap-2">
-                                            <a href="subject.php?edit=<?php echo $subject['id']; ?>" class="text-primary text-decoration-none">Edit</a>
-                                            <a href="subject.php?delete=<?php echo $subject['id']; ?>" class="text-danger text-decoration-none" onclick="return confirm('Are you sure you want to delete this subject?');">Delete</a>
-                                        </div>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
+                        <?php foreach ($subjects as $index => $subject): ?>
+                        <tr>
+                            <td><?php echo $index + 1; ?></td>
+                            <td><span
+                                    class="badge bg-light text-dark"><?php echo htmlspecialchars($subject['subject_code'] ?? ''); ?></span>
+                            </td>
+                            <td><strong><?php echo htmlspecialchars($subject['subject_name']); ?></strong></td>
+                            <td><?php echo htmlspecialchars($subject['class_name'] ?? '—'); ?></td>
+                            <td>
+                                <span
+                                    class="status-badge <?php echo $subject['status'] === 'Active' ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary'; ?>">
+                                    <?php echo htmlspecialchars($subject['status']); ?>
+                                </span>
+                            </td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    <a href="subject.php?edit=<?php echo $subject['id']; ?>"
+                                        class="text-primary text-decoration-none">Edit</a>
+                                    <a href="subject.php?delete=<?php echo $subject['id']; ?>"
+                                        class="text-danger text-decoration-none"
+                                        onclick="return confirm('Are you sure you want to delete this subject?');">Delete</a>
+                                </div>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
                         <?php endif; ?>
                     </tbody>
                 </table>
@@ -236,16 +221,20 @@ include 'includes/header.php';
         </div>
         <div class="card-footer bg-transparent border-top-0 p-3">
             <div class="d-flex justify-content-between align-items-center">
-                <div class="text-secondary small">Showing <?php echo min(1, $total_subjects); ?>-<?php echo $total_subjects; ?> of <?php echo $total_subjects; ?> subjects</div>
+                <div class="text-secondary small">Showing
+                    <?php echo min(1, $total_subjects); ?>-<?php echo $total_subjects; ?> of
+                    <?php echo $total_subjects; ?> subjects</div>
                 <nav>
                     <ul class="pagination pagination-custom mb-0">
-                        <li class="page-item disabled"><a class="page-link" href="#"><i class="fas fa-chevron-left"></i></a></li>
+                        <li class="page-item disabled"><a class="page-link" href="#"><i
+                                    class="fas fa-chevron-left"></i></a></li>
                         <li class="page-item active"><a class="page-link" href="#">1</a></li>
                         <li class="page-item"><a class="page-link" href="#">2</a></li>
                         <li class="page-item"><a class="page-link" href="#">3</a></li>
                         <li class="page-item"><a class="page-link" href="#">4</a></li>
                         <li class="page-item"><a class="page-link" href="#">5</a></li>
-                        <li class="page-item"><a class="page-link" href="#"><i class="fas fa-chevron-right"></i></a></li>
+                        <li class="page-item"><a class="page-link" href="#"><i class="fas fa-chevron-right"></i></a>
+                        </li>
                     </ul>
                 </nav>
             </div>
