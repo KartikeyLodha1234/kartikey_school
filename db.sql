@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 05, 2026 at 10:12 AM
+-- Generation Time: Aug 05, 2026 at 10:50 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -87,11 +87,20 @@ CREATE TABLE `expenses` (
 CREATE TABLE `fees` (
   `id` int(11) NOT NULL,
   `fee_name` varchar(100) NOT NULL,
+  `class_id` int(11) DEFAULT NULL,
   `fee_type` varchar(50) DEFAULT NULL,
   `amount` decimal(10,2) NOT NULL,
   `status` enum('Active','Inactive') DEFAULT 'Active',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `fees`
+--
+
+INSERT INTO `fees` (`id`, `fee_name`, `class_id`, `fee_type`, `amount`, `status`, `created_at`) VALUES
+(1, 'class1', 13, 'Tuition', 99.00, 'Active', '2026-08-05 08:45:17'),
+(2, 'class1', 13, 'Library', 1111.00, 'Active', '2026-08-05 08:47:21');
 
 -- --------------------------------------------------------
 
@@ -227,6 +236,13 @@ CREATE TABLE `subjects` (
   `class_id` int(11) DEFAULT NULL,
   `status` enum('Active','Inactive') DEFAULT 'Active'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `subjects`
+--
+
+INSERT INTO `subjects` (`id`, `subject_name`, `subject_code`, `class_id`, `status`) VALUES
+(1, 'maths', 'mathclass01', 13, 'Active');
 
 -- --------------------------------------------------------
 
@@ -436,7 +452,7 @@ ALTER TABLE `expenses`
 -- AUTO_INCREMENT for table `fees`
 --
 ALTER TABLE `fees`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `report_cards`
@@ -478,7 +494,7 @@ ALTER TABLE `student_fees`
 -- AUTO_INCREMENT for table `subjects`
 --
 ALTER TABLE `subjects`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `transport_assign`
