@@ -1,4 +1,7 @@
 <?php
+include '../config/config.php';
+include 'includes/auth_check.php'; 
+checkRole(['admin']);
 include 'includes/header.php';
 ?>
 <div class="main-content">
