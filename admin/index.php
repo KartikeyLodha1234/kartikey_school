@@ -1,51 +1,24 @@
 <?php
-// ============================================
-// DASHBOARD PAGE
-// ============================================
 include '../config/config.php';
 include 'includes/auth_check.php';
 checkRole(['admin']);
-
-// ============================================
-// FETCH ALL STATS FROM DATABASE
-// ============================================
-
-// Student Stats
 $total_students = $conn->query("SELECT COUNT(*) as total FROM students")->fetch()['total'] ?? 0;
 $active_students = $conn->query("SELECT COUNT(*) as total FROM students WHERE status = 'Active'")->fetch()['total'] ?? 0;
-
-// Class Stats
 $total_classes = $conn->query("SELECT COUNT(*) as total FROM classes")->fetch()['total'] ?? 0;
 $active_classes = $conn->query("SELECT COUNT(*) as total FROM classes WHERE status = 'Active'")->fetch()['total'] ?? 0;
-
-// Subject Stats
 $total_subjects = $conn->query("SELECT COUNT(*) as total FROM subjects")->fetch()['total'] ?? 0;
 $active_subjects = $conn->query("SELECT COUNT(*) as total FROM subjects WHERE status = 'Active'")->fetch()['total'] ?? 0;
-
-// Section Stats
 $total_sections = $conn->query("SELECT COUNT(*) as total FROM sections")->fetch()['total'] ?? 0;
-
-// Fee Stats
 $total_fees = $conn->query("SELECT SUM(amount) as total FROM fees")->fetch()['total'] ?? 0;
 $fee_collected = $conn->query("SELECT SUM(amount_paid) as total FROM student_fees WHERE payment_status = 'Paid'")->fetch()['total'] ?? 0;
 $pending_fees = $conn->query("SELECT SUM(due_amount) as total FROM student_fees")->fetch()['total'] ?? 0;
-
-// Expense Stats
 $total_expenses = $conn->query("SELECT SUM(amount) as total FROM expenses")->fetch()['total'] ?? 0;
-
-// Staff Stats
 $total_staff = $conn->query("SELECT COUNT(*) as total FROM staff")->fetch()['total'] ?? 0;
 $active_staff = $conn->query("SELECT COUNT(*) as total FROM staff WHERE status = 'Active'")->fetch()['total'] ?? 0;
 $staff_on_leave = $conn->query("SELECT COUNT(*) as total FROM staff WHERE status = 'On Leave'")->fetch()['total'] ?? 0;
-
-// Transport Stats
 $total_vehicles = $conn->query("SELECT COUNT(*) as total FROM vehicles")->fetch()['total'] ?? 0;
 $total_routes = $conn->query("SELECT COUNT(*) as total FROM routes")->fetch()['total'] ?? 0;
 $total_drivers = $conn->query("SELECT COUNT(*) as total FROM drivers")->fetch()['total'] ?? 0;
-
-// ============================================
-// FETCH MONTHLY FEE DATA FOR CHART
-// ============================================
 $months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'];
 $monthly_fees = [];
 foreach ($months as $index => $month) {
@@ -55,10 +28,6 @@ foreach ($months as $index => $month) {
     $result = $conn->query($sql)->fetch()['total'] ?? 0;
     $monthly_fees[] = $result > 0 ? $result : rand(400000, 700000); // Demo fallback
 }
-
-// ============================================
-// FETCH STUDENT DISTRIBUTION
-// ============================================
 $student_distribution = [];
 $class_categories = [
     'Primary' => [1, 2, 3, 4, 5],
@@ -70,21 +39,13 @@ foreach ($class_categories as $category => $class_ids) {
     $sql = "SELECT COUNT(*) as total FROM students WHERE class_id IN ($ids)";
     $student_distribution[$category] = $conn->query($sql)->fetch()['total'] ?? 0;
 }
-
-// ============================================
-// FETCH STAFF DISTRIBUTION
-// ============================================
 $staff_distribution = [
     'Teaching' => $conn->query("SELECT COUNT(*) as total FROM staff WHERE designation LIKE '%Teacher%' OR designation LIKE '%Professor%'")->fetch()['total'] ?? 0,
     'Non-Teaching' => $conn->query("SELECT COUNT(*) as total FROM staff WHERE designation NOT LIKE '%Teacher%' AND designation NOT LIKE '%Professor%' AND designation != 'Peon' AND designation != 'Driver' AND designation != 'Security'")->fetch()['total'] ?? 0,
     'Support' => $conn->query("SELECT COUNT(*) as total FROM staff WHERE designation = 'Peon' OR designation = 'Driver' OR designation = 'Security'")->fetch()['total'] ?? 0
 ];
 
-// ============================================
-// FETCH RECENT ACTIVITIES
-// ============================================
 $recent_activities = [];
-// Recent Students
 $recent_students = $conn->query("SELECT name, class_id, created_at FROM students ORDER BY id DESC LIMIT 3")->fetchAll();
 foreach ($recent_students as $student) {
     $recent_activities[] = [
@@ -96,7 +57,6 @@ foreach ($recent_students as $student) {
     ];
 }
 
-// Recent Fees
 $recent_fees = $conn->query("SELECT sf.amount_paid, s.name FROM student_fees sf JOIN students s ON sf.student_id = s.id ORDER BY sf.id DESC LIMIT 2")->fetchAll();
 foreach ($recent_fees as $fee) {
     $recent_activities[] = [
@@ -107,13 +67,8 @@ foreach ($recent_fees as $fee) {
         'time' => 'Just now'
     ];
 }
-
 include 'includes/header.php';
 ?>
-
-<!-- ============================================ -->
-<!-- PAGE HEADER -->
-<!-- ============================================ -->
 <div class="main-content">
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
         <div>
@@ -129,10 +84,6 @@ include 'includes/header.php';
             </a>
         </div>
     </div>
-
-    <!-- ============================================ -->
-    <!-- STATS ROW 1: Students, Classes, Sections, Subjects -->
-    <!-- ============================================ -->
     <div class="row g-3 mb-4">
         <div class="col-xl-3 col-md-6">
             <div class="stat-card">
@@ -183,10 +134,6 @@ include 'includes/header.php';
             </div>
         </div>
     </div>
-
-    <!-- ============================================ -->
-    <!-- STATS ROW 2: Fees, Expenses, Staff, Transport -->
-    <!-- ============================================ -->
     <div class="row g-3 mb-4">
         <div class="col-xl-3 col-md-6">
             <div class="stat-card">
@@ -237,10 +184,6 @@ include 'includes/header.php';
             </div>
         </div>
     </div>
-
-    <!-- ============================================ -->
-    <!-- CHARTS ROW 1: Fee Collection + Student Distribution -->
-    <!-- ============================================ -->
     <div class="row g-3 mb-4">
         <div class="col-xl-6">
             <div class="card border-0 rounded-4 shadow-sm p-3">
@@ -259,10 +202,6 @@ include 'includes/header.php';
             </div>
         </div>
     </div>
-
-    <!-- ============================================ -->
-    <!-- CHARTS ROW 2: Attendance + Staff Distribution -->
-    <!-- ============================================ -->
     <div class="row g-3 mb-4">
         <div class="col-xl-6">
             <div class="card border-0 rounded-4 shadow-sm p-3">
@@ -281,10 +220,6 @@ include 'includes/header.php';
             </div>
         </div>
     </div>
-
-    <!-- ============================================ -->
-    <!-- RECENT ACTIVITIES & NOTIFICATIONS -->
-    <!-- ============================================ -->
     <div class="row g-3">
         <div class="col-xl-6">
             <div class="card border-0 rounded-4 shadow-sm">
@@ -352,13 +287,8 @@ include 'includes/header.php';
         </div>
     </div>
 </div>
-
-<!-- ============================================ -->
-<!-- CHARTS SCRIPTS -->
-<!-- ============================================ -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 <script>
-    // Fee Collection Chart
     const feeCtx = document.getElementById('feeChart').getContext('2d');
     new Chart(feeCtx, {
         type: 'line',
@@ -385,8 +315,6 @@ include 'includes/header.php';
             }
         }
     });
-
-    // Student Distribution Chart
     const studentCtx = document.getElementById('studentChart').getContext('2d');
     new Chart(studentCtx, {
         type: 'doughnut',
@@ -403,8 +331,6 @@ include 'includes/header.php';
             plugins: { legend: { position: 'bottom' } }
         }
     });
-
-    // Attendance Chart
     const attCtx = document.getElementById('attendanceChart').getContext('2d');
     new Chart(attCtx, {
         type: 'bar',
@@ -423,8 +349,6 @@ include 'includes/header.php';
             scales: { y: { beginAtZero: true, max: 100 } }
         }
     });
-
-    // Staff Distribution Chart
     const staffCtx = document.getElementById('staffChart').getContext('2d');
     new Chart(staffCtx, {
         type: 'pie',
@@ -444,9 +368,6 @@ include 'includes/header.php';
 </script>
 
 <?php
-// ============================================
-// TIME AGO FUNCTION
-// ============================================
 function time_ago($datetime) {
     $time = strtotime($datetime);
     $diff = time() - $time;
