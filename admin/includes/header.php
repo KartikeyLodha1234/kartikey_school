@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>School ERP · Staff & Payroll</title>
-    <link rel="icon" type="../../images/logo.jpeg" href="../../images/logo.jpeg">   
+    <link rel="icon" type="image/svg+xml" href="../images/logo.png">
+    <link rel="shortcut icon" type="image/svg+xml" href="../images/logo.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
     <link rel="stylesheet" href="style/ok.css">
 </head>
 <body>
@@ -14,12 +15,8 @@
         <div class="row g-0">
             <aside class="col-lg-2 col-md-3 sidebar d-md-block d-none">
                 <div class="brand d-flex align-items-center gap-2">
-                    <span class="brand-logo d-flex align-items-center justify-content-center rounded-circle bg-primary text-white" style="width:42px; height:42px;">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 2L1 7L12 12L23 7L12 2Z" fill="currentColor"/>
-                            <path d="M3 8.6V16.4L12 20.5L21 16.4V8.6L12 12.6L3 8.6Z" fill="currentColor"/>
-                            <path d="M12 12.6V20.5" stroke="white" stroke-width="2" stroke-linecap="round"/>
-                        </svg>
+                    <span class="brand-logo d-flex align-items-center justify-content-center rounded-circle bg-white" style="width:42px; height:42px; overflow:hidden;">
+                        <img src="../images/logo.png" alt="Logo" style="width:36px; height:36px; display:block;" />
                     </span>
                     <span class="brand-text fw-bold text-white">School ERP</span>
                 </div>
