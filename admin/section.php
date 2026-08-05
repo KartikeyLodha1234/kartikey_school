@@ -18,7 +18,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Insert into sections using actual columns: class_id, section_name, room_no
             $insertClassId = ($class_id !== '') ? $class_id : null;
             $room_no = ''; // optional, not in form currently
-            $stmt = $conn->prepare("INSERT INTO sections (class_id, section_name, room_no) VALUES (?, ?, ?)");
             $stmt->execute([$insertClassId, $section_input, $room_no]);
 
             header('Location: section.php');
@@ -27,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $error = 'Database error: ' . $e->getMessage();
         }
     }
-}
+                    // leave section name unchanged
 
 // Load existing sections (join with classes to get class name and capacity)
 try {
