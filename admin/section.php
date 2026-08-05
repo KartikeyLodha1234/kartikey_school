@@ -51,7 +51,7 @@ try {
                 <span class="text-secondary small">Create a new academic class record</span>
             </div>
             <?php if (!empty($error)): ?>
-                <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
+            <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
             <?php endif; ?>
             <form class="row g-3" method="post">
                 <div class="col-md-4">
@@ -98,31 +98,36 @@ try {
                         </tr>
                     </thead>
                     <tbody>
-<?php if (!empty($sections)): ?>
-    <?php foreach ($sections as $row): ?>
-        <tr>
-            <td><?php echo htmlspecialchars($row['class_name']); ?></td>
-            <td><?php echo htmlspecialchars($row['section']); ?></td>
-            <td><?php echo htmlspecialchars($row['student_capacity']); ?></td>
-            <td>
-                <span class="status-badge <?php echo ($row['status'] === 'Active') ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary'; ?>">
-                    <?php echo htmlspecialchars($row['status']); ?>
-                </span>
-            </td>
-            <td>
-                <div class="d-flex gap-2">
-                    <a href="view_section.php?id=<?php echo urlencode($row['id']); ?>" class="text-primary text-decoration-none">View</a>
-                    <a href="edit_section.php?id=<?php echo urlencode($row['id']); ?>" class="text-primary text-decoration-none">Edit</a>
-                    <a href="delete_section.php?id=<?php echo urlencode($row['id']); ?>" class="text-primary text-decoration-none" onclick="return confirm('Delete this section?')">Delete</a>
-                </div>
-            </td>
-        </tr>
-    <?php endforeach; ?>
-<?php else: ?>
-    <tr>
-        <td colspan="5" class="text-center">No sections found.</td>
-    </tr>
-<?php endif; ?>
+                        <?php if (!empty($sections)): ?>
+                        <?php foreach ($sections as $row): ?>
+                        <tr>
+                            <td><?php echo htmlspecialchars($row['class_name']); ?></td>
+                            <td><?php echo htmlspecialchars($row['section']); ?></td>
+                            <td><?php echo htmlspecialchars($row['student_capacity']); ?></td>
+                            <td>
+                                <span
+                                    class="status-badge <?php echo ($row['status'] === 'Active') ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary'; ?>">
+                                    <?php echo htmlspecialchars($row['status']); ?>
+                                </span>
+                            </td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    <a href="view_section.php?id=<?php echo urlencode($row['id']); ?>"
+                                        class="text-primary text-decoration-none">View</a>
+                                    <a href="edit_section.php?id=<?php echo urlencode($row['id']); ?>"
+                                        class="text-primary text-decoration-none">Edit</a>
+                                    <a href="delete_section.php?id=<?php echo urlencode($row['id']); ?>"
+                                        class="text-primary text-decoration-none"
+                                        onclick="return confirm('Delete this section?')">Delete</a>
+                                </div>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                        <?php else: ?>
+                        <tr>
+                            <td colspan="5" class="text-center">No sections found.</td>
+                        </tr>
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>
