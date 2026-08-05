@@ -27,14 +27,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['edit_class'])) {
     $student_capacity = (int)$_POST['edit_student_capacity'];
     $status = $_POST['edit_status'];
     
-    try {
-        $stmt = $conn->prepare("UPDATE classes SET class_name = ?, student_capacity = ?, status = ? WHERE id = ?");
-        $stmt->execute([$class_name, $student_capacity, $status, $id]);
-        $_SESSION['success'] = "Class updated successfully!";
-        header("Location: class.php");
-        exit();
-    } catch(PDOException $e) {
-        $_SESSION['error'] = "Error: " . $e->getMessage();
+    if (empty($class_name)) {
+        $_SESSION['error'] = "Class name is required";
+    } else {
+        try {
+            $stmt = $conn->prepare("UPDATE classes SET class_name = ?, student_capacity = ?, status = ? WHERE id = ?");
+            $stmt->execute([$class_name, $student_capacity, $status, $id]);
+            $_SESSION['success'] = "Class updated successfully!";
+            header("Location: class.php");
+            exit();
+        } catch(PDOException $e) {
+            $_SESSION['error'] = "Error: " . $e->getMessage();
+        }
     }
 }
 if (isset($_GET['delete'])) {
@@ -75,49 +79,6 @@ include 'includes/header.php';
             <h3 class="mb-1"><i class="fas fa-school text-primary me-2"></i>Classes</h3>
             <div class="text-secondary small">Manage academic classes with student capacity.</div>
         </div>
-        <div class="d-flex gap-2">
-            <button class="btn btn-outline-primary rounded-pill px-3" data-bs-toggle="collapse" data-bs-target="#addClassForm">
-                <i class="fas fa-plus me-2"></i>Add New Class
-            </button>
-        </div>
-    </div>
-    <div class="row g-3 mb-4">
-        <div class="col-xl-4 col-md-6">
-            <div class="stat-card">
-                <div class="d-flex align-items-center justify-content-between">
-                    <div>
-                        <div class="stat-label">Total Classes</div>
-                        <div class="stat-number"><?php echo $total_classes; ?></div>
-                    </div>
-                    <div class="stat-icon" style="background:#2563eb;"><i class="fas fa-school"></i></div>
-                </div>
-                <div class="stat-sub">All classes</div>
-            </div>
-        </div>
-        <div class="col-xl-4 col-md-6">
-            <div class="stat-card">
-                <div class="d-flex align-items-center justify-content-between">
-                    <div>
-                        <div class="stat-label">Active Classes</div>
-                        <div class="stat-number"><?php echo $active_classes; ?></div>
-                    </div>
-                    <div class="stat-icon" style="background:#10b981;"><i class="fas fa-check-circle"></i></div>
-                </div>
-                <div class="stat-sub">Currently active</div>
-            </div>
-        </div>
-        <div class="col-xl-4 col-md-6">
-            <div class="stat-card">
-                <div class="d-flex align-items-center justify-content-between">
-                    <div>
-                        <div class="stat-label">Total Capacity</div>
-                        <div class="stat-number"><?php echo $total_capacity; ?></div>
-                    </div>
-                    <div class="stat-icon" style="background:#f59e0b;"><i class="fas fa-users"></i></div>
-                </div>
-                <div class="stat-sub">Total student capacity</div>
-            </div>
-        </div>
     </div>
     <?php if (isset($_SESSION['success'])): ?>
         <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -132,56 +93,48 @@ include 'includes/header.php';
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     <?php endif; ?>
-    <div class="card border-0 rounded-4 shadow-sm mb-4 <?php echo isset($_GET['edit']) ? '' : 'collapse'; ?>" id="addClassForm">
+    <div class="card border-0 rounded-4 shadow-sm mb-4">
         <div class="card-body">
             <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
-                <h5 class="mb-0">
-                    <i class="fas fa-plus-circle text-primary me-2"></i>
-                    <?php echo isset($edit_data) ? 'Edit Class' : 'Add New Class'; ?>
-                </h5>
-                <span class="text-secondary small">
-                    <?php echo isset($edit_data) ? 'Update class record' : 'Create a new academic class record'; ?>
-                </span>
+                <h5 class="mb-0">Add New Class</h5>
+                <span class="text-secondary small">Create a new academic class record</span>
             </div>
-            <form method="POST" action="" class="row g-3">
+
+                    <form class="row g-3" method="post">
                 <?php if (isset($edit_data)): ?>
-                    <input type="hidden" name="edit_id" value="<?php echo $edit_data['id']; ?>">
+                    <input type="hidden" name="edit_id" value="<?php echo htmlspecialchars($edit_data['id']); ?>">
                 <?php endif; ?>
-                
+
                 <div class="col-md-4">
-                    <label class="form-label fw-semibold">Class Name <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" name="<?php echo isset($edit_data) ? 'edit_class_name' : 'class_name'; ?>" 
-                           placeholder="e.g., Grade 10" 
-                           value="<?php echo isset($edit_data) ? htmlspecialchars($edit_data['class_name']) : ''; ?>" required>
+                    <label class="form-label">Class Name</label>
+                    <input type="text" class="form-control" name="<?php echo isset($edit_data) ? 'edit_class_name' : 'class_name'; ?>" placeholder="Grade 1" value="<?php echo htmlspecialchars($edit_data['class_name'] ?? ''); ?>" required>
                 </div>
+
                 <div class="col-md-4">
-                    <label class="form-label fw-semibold">Student Capacity</label>
-                    <input type="number" class="form-control" name="<?php echo isset($edit_data) ? 'edit_student_capacity' : 'student_capacity'; ?>" 
-                           placeholder="e.g., 40" 
-                           value="<?php echo isset($edit_data) ? $edit_data['student_capacity'] : ''; ?>" min="0">
+                    <label class="form-label">Student Capacity</label>
+                    <input type="number" class="form-control" name="<?php echo isset($edit_data) ? 'edit_student_capacity' : 'student_capacity'; ?>" placeholder="30" min="0" value="<?php echo htmlspecialchars($edit_data['student_capacity'] ?? ''); ?>" required>
                 </div>
+
                 <div class="col-md-4">
-                    <label class="form-label fw-semibold">Status</label>
+                    <label class="form-label">Status</label>
                     <select class="form-select" name="<?php echo isset($edit_data) ? 'edit_status' : 'status'; ?>">
-                        <option value="Active" <?php echo (isset($edit_data) && $edit_data['status'] == 'Active') ? 'selected' : ''; ?>>Active</option>
-                        <option value="Inactive" <?php echo (isset($edit_data) && $edit_data['status'] == 'Inactive') ? 'selected' : ''; ?>>Inactive</option>
+                        <option value="Active" <?php echo (isset($edit_data['status']) && $edit_data['status'] === 'Active') ? 'selected' : ''; ?>>Active</option>
+                        <option value="Inactive" <?php echo (isset($edit_data['status']) && $edit_data['status'] === 'Inactive') ? 'selected' : ''; ?>>Inactive</option>
                     </select>
                 </div>
+
                 <div class="col-12 d-flex justify-content-end gap-2">
                     <?php if (isset($edit_data)): ?>
                         <a href="class.php" class="btn btn-outline-secondary rounded-pill px-3">Cancel</a>
-                        <button type="submit" name="edit_class" class="btn btn-primary rounded-pill px-3">
-                            <i class="fas fa-save me-2"></i>Update Class
-                        </button>
+                        <button type="submit" name="edit_class" class="btn btn-primary rounded-pill px-3">Update Class</button>
                     <?php else: ?>
                         <button type="reset" class="btn btn-outline-secondary rounded-pill px-3">Reset</button>
-                        <button type="submit" name="add_class" class="btn btn-primary rounded-pill px-3">
-                            <i class="fas fa-save me-2"></i>Save Class
-                        </button>
+                        <button type="submit" name="add_class" class="btn btn-primary rounded-pill px-3">Save Class</button>
                     <?php endif; ?>
                 </div>
             </form>
         </div>
+    </div>
     </div>
     <div class="card border-0 rounded-4 shadow-sm">
         <div class="card-header bg-transparent border-bottom-0 p-3">

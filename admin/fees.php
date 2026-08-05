@@ -86,6 +86,11 @@ if (isset($_GET['edit_id'])) {
         $error = 'Failed to load fee details.';
     }
 }
+
+// ====== CALCULATE STATISTICS ======
+$total_fees = count($fees);
+$active_fees = count(array_filter($fees, fn($f) => $f['status'] == 'Active'));
+$total_amount = array_sum(array_column($fees, 'amount'));
 ?>
 
 <!-- ====== PAGE CONTENT ====== -->
@@ -93,7 +98,7 @@ if (isset($_GET['edit_id'])) {
     <!-- Page Header -->
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
         <div>
-            <h3 class="mb-1"><i class="fas fa-money-bill-wave text-primary me-2"></i>Fees Management</h3>
+            <h3 class="mb-1"><i class="fas fa-money-bill-wave text-primary me-2"></i>Fees</h3>
             <div class="text-secondary small">Manage academic fees and their details.</div>
         </div>
         <div>
@@ -118,6 +123,58 @@ if (isset($_GET['edit_id'])) {
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     <?php endif; ?>
+
+    <!-- ====== STATISTICS CARDS (Like Class Management) ====== -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card border-0 rounded-4 shadow-sm">
+                <div class="card-body p-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-secondary small">Total Fees</div>
+                            <h3 class="mb-0 fw-bold"><?= $total_fees ?></h3>
+                            <div class="text-secondary small">All fees</div>
+                        </div>
+                        <div class="bg-primary bg-opacity-10 rounded-circle p-3">
+                            <i class="fas fa-list text-primary fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 rounded-4 shadow-sm">
+                <div class="card-body p-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-secondary small">Active Fees</div>
+                            <h3 class="mb-0 fw-bold text-success"><?= $active_fees ?></h3>
+                            <div class="text-secondary small">Currently active</div>
+                        </div>
+                        <div class="bg-success bg-opacity-10 rounded-circle p-3">
+                            <i class="fas fa-check-circle text-success fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 rounded-4 shadow-sm">
+                <div class="card-body p-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-secondary small">Total Amount</div>
+                            <h3 class="mb-0 fw-bold text-warning">₹<?= number_format($total_amount, 0) ?></h3>
+                            <div class="text-secondary small">Total fee amount</div>
+                        </div>
+                        <div class="bg-warning bg-opacity-10 rounded-circle p-3">
+                            <i class="fas fa-rupee-sign text-warning fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- ====== ADD FEE MODAL ====== -->
     <div class="modal fade" id="addFeeModal" tabindex="-1">
@@ -240,7 +297,6 @@ if (isset($_GET['edit_id'])) {
                             <th>Fee Type</th>
                             <th>Amount (₹)</th>
                             <th>Status</th>
-                            <th>Created</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -266,11 +322,6 @@ if (isset($_GET['edit_id'])) {
                                         <?php endif; ?>
                                     </td>
                                     <td>
-                                        <small class="text-secondary">
-                                            <?= date('d M Y', strtotime($fee['created_at'])) ?>
-                                        </small>
-                                    </td>
-                                    <td>
                                         <div class="d-flex gap-2">
                                             <a href="fees.php?edit_id=<?= $fee['id'] ?>" class="btn btn-sm btn-outline-primary rounded-pill" title="Edit">
                                                 <i class="fas fa-edit"></i>
@@ -287,7 +338,7 @@ if (isset($_GET['edit_id'])) {
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="7" class="text-center py-4 text-secondary">
+                                <td colspan="6" class="text-center py-4 text-secondary">
                                     <i class="fas fa-inbox fa-3x d-block mb-2 text-muted"></i>
                                     No fees found. Click "Add New Fee" to create one.
                                 </td>
@@ -301,15 +352,18 @@ if (isset($_GET['edit_id'])) {
             <div class="card-footer bg-transparent border-top-0 p-3">
                 <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                     <div class="text-secondary small">
-                        <i class="fas fa-list me-1"></i>Showing <?= count($fees) ?> fee<?= count($fees) > 1 ? 's' : '' ?> total
+                        <i class="fas fa-list me-1"></i>Total: <?= count($fees) ?> fees
                     </div>
                     <div class="d-flex gap-3">
-                        <div class="text-secondary small">
-                            <span class="badge bg-success-subtle text-success">Active: <?= count(array_filter($fees, fn($f) => $f['status'] == 'Active')) ?></span>
-                        </div>
-                        <div class="text-secondary small">
-                            <span class="badge bg-danger-subtle text-danger">Inactive: <?= count(array_filter($fees, fn($f) => $f['status'] == 'Inactive')) ?></span>
-                        </div>
+                        <span class="badge bg-success-subtle text-success">
+                            <i class="fas fa-check-circle me-1"></i>Active: <?= $active_fees ?>
+                        </span>
+                        <span class="badge bg-danger-subtle text-danger">
+                            <i class="fas fa-times-circle me-1"></i>Inactive: <?= $total_fees - $active_fees ?>
+                        </span>
+                        <span class="badge bg-warning-subtle text-warning">
+                            <i class="fas fa-rupee-sign me-1"></i>Total: ₹<?= number_format($total_amount, 0) ?>
+                        </span>
                     </div>
                 </div>
             </div>
