@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 05, 2026 at 10:50 AM
+-- Generation Time: Aug 05, 2026 at 03:24 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -20,6 +20,24 @@ SET time_zone = "+00:00";
 --
 -- Database: `kartikeyschool`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `attendance`
+--
+
+CREATE TABLE `attendance` (
+  `id` int(11) NOT NULL,
+  `class_id` int(11) DEFAULT NULL,
+  `class_name` varchar(100) DEFAULT NULL,
+  `student_id` int(11) DEFAULT NULL,
+  `student_name` varchar(200) DEFAULT NULL,
+  `attendance_date` date NOT NULL,
+  `status` enum('Present','Absent','Leave') DEFAULT 'Present',
+  `marked_by` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -100,7 +118,7 @@ CREATE TABLE `fees` (
 
 INSERT INTO `fees` (`id`, `fee_name`, `class_id`, `fee_type`, `amount`, `status`, `created_at`) VALUES
 (1, 'class1', 13, 'Tuition', 99.00, 'Active', '2026-08-05 08:45:17'),
-(2, 'class1', 13, 'Library', 1111.00, 'Active', '2026-08-05 08:47:21');
+(2, 'class1', 13, 'Library', 88.00, 'Active', '2026-08-05 08:47:21');
 
 -- --------------------------------------------------------
 
@@ -247,6 +265,36 @@ INSERT INTO `subjects` (`id`, `subject_name`, `subject_code`, `class_id`, `statu
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `subject_marks_config`
+--
+
+CREATE TABLE `subject_marks_config` (
+  `id` int(11) NOT NULL,
+  `class_id` int(11) DEFAULT NULL,
+  `class_name` varchar(100) DEFAULT NULL,
+  `subject_id` int(11) DEFAULT NULL,
+  `subject_name` varchar(100) DEFAULT NULL,
+  `exam_type` varchar(50) DEFAULT NULL,
+  `total_marks` int(11) NOT NULL,
+  `passing_marks` int(11) NOT NULL,
+  `theory_marks` int(11) DEFAULT 0,
+  `practical_marks` int(11) DEFAULT 0,
+  `status` enum('Active','Inactive') DEFAULT 'Active',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `subject_marks_config`
+--
+
+INSERT INTO `subject_marks_config` (`id`, `class_id`, `class_name`, `subject_id`, `subject_name`, `exam_type`, `total_marks`, `passing_marks`, `theory_marks`, `practical_marks`, `status`, `created_at`) VALUES
+(1, 13, 'class1', 1, 'maths', 'Unit Test', 30, 9, 2, 0, 'Active', '2026-08-05 12:43:16'),
+(2, 13, 'class1', 1, 'maths', 'Quarterly Exam', 70, 30, 15, 30, 'Active', '2026-08-05 12:43:26'),
+(3, 13, 'class1', 1, 'maths', 'Unit Test', 30, 9, 5, 0, 'Active', '2026-08-05 12:45:37');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `transport_assign`
 --
 
@@ -298,7 +346,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `name`, `email`, `password`, `role`, `created_at`) VALUES
-(1, 'Admin User', 'admin@school.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2uheWG/igi.', 'admin', '2026-08-04 14:05:21');
+(1, 'Admin User', 'adminkartikey@gmail.com', '$2y$10$s.cYEyHRRuV8NvgSSeI.YO0Esvt0qGRZkuErszi5d4GD2LtZ4QEPK', 'admin', '2026-08-04 14:05:21');
 
 -- --------------------------------------------------------
 
@@ -318,6 +366,15 @@ CREATE TABLE `vehicles` (
 --
 -- Indexes for dumped tables
 --
+
+--
+-- Indexes for table `attendance`
+--
+ALTER TABLE `attendance`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `attendance_date` (`attendance_date`),
+  ADD KEY `student_id` (`student_id`),
+  ADD KEY `class_id` (`class_id`);
 
 --
 -- Indexes for table `classes`
@@ -396,6 +453,12 @@ ALTER TABLE `subjects`
   ADD KEY `class_id` (`class_id`);
 
 --
+-- Indexes for table `subject_marks_config`
+--
+ALTER TABLE `subject_marks_config`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `transport_assign`
 --
 ALTER TABLE `transport_assign`
@@ -429,6 +492,12 @@ ALTER TABLE `vehicles`
 --
 -- AUTO_INCREMENT for dumped tables
 --
+
+--
+-- AUTO_INCREMENT for table `attendance`
+--
+ALTER TABLE `attendance`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `classes`
@@ -495,6 +564,12 @@ ALTER TABLE `student_fees`
 --
 ALTER TABLE `subjects`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `subject_marks_config`
+--
+ALTER TABLE `subject_marks_config`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `transport_assign`

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,12 +11,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
     <link rel="stylesheet" href="style/ok.css">
 </head>
+
 <body>
     <div class="container-fluid px-0">
         <div class="row g-0">
             <aside class="col-lg-2 col-md-3 sidebar d-md-block d-none">
                 <div class="brand d-flex align-items-center gap-2">
-                    <span class="brand-logo d-flex align-items-center justify-content-center rounded-circle bg-white" style="width:42px; height:42px; overflow:hidden;">
+                    <span class="brand-logo d-flex align-items-center justify-content-center rounded-circle bg-white"
+                        style="width:42px; height:42px; overflow:hidden;">
                         <img src="../images/logo.png" alt="Logo" style="width:36px; height:36px; display:block;" />
                     </span>
                     <span class="brand-text fw-bold text-white">School ERP</span>
@@ -75,14 +78,15 @@
                                 <a class="nav-link py-2" href="student_fees.php">
                                     <i class="fas fa-wallet"></i> Student Fees
                                 </a>
-                    <li class="nav-item">
-                        <a class="nav-link py-1" href="report_card.php">
-                            <i class="fas fa-file-alt me-2"></i> Report Card
-                        </a>
+                                <a class="nav-link py-2" href="report_card.php">
+                                    <i class="fas fa-file-alt me-2"></i> Report Card
+                                </a>
+                                <a class="nav-link py-2" href="attendence.php">
+                                    <i class="fas fa-file-alt me-2"></i> Attendance Report
+                                </a>
+                            </nav>
+                        </div>
                     </li>
-                </nav>
-        </div>
-        </li>
         <li class="nav-item">
             <a class="nav-link d-flex justify-content-between align-items-center" data-bs-toggle="collapse"
                 href="#transportMenu">
