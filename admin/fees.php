@@ -6,17 +6,17 @@ include 'includes/header.php';
 
 // ====== HANDLE ADD FEE ======
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_fee'])) {
-    $fee_id = trim($_POST['fee_id'] ?? '');
     $fee_name = trim($_POST['fee_name'] ?? '');
-    $fee_amount = trim($_POST['fee_amount'] ?? '');
+    $fee_type = trim($_POST['fee_type'] ?? '');
+    $amount = trim($_POST['amount'] ?? '');
     $status = trim($_POST['status'] ?? 'Active');
 
-    if ($fee_id === '' || $fee_name === '' || $fee_amount === '') {
+    if ($fee_name === '' || $amount === '') {
         $error = 'Please fill in all required fields.';
     } else {
         try {
-            $stmt = $conn->prepare("INSERT INTO fees (fee_id, fee_name, fee_amount, status) VALUES (?, ?, ?, ?)");
-            $stmt->execute([$fee_id, $fee_name, $fee_amount, $status]);
+            $stmt = $conn->prepare("INSERT INTO fees (fee_name, fee_type, amount, status) VALUES (?, ?, ?, ?)");
+            $stmt->execute([$fee_name, $fee_type, $amount, $status]);
             $_SESSION['success'] = 'Fee added successfully!';
             header('Location: fees.php');
             exit();
@@ -28,17 +28,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_fee'])) {
 
 // ====== HANDLE EDIT FEE ======
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_fee'])) {
-    $fee_id = trim($_POST['fee_id'] ?? '');
+    $id = intval($_POST['id'] ?? 0);
     $fee_name = trim($_POST['fee_name'] ?? '');
-    $fee_amount = trim($_POST['fee_amount'] ?? '');
-    $status = trim($_POST['status'] ?? '');
+    $fee_type = trim($_POST['fee_type'] ?? '');
+    $amount = trim($_POST['amount'] ?? '');
+    $status = trim($_POST['status'] ?? 'Active');
 
-    if ($fee_id === '' || $fee_name === '' || $fee_amount === '') {
+    if ($id === 0 || $fee_name === '' || $amount === '') {
         $error = 'Please fill in all required fields.';
     } else {
         try {
-            $stmt = $conn->prepare("UPDATE fees SET fee_name = ?, fee_amount = ?, status = ? WHERE fee_id = ?");
-            $stmt->execute([$fee_name, $fee_amount, $status, $fee_id]);
+            $stmt = $conn->prepare("UPDATE fees SET fee_name = ?, fee_type = ?, amount = ?, status = ? WHERE id = ?");
+            $stmt->execute([$fee_name, $fee_type, $amount, $status, $id]);
             $_SESSION['success'] = 'Fee updated successfully!';
             header('Location: fees.php');
             exit();
@@ -50,11 +51,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_fee'])) {
 
 // ====== HANDLE DELETE FEE ======
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_fee'])) {
-    $fee_id = trim($_POST['fee_id'] ?? '');
-    if ($fee_id !== '') {
+    $id = intval($_POST['id'] ?? 0);
+    if ($id > 0) {
         try {
-            $stmt = $conn->prepare("DELETE FROM fees WHERE fee_id = ?");
-            $stmt->execute([$fee_id]);
+            $stmt = $conn->prepare("DELETE FROM fees WHERE id = ?");
+            $stmt->execute([$id]);
             $_SESSION['success'] = 'Fee deleted successfully!';
             header('Location: fees.php');
             exit();
@@ -66,19 +67,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_fee'])) {
 
 // ====== FETCH ALL FEES ======
 try {
-    $stmt = $conn->query("SELECT * FROM fees ORDER BY fee_id DESC");
+    $stmt = $conn->query("SELECT * FROM fees ORDER BY id DESC");
     $fees = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (Exception $e) {
     $fees = [];
     $error = 'Failed to load fees: ' . $e->getMessage();
 }
 
-// ====== FETCH SINGLE FEE FOR EDIT (AJAX/Modal) ======
+// ====== FETCH SINGLE FEE FOR EDIT ======
 $edit_fee = null;
 if (isset($_GET['edit_id'])) {
+    $edit_id = intval($_GET['edit_id']);
     try {
-        $stmt = $conn->prepare("SELECT * FROM fees WHERE fee_id = ?");
-        $stmt->execute([$_GET['edit_id']]);
+        $stmt = $conn->prepare("SELECT * FROM fees WHERE id = ?");
+        $stmt->execute([$edit_id]);
         $edit_fee = $stmt->fetch(PDO::FETCH_ASSOC);
     } catch (Exception $e) {
         $error = 'Failed to load fee details.';
@@ -104,7 +106,7 @@ if (isset($_GET['edit_id'])) {
     <!-- ====== SUCCESS/ERROR MESSAGES ====== -->
     <?php if (isset($_SESSION['success'])): ?>
         <div class="alert alert-success alert-dismissible fade show rounded-4" role="alert">
-            <i class="fas fa-check-circle me-2"></i><?= $_SESSION['success'] ?>
+            <i class="fas fa-check-circle me-2"></i><?= htmlspecialchars($_SESSION['success']) ?>
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
         <?php unset($_SESSION['success']); ?>
@@ -112,7 +114,7 @@ if (isset($_GET['edit_id'])) {
 
     <?php if (isset($error)): ?>
         <div class="alert alert-danger alert-dismissible fade show rounded-4" role="alert">
-            <i class="fas fa-exclamation-circle me-2"></i><?= $error ?>
+            <i class="fas fa-exclamation-circle me-2"></i><?= htmlspecialchars($error) ?>
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     <?php endif; ?>
@@ -128,24 +130,33 @@ if (isset($_GET['edit_id'])) {
                 <form method="post">
                     <div class="modal-body">
                         <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label required">Fee ID</label>
-                                <input type="text" class="form-control" name="fee_id" placeholder="FEE001" required>
-                            </div>
-                            <div class="col-md-6">
+                            <div class="col-md-12">
                                 <label class="form-label required">Fee Name</label>
-                                <input type="text" class="form-control" name="fee_name" placeholder="Tuition Fee" required>
+                                <input type="text" class="form-control" name="fee_name" placeholder="e.g., Tuition Fee" required>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label required">Fee Amount (₹)</label>
-                                <input type="number" class="form-control" name="fee_amount" placeholder="1000" min="0" step="0.01" required>
+                            <div class="col-md-12">
+                                <label class="form-label">Fee Type</label>
+                                <select class="form-select" name="fee_type">
+                                    <option value="">Select Fee Type</option>
+                                    <option value="Tuition">Tuition</option>
+                                    <option value="Exam">Exam</option>
+                                    <option value="Library">Library</option>
+                                    <option value="Sports">Sports</option>
+                                    <option value="Lab">Lab</option>
+                                    <option value="Transport">Transport</option>
+                                    <option value="Hostel">Hostel</option>
+                                    <option value="Other">Other</option>
+                                </select>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-12">
+                                <label class="form-label required">Amount (₹)</label>
+                                <input type="number" class="form-control" name="amount" placeholder="1000.00" min="0" step="0.01" required>
+                            </div>
+                            <div class="col-md-12">
                                 <label class="form-label">Status</label>
                                 <select class="form-select" name="status">
                                     <option value="Active" selected>Active</option>
                                     <option value="Inactive">Inactive</option>
-                                    <option value="Pending">Pending</option>
                                 </select>
                             </div>
                         </div>
@@ -173,24 +184,34 @@ if (isset($_GET['edit_id'])) {
                 <form method="post">
                     <div class="modal-body">
                         <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Fee ID</label>
-                                <input type="text" class="form-control" name="fee_id" value="<?= htmlspecialchars($edit_fee['fee_id']) ?>" readonly>
-                            </div>
-                            <div class="col-md-6">
+                            <input type="hidden" name="id" value="<?= $edit_fee['id'] ?>">
+                            <div class="col-md-12">
                                 <label class="form-label required">Fee Name</label>
                                 <input type="text" class="form-control" name="fee_name" value="<?= htmlspecialchars($edit_fee['fee_name']) ?>" required>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label required">Fee Amount (₹)</label>
-                                <input type="number" class="form-control" name="fee_amount" value="<?= htmlspecialchars($edit_fee['fee_amount']) ?>" min="0" step="0.01" required>
+                            <div class="col-md-12">
+                                <label class="form-label">Fee Type</label>
+                                <select class="form-select" name="fee_type">
+                                    <option value="">Select Fee Type</option>
+                                    <option value="Tuition" <?= $edit_fee['fee_type'] == 'Tuition' ? 'selected' : '' ?>>Tuition</option>
+                                    <option value="Exam" <?= $edit_fee['fee_type'] == 'Exam' ? 'selected' : '' ?>>Exam</option>
+                                    <option value="Library" <?= $edit_fee['fee_type'] == 'Library' ? 'selected' : '' ?>>Library</option>
+                                    <option value="Sports" <?= $edit_fee['fee_type'] == 'Sports' ? 'selected' : '' ?>>Sports</option>
+                                    <option value="Lab" <?= $edit_fee['fee_type'] == 'Lab' ? 'selected' : '' ?>>Lab</option>
+                                    <option value="Transport" <?= $edit_fee['fee_type'] == 'Transport' ? 'selected' : '' ?>>Transport</option>
+                                    <option value="Hostel" <?= $edit_fee['fee_type'] == 'Hostel' ? 'selected' : '' ?>>Hostel</option>
+                                    <option value="Other" <?= $edit_fee['fee_type'] == 'Other' ? 'selected' : '' ?>>Other</option>
+                                </select>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-12">
+                                <label class="form-label required">Amount (₹)</label>
+                                <input type="number" class="form-control" name="amount" value="<?= $edit_fee['amount'] ?>" min="0" step="0.01" required>
+                            </div>
+                            <div class="col-md-12">
                                 <label class="form-label">Status</label>
                                 <select class="form-select" name="status">
                                     <option value="Active" <?= $edit_fee['status'] == 'Active' ? 'selected' : '' ?>>Active</option>
                                     <option value="Inactive" <?= $edit_fee['status'] == 'Inactive' ? 'selected' : '' ?>>Inactive</option>
-                                    <option value="Pending" <?= $edit_fee['status'] == 'Pending' ? 'selected' : '' ?>>Pending</option>
                                 </select>
                             </div>
                         </div>
@@ -215,10 +236,11 @@ if (isset($_GET['edit_id'])) {
                     <thead class="table-light">
                         <tr>
                             <th>#</th>
-                            <th>Fee ID</th>
                             <th>Fee Name</th>
-                            <th>Fee Amount (₹)</th>
+                            <th>Fee Type</th>
+                            <th>Amount (₹)</th>
                             <th>Status</th>
+                            <th>Created</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -227,41 +249,35 @@ if (isset($_GET['edit_id'])) {
                             <?php $i = 1; foreach ($fees as $fee): ?>
                                 <tr>
                                     <td><?= $i++ ?></td>
-                                    <td><span class="badge bg-light text-dark"><?= htmlspecialchars($fee['fee_id']) ?></span></td>
                                     <td><strong><?= htmlspecialchars($fee['fee_name']) ?></strong></td>
-                                    <td>₹ <?= number_format($fee['fee_amount'], 2) ?></td>
                                     <td>
-                                        <?php
-                                        $status_class = '';
-                                        $status_text = '';
-                                        switch ($fee['status']) {
-                                            case 'Active':
-                                                $status_class = 'bg-success-subtle text-success';
-                                                $status_text = 'Active';
-                                                break;
-                                            case 'Inactive':
-                                                $status_class = 'bg-danger-subtle text-danger';
-                                                $status_text = 'Inactive';
-                                                break;
-                                            case 'Pending':
-                                                $status_class = 'bg-warning-subtle text-warning';
-                                                $status_text = 'Pending';
-                                                break;
-                                            default:
-                                                $status_class = 'bg-secondary-subtle text-secondary';
-                                                $status_text = $fee['status'];
-                                        }
-                                        ?>
-                                        <span class="status-badge <?= $status_class ?>"><?= $status_text ?></span>
+                                        <?php if ($fee['fee_type']): ?>
+                                            <span class="badge bg-info text-dark"><?= htmlspecialchars($fee['fee_type']) ?></span>
+                                        <?php else: ?>
+                                            <span class="text-secondary small">Not specified</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td>₹ <?= number_format($fee['amount'], 2) ?></td>
+                                    <td>
+                                        <?php if ($fee['status'] == 'Active'): ?>
+                                            <span class="status-badge bg-success-subtle text-success">Active</span>
+                                        <?php else: ?>
+                                            <span class="status-badge bg-danger-subtle text-danger">Inactive</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td>
+                                        <small class="text-secondary">
+                                            <?= date('d M Y', strtotime($fee['created_at'])) ?>
+                                        </small>
                                     </td>
                                     <td>
                                         <div class="d-flex gap-2">
-                                            <a href="fees.php?edit_id=<?= $fee['fee_id'] ?>" class="btn btn-sm btn-outline-primary rounded-pill">
+                                            <a href="fees.php?edit_id=<?= $fee['id'] ?>" class="btn btn-sm btn-outline-primary rounded-pill" title="Edit">
                                                 <i class="fas fa-edit"></i>
                                             </a>
-                                            <form method="post" onsubmit="return confirm('Are you sure you want to delete this fee?')">
-                                                <input type="hidden" name="fee_id" value="<?= $fee['fee_id'] ?>">
-                                                <button type="submit" name="delete_fee" class="btn btn-sm btn-outline-danger rounded-pill">
+                                            <form method="post" onsubmit="return confirm('Are you sure you want to delete this fee?')" style="display:inline;">
+                                                <input type="hidden" name="id" value="<?= $fee['id'] ?>">
+                                                <button type="submit" name="delete_fee" class="btn btn-sm btn-outline-danger rounded-pill" title="Delete">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
                                             </form>
@@ -271,7 +287,7 @@ if (isset($_GET['edit_id'])) {
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="6" class="text-center py-4 text-secondary">
+                                <td colspan="7" class="text-center py-4 text-secondary">
                                     <i class="fas fa-inbox fa-3x d-block mb-2 text-muted"></i>
                                     No fees found. Click "Add New Fee" to create one.
                                 </td>
@@ -283,12 +299,17 @@ if (isset($_GET['edit_id'])) {
         </div>
         <?php if (count($fees) > 0): ?>
             <div class="card-footer bg-transparent border-top-0 p-3">
-                <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                     <div class="text-secondary small">
-                        Showing <?= count($fees) ?> fee<?= count($fees) > 1 ? 's' : '' ?> total
+                        <i class="fas fa-list me-1"></i>Showing <?= count($fees) ?> fee<?= count($fees) > 1 ? 's' : '' ?> total
                     </div>
-                    <div class="text-secondary small">
-                        <i class="fas fa-calendar-alt me-1"></i>Last updated: <?= date('d M Y, h:i A') ?>
+                    <div class="d-flex gap-3">
+                        <div class="text-secondary small">
+                            <span class="badge bg-success-subtle text-success">Active: <?= count(array_filter($fees, fn($f) => $f['status'] == 'Active')) ?></span>
+                        </div>
+                        <div class="text-secondary small">
+                            <span class="badge bg-danger-subtle text-danger">Inactive: <?= count(array_filter($fees, fn($f) => $f['status'] == 'Inactive')) ?></span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -296,4 +317,4 @@ if (isset($_GET['edit_id'])) {
     </div>
 </div>
 
-<?php include 'includes/footer.php'; ?> 
+<?php include 'includes/footer.php'; ?>
