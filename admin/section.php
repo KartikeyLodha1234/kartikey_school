@@ -58,6 +58,7 @@ include 'includes/header.php';
                 <table class="table table-custom align-middle mb-0">
                     <thead class="table-light">
                         <tr>
+                            <th>id</th>
                             <th>Class</th>
                             <th>Section</th>
                             <th>Students</th>
@@ -67,6 +68,7 @@ include 'includes/header.php';
                     </thead>
                     <tbody>
                         <tr>
+                            <td>1</td>
                             <td>Grade 1</td>
                             <td>A</td>
                             <td>38</td>
@@ -80,6 +82,7 @@ include 'includes/header.php';
                             </td>
                         </tr>
                         <tr>
+                            <td>2</td>
                             <td>Grade 3</td>
                             <td>B</td>
                             <td>41</td>
@@ -93,6 +96,7 @@ include 'includes/header.php';
                             </td>
                         </tr>
                         <tr>
+                        <td>3</td>
                             <td>Grade 6</td>
                             <td>C</td>
                             <td>36</td>
@@ -106,6 +110,7 @@ include 'includes/header.php';
                             </td>
                         </tr>
                         <tr>
+                            <td>4</td>
                             <td>Grade 9</td>
                             <td>D</td>
                             <td>44</td>
