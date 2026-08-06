@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 06, 2026 at 07:57 AM
+-- Generation Time: Aug 06, 2026 at 09:29 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -230,15 +230,16 @@ CREATE TABLE `students` (
   `mother_aadhaar` varchar(255) DEFAULT NULL,
   `parent_email` varchar(100) DEFAULT NULL,
   `student_type` enum('RTO','Non-RTO') DEFAULT 'Non-RTO',
-  `admission_fees` decimal(10,2) DEFAULT 0.00
+  `admission_fees` decimal(10,2) DEFAULT 0.00,
+  `blood_group` enum('A+','A-','B+','B-','AB+','AB-','O+','O-') DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `students`
 --
 
-INSERT INTO `students` (`id`, `admission_no`, `name`, `class_id`, `section_id`, `gender`, `dob`, `phone`, `email`, `address`, `father_name`, `mother_name`, `parent_phone`, `status`, `created_at`, `photo`, `birth_certificate`, `marksheet`, `tc_certificate`, `aadhaar`, `father_aadhaar`, `mother_aadhaar`, `parent_email`, `student_type`, `admission_fees`) VALUES
-(1, 'ADM-2026-5462', 'Kartikey Lodha', 13, 1, 'Male', '2026-01-01', '+919352671104', 'kartikeylodha456@gmail.com', 'D-135 Azad Nagar', 'Omendra Singh Lodha', 'Mamta Lodha', '+919664153249', 'Active', '2026-08-06 05:21:33', 'photo_1785993693_5706.jpeg', 'birth_1785993693_6716.jpeg', 'marksheet_1785993693_8412.jpeg', 'tc_1785993693_9143.jpeg', 'aadhaar_1785993693_7757.jpeg', 'father_aadhaar_1785993693_4626.jpeg', 'mother_aadhaar_1785993693_8715.jpeg', 'kartikeylodha456@gmail.com', 'Non-RTO', 0.00);
+INSERT INTO `students` (`id`, `admission_no`, `name`, `class_id`, `section_id`, `gender`, `dob`, `phone`, `email`, `address`, `father_name`, `mother_name`, `parent_phone`, `status`, `created_at`, `photo`, `birth_certificate`, `marksheet`, `tc_certificate`, `aadhaar`, `father_aadhaar`, `mother_aadhaar`, `parent_email`, `student_type`, `admission_fees`, `blood_group`) VALUES
+(1, 'ADM-2026-5462', 'Kartikey Lodha', 13, 1, 'Male', '2026-01-01', '+919352671104', 'kartikeylodha456@gmail.com', 'D-135 Azad Nagar', 'Omendra Singh Lodha', 'Mamta Lodha', '+919664153249', 'Active', '2026-08-06 05:21:33', 'photo_1785993693_5706.jpeg', 'birth_1785993693_6716.jpeg', 'marksheet_1785993693_8412.jpeg', 'tc_1785993693_9143.jpeg', 'aadhaar_1785993693_7757.jpeg', 'father_aadhaar_1785993693_4626.jpeg', 'mother_aadhaar_1785993693_8715.jpeg', 'kartikeylodha456@gmail.com', 'Non-RTO', 0.00, NULL);
 
 -- --------------------------------------------------------
 

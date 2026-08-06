@@ -207,6 +207,20 @@ include 'includes/header.php';
                     <input type="tel" class="form-control" name="phone" placeholder="+91 98765 43210">
                 </div>
                 <div class="col-md-4">
+                    <label class="form-label fw-semibold">Blood Group</label>
+                    <select class="form-select" name="blood_group">
+                        <option value="">Select Blood Group</option>
+                        <option value="A+">A+</option>
+                        <option value="A-">A-</option>
+                        <option value="B+">B+</option>
+                        <option value="B-">B-</option>
+                        <option value="AB+">AB+</option>
+                        <option value="AB-">AB-</option>
+                        <option value="O+">O+</option>
+                        <option value="O-">O-</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
                     <label class="form-label fw-semibold">Email</label>
                     <input type="email" class="form-control" name="email" placeholder="student@example.com">
                 </div>
