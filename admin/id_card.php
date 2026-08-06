@@ -423,7 +423,7 @@ function closeIDCard(event) {
     document.body.style.overflow = '';
 }
 
-// ====== PERFECT PRINT ID CARD ======
+// ====== PRINT ID CARD WITH FRONT AND BACK ======
 function printIDCard(studentId) {
     const printWindow = window.open('', '_blank', 'width=450,height=650,menubar=no,toolbar=no,location=no,status=no');
     
@@ -471,6 +471,19 @@ function printIDCard(studentId) {
                     0% { transform: rotate(0deg); }
                     100% { transform: rotate(360deg); }
                 }
+                .card-page {
+                    page-break-after: always;
+                }
+                .card-page:last-child {
+                    page-break-after: avoid;
+                }
+                .side-label {
+                    text-align: center;
+                    font-size: 10px;
+                    color: #9ca3af;
+                    margin-top: 5px;
+                    letter-spacing: 2px;
+                }
                 @media print {
                     body { 
                         background: white; 
@@ -488,10 +501,22 @@ function printIDCard(studentId) {
                         min-height: 100vh;
                         margin: 0;
                         display: flex;
+                        flex-direction: column;
                         justify-content: center;
                         align-items: center;
                     }
                     .no-print { display: none !important; }
+                    .card-page {
+                        page-break-after: always;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        width: 100%;
+                        min-height: 100vh;
+                    }
+                    .card-page:last-child {
+                        page-break-after: avoid;
+                    }
                 }
             </style>
         </head>
@@ -503,13 +528,30 @@ function printIDCard(studentId) {
                 </div>
             </div>
             <script>
-                fetch('ajax_get_id_card.php?id=' + ${studentId})
+                // Load Front Side
+                fetch('ajax_get_id_card.php?id=' + ${studentId} + '&side=front')
                     .then(response => response.text())
-                    .then(data => {
-                        document.getElementById('printContent').innerHTML = data;
-                        setTimeout(function() {
-                            window.print();
-                        }, 800);
+                    .then(frontData => {
+                        // Load Back Side
+                        fetch('ajax_get_id_card.php?id=' + ${studentId} + '&side=back')
+                            .then(response => response.text())
+                            .then(backData => {
+                                document.getElementById('printContent').innerHTML = \`
+                                    <div class="card-page">\${frontData}</div>
+                                    <div class="card-page">\${backData}</div>
+                                \`;
+                                setTimeout(function() {
+                                    window.print();
+                                }, 800);
+                            })
+                            .catch(error => {
+                                document.getElementById('printContent').innerHTML = \`
+                                    <div style="text-align:center; padding:30px; color:#dc3545;">
+                                        <i class="fas fa-exclamation-circle fa-3x mb-3"></i>
+                                        <p>Error loading ID card back side.</p>
+                                    </div>
+                                \`;
+                            });
                     })
                     .catch(error => {
                         document.getElementById('printContent').innerHTML = \`
