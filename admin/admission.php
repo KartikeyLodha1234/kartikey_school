@@ -151,7 +151,7 @@ include 'includes/header.php';
             <div class="text-secondary small">Manage student admissions, applications, and enrollments</div>
         </div>
         <div>
-            <a href="students_list.php" class="btn btn-outline-primary rounded-pill px-3">
+            <a href="student_report.php" class="btn btn-outline-primary rounded-pill px-3">
                 <i class="fas fa-list me-2"></i>View All Students
             </a>
         </div>
