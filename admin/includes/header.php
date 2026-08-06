@@ -244,34 +244,72 @@
                 </div>
             </nav>
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+            <style>
+                /* Small design tweaks for sidebar and topbar */
+                .sidebar { background: linear-gradient(180deg,#0b2240,#0e2a56); min-height:100vh; }
+                .topbar { background: #0b2240; }
+                .sidebar .nav-link.active { background: rgba(255,255,255,0.08); color: #fff; }
+                .sidebar .nav-link { color: rgba(255,255,255,0.92); }
+                .sidebar .nav-link .fas { width:18px; }
+            </style>
             <script>
-                const sidebarLinks = document.querySelectorAll('.sidebar .nav-link');
-                const currentPage = window.location.pathname.split('/').pop();
+                // Correctly mark active sidebar links and expand parent collapse menus.
+                (function() {
+                    const sidebar = document.querySelector('.sidebar');
+                    if (!sidebar) return;
+                    const links = Array.from(sidebar.querySelectorAll('a.nav-link')).filter(a => a.getAttribute('href'));
+                    const currentPath = window.location.pathname.split('/').pop();
 
-                function setActiveSidebar(link) {
-                    sidebarLinks.forEach(item => item.classList.remove('active'));
-                    link.classList.add('active');
-                }
-                sidebarLinks.forEach(link => {
-                    const href = link.getAttribute('href');
-                    const isCollapseToggle = link.getAttribute('data-bs-toggle') === 'collapse';
-                    if (!href || href === '#') {
-                        if (isCollapseToggle) {
-                            link.addEventListener('click', function(e) {
-                                e.preventDefault();
-                            });
-                        }
-                        return;
+                    function clearActive() {
+                        sidebar.querySelectorAll('a.nav-link.active').forEach(el => el.classList.remove('active'));
                     }
-                    if (href === currentPage) {
-                        setActiveSidebar(link);
+
+                    // Find the best matching link (by file name)
+                    let matched = null;
+                    for (const a of links) {
+                        const href = a.getAttribute('href');
+                        if (!href) continue;
+                        if (href.startsWith('#')) continue; // collapse toggles
+                        const target = href.split('/').pop();
+                        if (target === currentPath) { matched = a; break; }
                     }
-                    link.addEventListener('click', function(e) {
-                        if (href === '#') {
-                            e.preventDefault();
-                            return;
+
+                    if (matched) {
+                        clearActive();
+                        matched.classList.add('active');
+                        // If inside a collapse, open its parent collapse and mark the toggle active
+                        const collapseParent = matched.closest('.collapse');
+                        if (collapseParent) {
+                            const collapseId = collapseParent.getAttribute('id');
+                            if (collapseId) {
+                                const toggle = sidebar.querySelector('[href="#' + collapseId + '"]');
+                                if (toggle) {
+                                    toggle.classList.add('active');
+                                    // Use Bootstrap collapse show
+                                    try {
+                                        const bsCollapse = bootstrap.Collapse.getOrCreateInstance(collapseParent);
+                                        bsCollapse.show();
+                                    } catch (e) {
+                                        // ignore if bootstrap not available
+                                    }
+                                }
+                            }
                         }
-                        setActiveSidebar(this);
+                    }
+
+                    // Ensure clicking a normal link sets active style and clears others
+                    links.forEach(a => {
+                        if (a.getAttribute('href').startsWith('#')) return;
+                        a.addEventListener('click', function() {
+                            clearActive();
+                            this.classList.add('active');
+                            // mark parent toggle as active if exists
+                            const parentCollapse = this.closest('.collapse');
+                            if (parentCollapse) {
+                                const toggle = sidebar.querySelector('[href="#' + parentCollapse.id + '"]');
+                                if (toggle) toggle.classList.add('active');
+                            }
+                        });
                     });
-                });
+                })();
             </script>
