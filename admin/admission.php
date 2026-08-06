@@ -3,6 +3,8 @@ ob_start();
 include '../config/config.php';
 include 'includes/auth_check.php'; 
 checkRole(['admin']);
+
+// ====== HANDLE ADD ADMISSION ======
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_admission'])) {
     // Personal Information
     $name = trim($_POST['name'] ?? '');
@@ -17,6 +19,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_admission'])) {
     $parent_email = trim($_POST['parent_email'] ?? '');
     $class_id = intval($_POST['class_id'] ?? 0);
     $section_id = intval($_POST['section_id'] ?? 0);
+    $student_type = trim($_POST['student_type'] ?? 'Non-RTO');
+    $admission_fees = trim($_POST['admission_fees'] ?? 0);
     $admission_no = 'ADM-' . date('Y') . '-' . str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
     
     if ($name === '' || $dob === '' || $gender === '' || $class_id === 0) {
@@ -80,10 +84,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_admission'])) {
                 $ext = pathinfo($_FILES['mother_aadhaar']['name'], PATHINFO_EXTENSION);
                 $mother_aadhaar = 'mother_aadhaar_' . time() . '_' . rand(1000, 9999) . '.' . $ext;
                 move_uploaded_file($_FILES['mother_aadhaar']['tmp_name'], $upload_dir . $mother_aadhaar);
-            }            
-            // Insert student record
-            $stmt = $conn->prepare("INSERT INTO students (admission_no, name, class_id, section_id, gender, dob, phone, email, address, father_name, mother_name, parent_phone, parent_email, photo, birth_certificate, marksheet, tc_certificate, aadhaar, father_aadhaar, mother_aadhaar, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Active')");
-            $stmt->execute([$admission_no, $name, $class_id, $section_id, $gender, $dob, $phone, $email, $address, $father_name, $mother_name, $parent_phone, $parent_email, $photo, $birth_certificate, $marksheet, $tc_certificate, $aadhaar, $father_aadhaar, $mother_aadhaar]);
+            }
+            
+            // ====== UPDATED: Insert with student_type and admission_fees ======
+            $stmt = $conn->prepare("INSERT INTO students (admission_no, name, class_id, section_id, gender, dob, phone, email, address, father_name, mother_name, parent_phone, parent_email, photo, birth_certificate, marksheet, tc_certificate, aadhaar, father_aadhaar, mother_aadhaar, student_type, admission_fees, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Active')");
+            $stmt->execute([$admission_no, $name, $class_id, $section_id, $gender, $dob, $phone, $email, $address, $father_name, $mother_name, $parent_phone, $parent_email, $photo, $birth_certificate, $marksheet, $tc_certificate, $aadhaar, $father_aadhaar, $mother_aadhaar, $student_type, $admission_fees]);
+            
             $_SESSION['success'] = 'Student admitted successfully! Admission No: ' . $admission_no;
             ob_end_clean();
             header('Location: admission.php?success=1');
@@ -93,51 +99,151 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_admission'])) {
         }
     }
 }
+
+// ====== FETCH ALL CLASSES FOR DROPDOWN ======
 try {
     $stmt = $conn->query("SELECT id, class_name FROM classes WHERE status = 'Active' ORDER BY class_name");
     $classes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (Exception $e) {
     $classes = [];
 }
+
+// ====== FETCH ADMISSION FEES FROM FEES TABLE ======
+try {
+    $stmt = $conn->query("SELECT class_id, amount FROM fees WHERE fee_type = 'Admission' AND status = 'Active' ORDER BY class_id");
+    $admission_fee_map = [];
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $admission_fee_map[(int)$row['class_id']] = (float)$row['amount'];
+    }
+} catch (Exception $e) {
+    $admission_fee_map = [];
+}
+
+// ====== FETCH ALL SECTIONS FOR DROPDOWN ======
 try {
     $stmt = $conn->query("SELECT s.*, c.class_name FROM sections s LEFT JOIN classes c ON s.class_id = c.id ORDER BY c.class_name, s.section_name");
     $sections = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (Exception $e) {
     $sections = [];
 }
+
+// ====== FETCH RECENT ADMISSIONS ======
 try {
     $stmt = $conn->query("SELECT s.*, c.class_name, sec.section_name FROM students s LEFT JOIN classes c ON s.class_id = c.id LEFT JOIN sections sec ON s.section_id = sec.id ORDER BY s.id DESC LIMIT 10");
     $recent_admissions = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (Exception $e) {
     $recent_admissions = [];
 }
+
+// ====== COUNT STATISTICS ======
 try {
     $stmt = $conn->query("SELECT COUNT(*) as total FROM students");
     $total_students = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 } catch (Exception $e) {
     $total_students = 0;
 }
+
 try {
     $stmt = $conn->query("SELECT COUNT(*) as total FROM students WHERE status = 'Active'");
     $active_students = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 } catch (Exception $e) {
     $active_students = 0;
 }
+
 try {
     $stmt = $conn->query("SELECT COUNT(*) as total FROM students WHERE DATE(created_at) = CURDATE()");
     $today_admissions = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 } catch (Exception $e) {
     $today_admissions = 0;
 }
+
 include 'includes/header.php';
 ?>
+
+<!-- ====== PAGE CONTENT ====== -->
 <div class="main-content">
+    <!-- Page Header -->
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
         <div>
-            <h3 class="mb-1">Admission</h3>
+            <h3 class="mb-1"><i class="fas fa-user-graduate text-primary me-2"></i>Admission</h3>
             <div class="text-secondary small">Manage student admissions, applications, and enrollments</div>
         </div>
+        <div>
+            <a href="students_list.php" class="btn btn-outline-primary rounded-pill px-3">
+                <i class="fas fa-list me-2"></i>View All Students
+            </a>
+        </div>
     </div>
+
+    <!-- ====== STATISTICS CARDS ====== -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 rounded-4 shadow-sm">
+                <div class="card-body p-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-secondary small">Total Students</div>
+                            <h3 class="mb-0 fw-bold"><?= $total_students ?></h3>
+                            <div class="text-secondary small">All students</div>
+                        </div>
+                        <div class="bg-primary bg-opacity-10 rounded-circle p-3">
+                            <i class="fas fa-users text-primary fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 rounded-4 shadow-sm">
+                <div class="card-body p-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-secondary small">Active Students</div>
+                            <h3 class="mb-0 fw-bold text-success"><?= $active_students ?></h3>
+                            <div class="text-secondary small">Currently active</div>
+                        </div>
+                        <div class="bg-success bg-opacity-10 rounded-circle p-3">
+                            <i class="fas fa-check-circle text-success fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 rounded-4 shadow-sm">
+                <div class="card-body p-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-secondary small">Today's Admissions</div>
+                            <h3 class="mb-0 fw-bold text-info"><?= $today_admissions ?></h3>
+                            <div class="text-secondary small">New enrollments today</div>
+                        </div>
+                        <div class="bg-info bg-opacity-10 rounded-circle p-3">
+                            <i class="fas fa-calendar-plus text-info fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 rounded-4 shadow-sm">
+                <div class="card-body p-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-secondary small">Total Classes</div>
+                            <h3 class="mb-0 fw-bold text-warning"><?= count($classes) ?></h3>
+                            <div class="text-secondary small">Active classes</div>
+                        </div>
+                        <div class="bg-warning bg-opacity-10 rounded-circle p-3">
+                            <i class="fas fa-school text-warning fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ====== SUCCESS/ERROR MESSAGES ====== -->
     <?php if (isset($_SESSION['success'])): ?>
     <div class="alert alert-success alert-dismissible fade show rounded-4" role="alert">
         <i class="fas fa-check-circle me-2"></i><?= htmlspecialchars($_SESSION['success']) ?>
@@ -152,6 +258,8 @@ include 'includes/header.php';
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
     <?php endif; ?>
+
+    <!-- ====== ADMISSION FORM ====== -->
     <div class="card border-0 rounded-4 shadow-sm mb-4">
         <div class="card-body">
             <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
@@ -160,6 +268,8 @@ include 'includes/header.php';
             </div>
             <form class="row g-3" method="post" enctype="multipart/form-data">
                 <input type="hidden" name="add_admission" value="1">
+                
+                <!-- ====== PERSONAL INFORMATION ====== -->
                 <div class="col-12">
                     <h6 class="fw-bold mb-3"><i class="fas fa-user text-primary me-2"></i>Personal Information</h6>
                 </div>
@@ -193,28 +303,15 @@ include 'includes/header.php';
                     <label class="form-label fw-semibold">Email</label>
                     <input type="email" class="form-control" name="email" placeholder="student@example.com">
                 </div>
-
-                <div class="col-md-4">
-                    <label class="form-label fw-semibold">Student Type</label>
-                    <select class="form-select" name="student_type">
-                        <option value="">Select Type</option>
-                        <option value="RTO">RTO</option>
-                        <option value="Non-RTO">Non-RTO</option>
-                    </select>
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label fw-semibold">Admission Fees</label>
-                    <input type="number" class="form-control" name="admission_fees" placeholder="0.00" min="0" step="0.01" required>
-                </div>
                 <div class="col-md-12">
                     <label class="form-label fw-semibold">Address</label>
                     <textarea class="form-control" name="address" rows="2" placeholder="Full Address"></textarea>
                 </div>
-                <div class="col-12">
-                    <h6 class="fw-bold mb-3 mt-2"><i class="fas fa-address-card text-primary me-2"></i>Parent / Guardian
-                        Details</h6>
-                </div>
 
+                <!-- ====== PARENT / GUARDIAN DETAILS ====== -->
+                <div class="col-12">
+                    <h6 class="fw-bold mb-3 mt-2"><i class="fas fa-address-card text-primary me-2"></i>Parent / Guardian Details</h6>
+                </div>
                 <div class="col-md-4">
                     <label class="form-label fw-semibold">Father Name</label>
                     <input type="text" class="form-control" name="father_name" placeholder="Father Name">
@@ -231,6 +328,8 @@ include 'includes/header.php';
                     <label class="form-label fw-semibold">Parent Email</label>
                     <input type="email" class="form-control" name="parent_email" placeholder="parent@example.com">
                 </div>
+
+                <!-- ====== AADHAAR DOCUMENTS ====== -->
                 <div class="col-12">
                     <h6 class="fw-bold mb-3 mt-4"><i class="fas fa-id-card text-primary me-2"></i>Aadhaar Documents</h6>
                 </div>
@@ -249,9 +348,10 @@ include 'includes/header.php';
                     <input type="file" class="form-control" name="aadhaar" accept=".jpg,.png,.jpeg,.pdf">
                     <small class="text-secondary">Upload Student's Aadhaar</small>
                 </div>
+
+                <!-- ====== ACADEMIC DETAILS ====== -->
                 <div class="col-12">
-                    <h6 class="fw-bold mb-3 mt-4"><i class="fas fa-book-open text-primary me-2"></i>Academic Details
-                    </h6>
+                    <h6 class="fw-bold mb-3 mt-4"><i class="fas fa-book-open text-primary me-2"></i>Academic Details</h6>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label fw-semibold">Class <span class="text-danger">*</span></label>
@@ -262,8 +362,7 @@ include 'includes/header.php';
                         <?php endforeach; ?>
                     </select>
                     <?php if (count($classes) == 0): ?>
-                    <small class="text-danger">No classes found. Please <a href="classes.php">add a class</a>
-                        first.</small>
+                    <small class="text-danger">No classes found. Please <a href="classes.php">add a class</a> first.</small>
                     <?php endif; ?>
                 </div>
                 <div class="col-md-4">
@@ -271,8 +370,7 @@ include 'includes/header.php';
                     <select class="form-select" name="section_id">
                         <option value="">Select Section</option>
                         <?php foreach ($sections as $section): ?>
-                        <option value="<?= $section['id'] ?>"><?= htmlspecialchars($section['section_name']) ?>
-                            (<?= htmlspecialchars($section['class_name']) ?>)</option>
+                        <option value="<?= $section['id'] ?>"><?= htmlspecialchars($section['section_name']) ?> (<?= htmlspecialchars($section['class_name']) ?>)</option>
                         <?php endforeach; ?>
                     </select>
                 </div>
@@ -281,9 +379,28 @@ include 'includes/header.php';
                     <input type="text" class="form-control" value="Auto-generated" disabled>
                     <small class="text-secondary">Will be auto-generated on submit</small>
                 </div>
+
+                <!-- ====== STUDENT TYPE & ADMISSION FEES ====== -->
                 <div class="col-12">
-                    <h6 class="fw-bold mb-3 mt-4"><i class="fas fa-file-upload text-primary me-2"></i>Other Documents
-                    </h6>
+                    <h6 class="fw-bold mb-3 mt-4"><i class="fas fa-tag text-primary me-2"></i>Fee Details</h6>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Student Type</label>
+                    <select class="form-select" name="student_type">
+                        <option value="Non-RTO">Non-RTO</option>
+                        <option value="RTO">RTO</option>
+                    </select>
+                    <small class="text-secondary">RTO - Right to Education, Non-RTO - General</small>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Admission Fees (₹)</label>
+                    <input type="number" class="form-control" id="admission_fees" name="admission_fees" placeholder="0.00" min="0" step="0.01" value="<?= htmlspecialchars($_POST['admission_fees'] ?? '') ?>">
+                    <small class="text-secondary">Auto-filled from the Admission fee set in Fees</small>
+                </div>
+
+                <!-- ====== OTHER DOCUMENTS ====== -->
+                <div class="col-12">
+                    <h6 class="fw-bold mb-3 mt-4"><i class="fas fa-file-upload text-primary me-2"></i>Other Documents</h6>
                 </div>
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Birth Certificate</label>
@@ -300,6 +417,8 @@ include 'includes/header.php';
                     <input type="file" class="form-control" name="tc_certificate" accept=".pdf,.jpg,.png,.jpeg">
                     <small class="text-secondary">Upload Transfer Certificate</small>
                 </div>
+
+                <!-- ====== FORM ACTIONS ====== -->
                 <div class="col-12 d-flex justify-content-end gap-2 mt-3">
                     <button type="reset" class="btn btn-outline-secondary rounded-pill px-4">
                         <i class="fas fa-undo me-2"></i>Reset
@@ -311,6 +430,34 @@ include 'includes/header.php';
             </form>
         </div>
     </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const classSelect = document.querySelector('select[name="class_id"]');
+        const feeInput = document.getElementById('admission_fees');
+        const feeMap = <?= json_encode($admission_fee_map, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
+
+        if (!classSelect || !feeInput) {
+            return;
+        }
+
+        function updateAdmissionFee() {
+            const classId = classSelect.value;
+            const amount = feeMap[classId];
+
+            if (amount !== undefined && amount !== null && amount !== '') {
+                feeInput.value = amount;
+            } else {
+                feeInput.value = '';
+            }
+        }
+
+        classSelect.addEventListener('change', updateAdmissionFee);
+        updateAdmissionFee();
+    });
+    </script>
+
+    <!-- ====== RECENT ADMISSIONS TABLE ====== -->
     <div class="card border-0 rounded-4 shadow-sm">
         <div class="card-header bg-transparent border-bottom-0 p-3">
             <div class="d-flex justify-content-between align-items-center">
@@ -329,7 +476,7 @@ include 'includes/header.php';
                             <th>Class</th>
                             <th>Section</th>
                             <th>Father Name</th>
-                            <th>Parent Contact</th>
+                            <th>Type</th>
                             <th>Status</th>
                             <th>Action</th>
                         </tr>
@@ -339,14 +486,18 @@ include 'includes/header.php';
                         <?php $i = 1; foreach ($recent_admissions as $student): ?>
                         <tr>
                             <td><?= $i++ ?></td>
-                            <td><span
-                                    class="badge bg-light text-dark"><?= htmlspecialchars($student['admission_no']) ?></span>
-                            </td>
+                            <td><span class="badge bg-light text-dark"><?= htmlspecialchars($student['admission_no']) ?></span></td>
                             <td><strong><?= htmlspecialchars($student['name']) ?></strong></td>
                             <td><?= htmlspecialchars($student['class_name'] ?? '—') ?></td>
                             <td><?= htmlspecialchars($student['section_name'] ?? '—') ?></td>
                             <td><?= htmlspecialchars($student['father_name']) ?></td>
-                            <td><?= htmlspecialchars($student['parent_phone']) ?></td>
+                            <td>
+                                <?php if ($student['student_type'] == 'RTO'): ?>
+                                <span class="badge bg-success">RTO</span>
+                                <?php else: ?>
+                                <span class="badge bg-secondary">Non-RTO</span>
+                                <?php endif; ?>
+                            </td>
                             <td>
                                 <?php if ($student['status'] == 'Active'): ?>
                                 <span class="status-badge bg-success-subtle text-success">Active</span>
@@ -356,12 +507,10 @@ include 'includes/header.php';
                             </td>
                             <td>
                                 <div class="d-flex gap-2">
-                                    <a href="view_student.php?id=<?= $student['id'] ?>"
-                                        class="btn btn-sm btn-outline-primary rounded-pill" title="View">
+                                    <a href="view_student.php?id=<?= $student['id'] ?>" class="btn btn-sm btn-outline-primary rounded-pill" title="View">
                                         <i class="fas fa-eye"></i>
                                     </a>
-                                    <a href="edit_student.php?id=<?= $student['id'] ?>"
-                                        class="btn btn-sm btn-outline-warning rounded-pill" title="Edit">
+                                    <a href="edit_student.php?id=<?= $student['id'] ?>" class="btn btn-sm btn-outline-warning rounded-pill" title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                 </div>
@@ -389,6 +538,7 @@ include 'includes/header.php';
         <?php endif; ?>
     </div>
 </div>
+
 <?php 
 include 'includes/footer.php';
 ob_end_flush();
