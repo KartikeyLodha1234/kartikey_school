@@ -1,4 +1,14 @@
 <?php
+ob_start();
+include '../config/config.php';
+include 'includes/auth_check.php'; 
+checkRole(['admin']);
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Handle form submission and save admission data to the database
+    // You can access form data using $_POST and uploaded files using $_FILES
+    // Example: $studentName = $_POST['student_name'];
+    // Example: $photo = $_FILES['photo'];
+}
 include 'includes/header.php';
 ?>
 <div class="main-content">
@@ -17,7 +27,7 @@ include 'includes/header.php';
             <form class="row g-3">
                 <h6 class="fw-bold mb-3"><i class="fas fa-user text-primary me-2"></i>Personal Information</h6>
                 <div class="col-md-4">
-                    <label class="form-label fw-semibold">Passport Photo</label>
+                    <label class="form-label fw-semibold">Student Passport Photo</label>
                     <input type="file" class="form-control" id="photo" accept=".jpg,.png,.pdf" />
                 </div>
                 <div class="col-md-4">
