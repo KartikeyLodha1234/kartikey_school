@@ -184,6 +184,45 @@ if (isset($_GET['view_id'])) {
 include 'includes/header.php';
 ?>
 
+<style>
+.document-link {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    text-decoration: none;
+    margin: 2px;
+}
+.document-link:hover {
+    opacity: 0.8;
+}
+.document-link .badge {
+    font-size: 10px;
+}
+.student-photo-sm {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #2563eb;
+}
+.doc-card {
+    transition: all 0.3s ease;
+}
+.doc-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+.file-missing {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    padding: 5px 10px;
+    font-size: 11px;
+    color: #dc2626;
+}
+</style>
+
 <!-- ====== MAIN CONTENT ====== -->
 <div class="main-content">
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
@@ -226,6 +265,7 @@ include 'includes/header.php';
                 <h5 class="mb-0"><i class="fas fa-user-graduate text-primary me-2"></i><?= $mode === 'edit' ? 'Edit Student' : 'Student Details' ?></h5>
                 <a href="student_report.php" class="btn btn-outline-secondary rounded-pill px-3">Close</a>
             </div>
+            
             <?php if ($mode === 'edit'): ?>
             <form method="post" class="row g-3">
                 <input type="hidden" name="student_id" value="<?= (int)$selected_student['id'] ?>">
@@ -292,16 +332,87 @@ include 'includes/header.php';
                 </div>
             </form>
             <?php else: ?>
+            <!-- Student Details View -->
             <div class="row g-3">
-                <div class="col-md-4"><strong>Admission No:</strong><br><?= htmlspecialchars($selected_student['admission_no'] ?? '—') ?></div>
-                <div class="col-md-4"><strong>Student Name:</strong><br><?= htmlspecialchars($selected_student['name'] ?? '—') ?></div>
-                <div class="col-md-4"><strong>Class:</strong><br><?= htmlspecialchars($selected_student['class_name'] ?? '—') ?></div>
-                <div class="col-md-4"><strong>Father Name:</strong><br><?= htmlspecialchars($selected_student['father_name'] ?? '—') ?></div>
-                <div class="col-md-4"><strong>Parent Phone:</strong><br><?= htmlspecialchars($selected_student['parent_phone'] ?? '—') ?></div>
-                <div class="col-md-4"><strong>Address:</strong><br><?= nl2br(htmlspecialchars($selected_student['address'] ?? '—')) ?></div>
-                <div class="col-md-4"><strong>Student Type:</strong><br><?= htmlspecialchars($selected_student['student_type'] ?? '—') ?></div>
-                <div class="col-md-4"><strong>Admission Fees:</strong><br>₹<?= number_format((float)($selected_student['admission_fees'] ?? 0), 2) ?></div>
-                <div class="col-md-4"><strong>Status:</strong><br><?= htmlspecialchars($selected_student['status'] ?? '—') ?></div>
+                <div class="col-md-3"><strong>Admission No:</strong><br><?= htmlspecialchars($selected_student['admission_no'] ?? '—') ?></div>
+                <div class="col-md-3"><strong>Student Name:</strong><br><?= htmlspecialchars($selected_student['name'] ?? '—') ?></div>
+                <div class="col-md-3"><strong>Class:</strong><br><?= htmlspecialchars($selected_student['class_name'] ?? '—') ?></div>
+                <div class="col-md-3"><strong>Section:</strong><br><?= htmlspecialchars($selected_student['section_name'] ?? '—') ?></div>
+                <div class="col-md-3"><strong>Father Name:</strong><br><?= htmlspecialchars($selected_student['father_name'] ?? '—') ?></div>
+                <div class="col-md-3"><strong>Parent Phone:</strong><br><?= htmlspecialchars($selected_student['parent_phone'] ?? '—') ?></div>
+                <div class="col-md-3"><strong>Parent Email:</strong><br><?= htmlspecialchars($selected_student['parent_email'] ?? '—') ?></div>
+                <div class="col-md-3"><strong>Blood Group:</strong><br><?= htmlspecialchars($selected_student['blood_group'] ?? '—') ?></div>
+                <div class="col-md-3"><strong>Student Type:</strong><br><?= htmlspecialchars($selected_student['student_type'] ?? '—') ?></div>
+                <div class="col-md-3"><strong>Admission Fees:</strong><br>₹<?= number_format((float)($selected_student['admission_fees'] ?? 0), 2) ?></div>
+                <div class="col-md-3"><strong>Status:</strong><br><?= htmlspecialchars($selected_student['status'] ?? '—') ?></div>
+                <div class="col-md-3"><strong>Address:</strong><br><?= nl2br(htmlspecialchars($selected_student['address'] ?? '—')) ?></div>
+            </div>
+            
+            <!-- ====== UPLOADED DOCUMENTS ====== -->
+            <div class="mt-4">
+                <h6 class="fw-bold"><i class="fas fa-file-alt text-primary me-2"></i>Uploaded Documents</h6>
+                <hr>
+                <div class="row g-3">
+                    <?php
+                    $documents = [
+                        'photo' => ['label' => '📸 Photo', 'icon' => 'fa-image', 'color' => 'primary', 'is_image' => true],
+                        'birth_certificate' => ['label' => '📄 Birth Certificate', 'icon' => 'fa-file-pdf', 'color' => 'danger'],
+                        'marksheet' => ['label' => '📊 Marksheet', 'icon' => 'fa-file-alt', 'color' => 'success'],
+                        'tc_certificate' => ['label' => '📜 TC Certificate', 'icon' => 'fa-file-pdf', 'color' => 'warning'],
+                        'aadhaar' => ['label' => '🆔 Student Aadhaar', 'icon' => 'fa-id-card', 'color' => 'info'],
+                        'father_aadhaar' => ['label' => '🆔 Father Aadhaar', 'icon' => 'fa-id-card', 'color' => 'secondary'],
+                        'mother_aadhaar' => ['label' => '🆔 Mother Aadhaar', 'icon' => 'fa-id-card', 'color' => 'secondary']
+                    ];
+                    
+                    $has_documents = false;
+                    foreach ($documents as $field => $doc) {
+                        $file = $selected_student[$field] ?? '';
+                        if (!empty($file)) {
+                            $file_path = '../uploads/students/' . $file;
+                            $has_documents = true;
+                            ?>
+                            <div class="col-md-3">
+                                <div class="card border-0 shadow-sm rounded-3 h-100 doc-card">
+                                    <div class="card-body text-center p-3">
+                                        <?php if ($doc['is_image'] ?? false): ?>
+                                            <img src="<?= file_exists($file_path) ? $file_path : 'https://ui-avatars.com/api/?name=' . urlencode($selected_student['name'] ?? 'S') . '&background=2563eb&color=fff&size=100' ?>" 
+                                                 alt="Photo" style="width:80px; height:80px; border-radius:50%; object-fit:cover; border:2px solid #2563eb; margin-bottom:8px;">
+                                        <?php else: ?>
+                                            <i class="fas <?= $doc['icon'] ?> fa-3x text-<?= $doc['color'] ?> mb-2"></i>
+                                        <?php endif; ?>
+                                        <div class="small fw-bold text-truncate"><?= $doc['label'] ?></div>
+                                        <div class="text-secondary small text-truncate" style="font-size:10px;"><?= htmlspecialchars($file) ?></div>
+                                        
+                                        <?php if (file_exists($file_path)): ?>
+                                            <div class="mt-2">
+                                                <a href="<?= $file_path ?>" target="_blank" class="btn btn-sm btn-outline-<?= $doc['color'] ?> rounded-pill">
+                                                    <i class="fas fa-eye me-1"></i> View
+                                                </a>
+                                                <a href="<?= $file_path ?>" download class="btn btn-sm btn-outline-secondary rounded-pill">
+                                                    <i class="fas fa-download me-1"></i>
+                                                </a>
+                                            </div>
+                                        <?php else: ?>
+                                            <div class="file-missing mt-2">
+                                                <i class="fas fa-exclamation-triangle me-1"></i> File Missing
+                                            </div>
+                                            <div class="text-secondary small mt-1" style="font-size:9px;">Please re-upload</div>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            </div>
+                            <?php
+                        }
+                    }
+                    
+                    if (!$has_documents): 
+                    ?>
+                    <div class="col-12 text-center text-secondary py-4">
+                        <i class="fas fa-file fa-3x d-block mb-3 text-muted"></i>
+                        No documents uploaded for this student.
+                    </div>
+                    <?php endif; ?>
+                </div>
             </div>
             <?php endif; ?>
         </div>
@@ -351,6 +462,7 @@ include 'includes/header.php';
                     <thead class="table-light">
                         <tr>
                             <th>#</th>
+                            <th>Photo</th>
                             <th>Admission No</th>
                             <th>Student Name</th>
                             <th>Class</th>
@@ -366,6 +478,16 @@ include 'includes/header.php';
                         <?php $i = 1; foreach ($students as $student): ?>
                         <tr>
                             <td><?= $i++ ?></td>
+                            <td>
+                                <?php if (!empty($student['photo']) && file_exists('../uploads/students/' . $student['photo'])): ?>
+                                <img src="../uploads/students/<?= htmlspecialchars($student['photo']) ?>" 
+                                     alt="Student" class="student-photo-sm"
+                                     onerror="this.src='https://ui-avatars.com/api/?name=<?= urlencode($student['name'] ?? 'S') ?>&background=2563eb&color=fff&size=35'">
+                                <?php else: ?>
+                                <img src="https://ui-avatars.com/api/?name=<?= urlencode($student['name'] ?? 'S') ?>&background=2563eb&color=fff&size=35" 
+                                     alt="Student" class="student-photo-sm">
+                                <?php endif; ?>
+                            </td>
                             <td><span class="badge bg-light text-dark"><?= htmlspecialchars($student['admission_no'] ?? '—') ?></span></td>
                             <td><strong><?= htmlspecialchars($student['name'] ?? '—') ?></strong></td>
                             <td><?= htmlspecialchars($student['class_name'] ?? '—') ?></td>
@@ -399,7 +521,7 @@ include 'includes/header.php';
                         <?php endforeach; ?>
                         <?php else: ?>
                         <tr>
-                            <td colspan="9" class="text-center py-4 text-secondary">
+                            <td colspan="10" class="text-center py-4 text-secondary">
                                 <i class="fas fa-inbox fa-3x d-block mb-2 text-muted"></i>
                                 No admissions found.
                             </td>
