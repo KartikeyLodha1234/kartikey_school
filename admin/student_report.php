@@ -421,6 +421,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_student'])) {
     $name = trim($_POST['name'] ?? '');
     $father_name = trim($_POST['father_name'] ?? '');
     $parent_phone = trim($_POST['parent_phone'] ?? '');
+    $address = trim($_POST['address'] ?? '');
     $class_id = intval($_POST['class_id'] ?? 0);
     $status = trim($_POST['status'] ?? 'Active');
     $student_type = trim($_POST['student_type'] ?? 'Non-RTO');
@@ -429,8 +430,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_student'])) {
 
     if ($student_id > 0 && $name !== '') {
         try {
-            $stmt = $conn->prepare("UPDATE students SET name = ?, father_name = ?, parent_phone = ?, class_id = ?, status = ?, student_type = ?, admission_fees = ?, blood_group = ? WHERE id = ?");
-            $stmt->execute([$name, $father_name, $parent_phone, $class_id, $status, $student_type, $admission_fees, $blood_group, $student_id]);
+            $stmt = $conn->prepare("UPDATE students SET name = ?, father_name = ?, parent_phone = ?, address = ?, class_id = ?, status = ?, student_type = ?, admission_fees = ?, blood_group = ? WHERE id = ?");
+            $stmt->execute([$name, $father_name, $parent_phone, $address, $class_id, $status, $student_type, $admission_fees, $blood_group, $student_id]);
             $_SESSION['success'] = 'Student updated successfully.';
         } catch (Exception $e) {
             $error = 'Failed to update student.';
@@ -533,6 +534,10 @@ include 'includes/header.php';
                     <input type="text" class="form-control" name="parent_phone" value="<?= htmlspecialchars($selected_student['parent_phone'] ?? '') ?>">
                 </div>
                 <div class="col-md-4">
+                    <label class="form-label">Address</label>
+                    <input type="text" class="form-control" name="address" value="<?= htmlspecialchars($selected_student['address'] ?? '') ?>">
+                </div>
+                <div class="col-md-4">
                     <label class="form-label">Class</label>
                     <select class="form-select" name="class_id">
                         <option value="">Select Class</option>
@@ -585,6 +590,7 @@ include 'includes/header.php';
                 <div class="col-md-4"><strong>Class:</strong><br><?= htmlspecialchars($selected_student['class_name'] ?? '—') ?></div>
                 <div class="col-md-4"><strong>Father Name:</strong><br><?= htmlspecialchars($selected_student['father_name'] ?? '—') ?></div>
                 <div class="col-md-4"><strong>Parent Phone:</strong><br><?= htmlspecialchars($selected_student['parent_phone'] ?? '—') ?></div>
+                <div class="col-md-4"><strong>Address:</strong><br><?= nl2br(htmlspecialchars($selected_student['address'] ?? '—')) ?></div>
                 <div class="col-md-4"><strong>Student Type:</strong><br><?= htmlspecialchars($selected_student['student_type'] ?? '—') ?></div>
                 <div class="col-md-4"><strong>Admission Fees:</strong><br>₹<?= number_format((float)($selected_student['admission_fees'] ?? 0), 2) ?></div>
                 <div class="col-md-4"><strong>Status:</strong><br><?= htmlspecialchars($selected_student['status'] ?? '—') ?></div>
