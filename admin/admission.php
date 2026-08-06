@@ -3,8 +3,6 @@ ob_start();
 include '../config/config.php';
 include 'includes/auth_check.php'; 
 checkRole(['admin']);
-
-// ====== HANDLE ADD ADMISSION ======
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_admission'])) {
     // Personal Information
     $name = trim($_POST['name'] ?? '');
@@ -20,8 +18,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_admission'])) {
     $class_id = intval($_POST['class_id'] ?? 0);
     $section_id = intval($_POST['section_id'] ?? 0);
     $student_type = trim($_POST['student_type'] ?? 'Non-RTO');
-    
-    // ====== FIX: Get admission_fees from POST ======
     $admission_fees = floatval($_POST['admission_fees'] ?? 0);
     
     $admission_no = 'ADM-' . date('Y') . '-' . str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
@@ -89,8 +85,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_admission'])) {
                 $mother_aadhaar = 'mother_aadhaar_' . time() . '_' . rand(1000, 9999) . '.' . $ext;
                 move_uploaded_file($_FILES['mother_aadhaar']['tmp_name'], $upload_dir . $mother_aadhaar);
             }
-            
-            // ====== INSERT with admission_fees ======
             $stmt = $conn->prepare("INSERT INTO students (admission_no, name, class_id, section_id, gender, dob, phone, email, address, father_name, mother_name, parent_phone, parent_email, photo, birth_certificate, marksheet, tc_certificate, aadhaar, father_aadhaar, mother_aadhaar, student_type, admission_fees, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Active')");
             $stmt->execute([$admission_no, $name, $class_id, $section_id, $gender, $dob, $phone, $email, $address, $father_name, $mother_name, $parent_phone, $parent_email, $photo, $birth_certificate, $marksheet, $tc_certificate, $aadhaar, $father_aadhaar, $mother_aadhaar, $student_type, $admission_fees]);
             
@@ -103,8 +97,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_admission'])) {
         }
     }
 }
-
-// ====== FETCH ADMISSION FEES FROM FEES TABLE ======
 try {
     $stmt = $conn->query("SELECT class_id, amount FROM fees WHERE fee_type = 'Admission' AND status = 'Active' ORDER BY class_id");
     $admission_fee_map = [];
@@ -114,61 +106,48 @@ try {
 } catch (Exception $e) {
     $admission_fee_map = [];
 }
-
-// ====== FETCH ALL CLASSES ======
 try {
     $stmt = $conn->query("SELECT id, class_name FROM classes WHERE status = 'Active' ORDER BY class_name");
     $classes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (Exception $e) {
     $classes = [];
 }
-
-// ====== FETCH ALL SECTIONS ======
 try {
     $stmt = $conn->query("SELECT s.*, c.class_name FROM sections s LEFT JOIN classes c ON s.class_id = c.id ORDER BY c.class_name, s.section_name");
     $sections = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (Exception $e) {
     $sections = [];
 }
-
-// ====== FETCH RECENT ADMISSIONS ======
 try {
     $stmt = $conn->query("SELECT s.*, c.class_name, sec.section_name FROM students s LEFT JOIN classes c ON s.class_id = c.id LEFT JOIN sections sec ON s.section_id = sec.id ORDER BY s.id DESC LIMIT 10");
     $recent_admissions = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (Exception $e) {
     $recent_admissions = [];
 }
-
-// ====== COUNT STATISTICS ======
 try {
     $stmt = $conn->query("SELECT COUNT(*) as total FROM students");
     $total_students = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 } catch (Exception $e) {
     $total_students = 0;
 }
-
 try {
     $stmt = $conn->query("SELECT COUNT(*) as total FROM students WHERE status = 'Active'");
     $active_students = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 } catch (Exception $e) {
     $active_students = 0;
 }
-
 try {
     $stmt = $conn->query("SELECT COUNT(*) as total FROM students WHERE DATE(created_at) = CURDATE()");
     $today_admissions = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 } catch (Exception $e) {
     $today_admissions = 0;
 }
-
 include 'includes/header.php';
 ?>
-
-<!-- ====== PAGE CONTENT ====== -->
 <div class="main-content">
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
         <div>
-            <h3 class="mb-1"><i class="fas fa-user-graduate text-primary me-2"></i>Admission</h3>
+            <h3 class="mb-1">Admission</h3>
             <div class="text-secondary small">Manage student admissions, applications, and enrollments</div>
         </div>
         <div>
@@ -177,8 +156,6 @@ include 'includes/header.php';
             </a>
         </div>
     </div>
-
-    <!-- ====== STATISTICS CARDS ====== -->
     <div class="row g-3 mb-4">
         <div class="col-md-3">
             <div class="card border-0 rounded-4 shadow-sm">
@@ -245,8 +222,6 @@ include 'includes/header.php';
             </div>
         </div>
     </div>
-
-    <!-- ====== SUCCESS/ERROR MESSAGES ====== -->
     <?php if (isset($_SESSION['success'])): ?>
     <div class="alert alert-success alert-dismissible fade show rounded-4" role="alert">
         <i class="fas fa-check-circle me-2"></i><?= htmlspecialchars($_SESSION['success']) ?>
@@ -254,15 +229,12 @@ include 'includes/header.php';
     </div>
     <?php unset($_SESSION['success']); ?>
     <?php endif; ?>
-
     <?php if (isset($error)): ?>
     <div class="alert alert-danger alert-dismissible fade show rounded-4" role="alert">
         <i class="fas fa-exclamation-circle me-2"></i><?= htmlspecialchars($error) ?>
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
     <?php endif; ?>
-
-    <!-- ====== ADMISSION FORM ====== -->
     <div class="card border-0 rounded-4 shadow-sm mb-4">
         <div class="card-body">
             <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
@@ -271,8 +243,6 @@ include 'includes/header.php';
             </div>
             <form class="row g-3" method="post" enctype="multipart/form-data">
                 <input type="hidden" name="add_admission" value="1">
-                
-                <!-- Personal Information -->
                 <div class="col-12">
                     <h6 class="fw-bold mb-3"><i class="fas fa-user text-primary me-2"></i>Personal Information</h6>
                 </div>
@@ -310,8 +280,6 @@ include 'includes/header.php';
                     <label class="form-label fw-semibold">Address</label>
                     <textarea class="form-control" name="address" rows="2" placeholder="Full Address"></textarea>
                 </div>
-
-                <!-- Parent Details -->
                 <div class="col-12">
                     <h6 class="fw-bold mb-3 mt-2"><i class="fas fa-address-card text-primary me-2"></i>Parent / Guardian Details</h6>
                 </div>
@@ -331,8 +299,6 @@ include 'includes/header.php';
                     <label class="form-label fw-semibold">Parent Email</label>
                     <input type="email" class="form-control" name="parent_email" placeholder="parent@example.com">
                 </div>
-
-                <!-- Aadhaar Documents -->
                 <div class="col-12">
                     <h6 class="fw-bold mb-3 mt-4"><i class="fas fa-id-card text-primary me-2"></i>Aadhaar Documents</h6>
                 </div>
@@ -351,8 +317,6 @@ include 'includes/header.php';
                     <input type="file" class="form-control" name="aadhaar" accept=".jpg,.png,.jpeg,.pdf">
                     <small class="text-secondary">Upload Student's Aadhaar</small>
                 </div>
-
-                <!-- Academic Details -->
                 <div class="col-12">
                     <h6 class="fw-bold mb-3 mt-4"><i class="fas fa-book-open text-primary me-2"></i>Academic Details</h6>
                 </div>
@@ -382,8 +346,6 @@ include 'includes/header.php';
                     <input type="text" class="form-control" value="Auto-generated" disabled>
                     <small class="text-secondary">Will be auto-generated on submit</small>
                 </div>
-
-                <!-- Fee Details -->
                 <div class="col-12">
                     <h6 class="fw-bold mb-3 mt-4"><i class="fas fa-tag text-primary me-2"></i>Fee Details</h6>
                 </div>
@@ -397,11 +359,9 @@ include 'includes/header.php';
                 </div>
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Admission Fees (₹)</label>
-                    <input type="number" class="form-control" id="admission_fees" name="admission_fees" placeholder="0.00" min="0" step="0.01" readonly>
+                    <input type="number" class="form-control" id="admission_fees" name="admission_fees" placeholder="Select class first" min="0" step="0.01" readonly>
                     <small class="text-secondary">Auto-filled from fees.php (Admission fee type)</small>
                 </div>
-
-                <!-- Other Documents -->
                 <div class="col-12">
                     <h6 class="fw-bold mb-3 mt-4"><i class="fas fa-file-upload text-primary me-2"></i>Other Documents</h6>
                 </div>
@@ -420,8 +380,6 @@ include 'includes/header.php';
                     <input type="file" class="form-control" name="tc_certificate" accept=".pdf,.jpg,.png,.jpeg">
                     <small class="text-secondary">Upload Transfer Certificate</small>
                 </div>
-
-                <!-- Form Actions -->
                 <div class="col-12 d-flex justify-content-end gap-2 mt-3">
                     <button type="reset" class="btn btn-outline-secondary rounded-pill px-4">
                         <i class="fas fa-undo me-2"></i>Reset
@@ -433,46 +391,51 @@ include 'includes/header.php';
             </form>
         </div>
     </div>
-
-    <!-- ====== JAVASCRIPT ====== -->
     <script>
     document.addEventListener('DOMContentLoaded', function () {
         const classSelect = document.getElementById('classSelect');
         const feeInput = document.getElementById('admission_fees');
         const studentType = document.getElementById('studentType');
-        
-        // Fee map from PHP
         const feeMap = <?= json_encode($admission_fee_map, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
-
         function updateAdmissionFee() {
             const classId = classSelect.value;
             const type = studentType.value;
-            const amount = feeMap[classId] ?? 0;
-
+            const amount = feeMap[classId] || 0;
             if (type === 'RTO') {
                 feeInput.value = '';
                 feeInput.style.backgroundColor = '#f8f9fa';
                 feeInput.style.borderColor = '#dee2e6';
-            } else if (classId) {
-                feeInput.value = amount > 0 ? Number(amount).toFixed(2) : '';
-                feeInput.style.backgroundColor = '#ffffff';
-                feeInput.style.borderColor = amount > 0 ? '#28a745' : '#dee2e6';
+                feeInput.placeholder = 'No fees (RTO)';
+                feeInput.style.color = '#6c757d';
+                feeInput.style.fontWeight = 'normal';
+            } else if (classId && amount > 0) {
+                feeInput.value = Number(amount).toFixed(2);
+                feeInput.style.backgroundColor = '#e8f5e9';
+                feeInput.style.borderColor = '#28a745';
+                feeInput.placeholder = '';
+                feeInput.style.color = '#155724';
+                feeInput.style.fontWeight = 'bold';
+            } else if (classId && amount === 0) {
+                feeInput.value = '';
+                feeInput.style.backgroundColor = '#fff3cd';
+                feeInput.style.borderColor = '#ffc107';
+                feeInput.placeholder = '⚠️ No fee configured for this class';
+                feeInput.style.color = '#856404';
+                feeInput.style.fontWeight = 'normal';
             } else {
                 feeInput.value = '';
                 feeInput.style.backgroundColor = '#ffffff';
                 feeInput.style.borderColor = '#dee2e6';
+                feeInput.placeholder = 'Select class first';
+                feeInput.style.color = '#6c757d';
+                feeInput.style.fontWeight = 'normal';
             }
         }
-
         classSelect.addEventListener('change', updateAdmissionFee);
         studentType.addEventListener('change', updateAdmissionFee);
-        
-        // Initial call
         updateAdmissionFee();
     });
     </script>
-
-    <!-- ====== RECENT ADMISSIONS TABLE ====== -->
     <div class="card border-0 rounded-4 shadow-sm">
         <div class="card-header bg-transparent border-bottom-0 p-3">
             <div class="d-flex justify-content-between align-items-center">
@@ -555,7 +518,6 @@ include 'includes/header.php';
         <?php endif; ?>
     </div>
 </div>
-
 <?php 
 include 'includes/footer.php';
 ob_end_flush();
