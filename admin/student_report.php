@@ -1,4 +1,15 @@
 <?php
+include '../config/config.php';
+include 'includes/auth_check.php';
+checkRole(['admin']);
+
+try {
+    $stmt = $conn->query("SELECT s.*, c.class_name, sec.section_name FROM students s LEFT JOIN classes c ON s.class_id = c.id LEFT JOIN sections sec ON s.section_id = sec.id ORDER BY s.id DESC");
+    $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (Exception $e) {
+    $students = [];
+}
+
 include 'includes/header.php';
 ?>
 <div class="main-content">
@@ -83,91 +94,39 @@ include 'includes/header.php';
                         </tr>
                     </thead>
                     <tbody>
+                        <?php if (count($students) > 0): ?>
+                        <?php $i = 1; foreach ($students as $student): ?>
                         <tr>
-                            <td>1</td>
-                            <td><span class="badge bg-light text-dark">ADM-2025-001</span></td>
-                            <td><strong>Aarav Sharma</strong></td>
-                            <td>Grade 10</td>
-                            <td>Mr. Rajesh Sharma</td>
-                            <td>+91 98765 43210</td>
-                            <td>10 Mar 2025</td>
-                            <td><span class="status-badge bg-success-subtle text-success">✅ Enrolled</span></td>
+                            <td><?= $i++ ?></td>
+                            <td><span class="badge bg-light text-dark"><?= htmlspecialchars($student['admission_no'] ?? '—') ?></span></td>
+                            <td><strong><?= htmlspecialchars($student['name'] ?? '—') ?></strong></td>
+                            <td><?= htmlspecialchars($student['class_name'] ?? '—') ?></td>
+                            <td><?= htmlspecialchars($student['father_name'] ?? '—') ?></td>
+                            <td><?= htmlspecialchars($student['parent_phone'] ?? $student['phone'] ?? '—') ?></td>
+                            <td><?= !empty($student['created_at']) ? date('d M Y', strtotime($student['created_at'])) : '—' ?></td>
+                            <td>
+                                <?php if (($student['status'] ?? '') === 'Active'): ?>
+                                <span class="status-badge bg-success-subtle text-success">✅ Active</span>
+                                <?php else: ?>
+                                <span class="status-badge bg-danger-subtle text-danger">❌ Inactive</span>
+                                <?php endif; ?>
+                            </td>
                             <td>
                                 <div class="d-flex gap-2">
                                     <a href="#" class="text-primary text-decoration-none">View</a>
                                     <a href="#" class="text-primary text-decoration-none">Edit</a>
-                                    <a href="#" class="text-primary text-decoration-none">Delete</a>
                                 </div>
                             </td>
                         </tr>
+                        <?php endforeach; ?>
+                        <?php else: ?>
                         <tr>
-                            <td>2</td>
-                            <td><span class="badge bg-light text-dark">ADM-2025-002</span></td>
-                            <td><strong>Priya Patel</strong></td>
-                            <td>Grade 8</td>
-                            <td>Mr. Suresh Patel</td>
-                            <td>+91 87654 32109</td>
-                            <td>12 Mar 2025</td>
-                            <td><span class="status-badge bg-warning-subtle text-warning">🟡 Pending</span></td>
-                            <td>
-                                <div class="d-flex gap-2">
-                                    <a href="#" class="text-primary text-decoration-none">View</a>
-                                    <a href="#" class="text-primary text-decoration-none">Edit</a>
-                                    <a href="#" class="text-primary text-decoration-none">Delete</a>
-                                </div>
+                            <td colspan="9" class="text-center py-4 text-secondary">
+                                <i class="fas fa-inbox fa-3x d-block mb-2 text-muted"></i>
+                                No admissions found.
                             </td>
                         </tr>
-                        <tr>
-                            <td>3</td>
-                            <td><span class="badge bg-light text-dark">ADM-2025-003</span></td>
-                            <td><strong>Rohit Singh</strong></td>
-                            <td>Grade 11</td>
-                            <td>Mr. Amit Singh</td>
-                            <td>+91 76543 21098</td>
-                            <td>15 Mar 2025</td>
-                            <td><span class="status-badge bg-info-subtle text-info">📋 Interview</span></td>
-                            <td>
-                                <div class="d-flex gap-2">
-                                    <a href="#" class="text-primary text-decoration-none">View</a>
-                                    <a href="#" class="text-primary text-decoration-none">Edit</a>
-                                    <a href="#" class="text-primary text-decoration-none">Delete</a>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>4</td>
-                            <td><span class="badge bg-light text-dark">ADM-2025-004</span></td>
-                            <td><strong>Sneha Reddy</strong></td>
-                            <td>Grade 6</td>
-                            <td>Dr. Krishna Reddy</td>
-                            <td>+91 65432 10987</td>
-                            <td>18 Mar 2025</td>
-                            <td><span class="status-badge bg-danger-subtle text-danger">❌ Rejected</span></td>
-                            <td>
-                                <div class="d-flex gap-2">
-                                    <a href="#" class="text-primary text-decoration-none">View</a>
-                                    <a href="#" class="text-primary text-decoration-none">Edit</a>
-                                    <a href="#" class="text-primary text-decoration-none">Delete</a>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>5</td>
-                            <td><span class="badge bg-light text-dark">ADM-2025-005</span></td>
-                            <td><strong>Amit Kumar</strong></td>
-                            <td>Grade 3</td>
-                            <td>Mr. Raj Kumar</td>
-                            <td>+91 54321 09876</td>
-                            <td>20 Mar 2025</td>
-                            <td><span class="status-badge bg-success-subtle text-success">✅ Enrolled</span></td>
-                            <td>
-                                <div class="d-flex gap-2">
-                                    <a href="#" class="text-primary text-decoration-none">View</a>
-                                    <a href="#" class="text-primary text-decoration-none">Edit</a>
-                                    <a href="#" class="text-primary text-decoration-none">Delete</a>
-                                </div>
-                            </td>
-                        </tr>
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>
