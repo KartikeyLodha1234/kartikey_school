@@ -134,79 +134,8 @@ include 'includes/header.php';
 <div class="main-content">
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
         <div>
-            <h3 class="mb-1"><i class="fas fa-user-graduate text-primary me-2"></i>Admission</h3>
+            <h3 class="mb-1">Admission</h3>
             <div class="text-secondary small">Manage student admissions, applications, and enrollments</div>
-        </div>
-        <div>
-            <a href="students_list.php" class="btn btn-outline-primary rounded-pill px-3">
-                <i class="fas fa-list me-2"></i>View All Students
-            </a>
-        </div>
-    </div>
-    <div class="row g-3 mb-4">
-        <div class="col-md-3">
-            <div class="card border-0 rounded-4 shadow-sm">
-                <div class="card-body p-3">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <div class="text-secondary small">Total Students</div>
-                            <h3 class="mb-0 fw-bold"><?= $total_students ?></h3>
-                            <div class="text-secondary small">All students</div>
-                        </div>
-                        <div class="bg-primary bg-opacity-10 rounded-circle p-3">
-                            <i class="fas fa-users text-primary fs-4"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card border-0 rounded-4 shadow-sm">
-                <div class="card-body p-3">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <div class="text-secondary small">Active Students</div>
-                            <h3 class="mb-0 fw-bold text-success"><?= $active_students ?></h3>
-                            <div class="text-secondary small">Currently active</div>
-                        </div>
-                        <div class="bg-success bg-opacity-10 rounded-circle p-3">
-                            <i class="fas fa-check-circle text-success fs-4"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card border-0 rounded-4 shadow-sm">
-                <div class="card-body p-3">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <div class="text-secondary small">Today's Admissions</div>
-                            <h3 class="mb-0 fw-bold text-info"><?= $today_admissions ?></h3>
-                            <div class="text-secondary small">New enrollments today</div>
-                        </div>
-                        <div class="bg-info bg-opacity-10 rounded-circle p-3">
-                            <i class="fas fa-calendar-plus text-info fs-4"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card border-0 rounded-4 shadow-sm">
-                <div class="card-body p-3">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <div class="text-secondary small">Total Classes</div>
-                            <h3 class="mb-0 fw-bold text-warning"><?= count($classes) ?></h3>
-                            <div class="text-secondary small">Active classes</div>
-                        </div>
-                        <div class="bg-warning bg-opacity-10 rounded-circle p-3">
-                            <i class="fas fa-school text-warning fs-4"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
     <?php if (isset($_SESSION['success'])): ?>
@@ -264,12 +193,26 @@ include 'includes/header.php';
                     <label class="form-label fw-semibold">Email</label>
                     <input type="email" class="form-control" name="email" placeholder="student@example.com">
                 </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Student Type</label>
+                    <select class="form-select" name="student_type">
+                        <option value="">Select Type</option>
+                        <option value="RTO">RTO</option>
+                        <option value="Non-RTO">Non-RTO</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Admission Fees</label>
+                    <input type="number" class="form-control" name="admission_fees" placeholder="0.00" min="0" step="0.01" required>
+                </div>
                 <div class="col-md-12">
                     <label class="form-label fw-semibold">Address</label>
                     <textarea class="form-control" name="address" rows="2" placeholder="Full Address"></textarea>
                 </div>
                 <div class="col-12">
-                    <h6 class="fw-bold mb-3 mt-2"><i class="fas fa-address-card text-primary me-2"></i>Parent / Guardian Details</h6>
+                    <h6 class="fw-bold mb-3 mt-2"><i class="fas fa-address-card text-primary me-2"></i>Parent / Guardian
+                        Details</h6>
                 </div>
 
                 <div class="col-md-4">
@@ -307,7 +250,8 @@ include 'includes/header.php';
                     <small class="text-secondary">Upload Student's Aadhaar</small>
                 </div>
                 <div class="col-12">
-                    <h6 class="fw-bold mb-3 mt-4"><i class="fas fa-book-open text-primary me-2"></i>Academic Details</h6>
+                    <h6 class="fw-bold mb-3 mt-4"><i class="fas fa-book-open text-primary me-2"></i>Academic Details
+                    </h6>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label fw-semibold">Class <span class="text-danger">*</span></label>
@@ -318,7 +262,8 @@ include 'includes/header.php';
                         <?php endforeach; ?>
                     </select>
                     <?php if (count($classes) == 0): ?>
-                    <small class="text-danger">No classes found. Please <a href="classes.php">add a class</a> first.</small>
+                    <small class="text-danger">No classes found. Please <a href="classes.php">add a class</a>
+                        first.</small>
                     <?php endif; ?>
                 </div>
                 <div class="col-md-4">
@@ -326,7 +271,8 @@ include 'includes/header.php';
                     <select class="form-select" name="section_id">
                         <option value="">Select Section</option>
                         <?php foreach ($sections as $section): ?>
-                        <option value="<?= $section['id'] ?>"><?= htmlspecialchars($section['section_name']) ?> (<?= htmlspecialchars($section['class_name']) ?>)</option>
+                        <option value="<?= $section['id'] ?>"><?= htmlspecialchars($section['section_name']) ?>
+                            (<?= htmlspecialchars($section['class_name']) ?>)</option>
                         <?php endforeach; ?>
                     </select>
                 </div>
@@ -336,7 +282,8 @@ include 'includes/header.php';
                     <small class="text-secondary">Will be auto-generated on submit</small>
                 </div>
                 <div class="col-12">
-                    <h6 class="fw-bold mb-3 mt-4"><i class="fas fa-file-upload text-primary me-2"></i>Other Documents</h6>
+                    <h6 class="fw-bold mb-3 mt-4"><i class="fas fa-file-upload text-primary me-2"></i>Other Documents
+                    </h6>
                 </div>
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Birth Certificate</label>
@@ -392,7 +339,9 @@ include 'includes/header.php';
                         <?php $i = 1; foreach ($recent_admissions as $student): ?>
                         <tr>
                             <td><?= $i++ ?></td>
-                            <td><span class="badge bg-light text-dark"><?= htmlspecialchars($student['admission_no']) ?></span></td>
+                            <td><span
+                                    class="badge bg-light text-dark"><?= htmlspecialchars($student['admission_no']) ?></span>
+                            </td>
                             <td><strong><?= htmlspecialchars($student['name']) ?></strong></td>
                             <td><?= htmlspecialchars($student['class_name'] ?? '—') ?></td>
                             <td><?= htmlspecialchars($student['section_name'] ?? '—') ?></td>
@@ -407,10 +356,12 @@ include 'includes/header.php';
                             </td>
                             <td>
                                 <div class="d-flex gap-2">
-                                    <a href="view_student.php?id=<?= $student['id'] ?>" class="btn btn-sm btn-outline-primary rounded-pill" title="View">
+                                    <a href="view_student.php?id=<?= $student['id'] ?>"
+                                        class="btn btn-sm btn-outline-primary rounded-pill" title="View">
                                         <i class="fas fa-eye"></i>
                                     </a>
-                                    <a href="edit_student.php?id=<?= $student['id'] ?>" class="btn btn-sm btn-outline-warning rounded-pill" title="Edit">
+                                    <a href="edit_student.php?id=<?= $student['id'] ?>"
+                                        class="btn btn-sm btn-outline-warning rounded-pill" title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                 </div>

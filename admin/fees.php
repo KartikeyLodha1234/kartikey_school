@@ -104,7 +104,7 @@ $total_amount = array_sum(array_column($fees, 'amount'));
 <div class="main-content">
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
         <div>
-            <h3 class="mb-1"><i class="fas fa-money-bill-wave text-primary me-2"></i>Fees</h3>
+            <h3 class="mb-1">Fees</h3>
             <div class="text-secondary small">Manage academic fees and their details.</div>
         </div>
     </div>
@@ -204,6 +204,7 @@ $total_amount = array_sum(array_column($fees, 'amount'));
                     <label class="form-label">Fee Type</label>
                     <select class="form-select" name="fee_type">
                         <option value="">Select Fee Type</option>
+                        <option value="Admission" <?= $edit_fee && $edit_fee['fee_type'] == 'Admission' ? 'selected' : '' ?>>Admission</option>
                         <option value="Tuition" <?= $edit_fee && $edit_fee['fee_type'] == 'Tuition' ? 'selected' : '' ?>>Tuition</option>
                         <option value="Exam" <?= $edit_fee && $edit_fee['fee_type'] == 'Exam' ? 'selected' : '' ?>>Exam</option>
                         <option value="Library" <?= $edit_fee && $edit_fee['fee_type'] == 'Library' ? 'selected' : '' ?>>Library</option>
