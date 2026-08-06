@@ -20,7 +20,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_admission'])) {
     $class_id = intval($_POST['class_id'] ?? 0);
     $section_id = intval($_POST['section_id'] ?? 0);
     $student_type = trim($_POST['student_type'] ?? 'Non-RTO');
-    $admission_fees = trim($_POST['admission_fees'] ?? 0);
+    
+    // ====== FIX: Get admission_fees from POST ======
+    $admission_fees = floatval($_POST['admission_fees'] ?? 0);
+    
     $admission_no = 'ADM-' . date('Y') . '-' . str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
     
     if ($name === '' || $dob === '' || $gender === '' || $class_id === 0) {
@@ -36,49 +39,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_admission'])) {
             if (!file_exists($upload_dir)) {
                 mkdir($upload_dir, 0777, true);
             }            
-            // Upload Photo
+            
+            // File uploads...
             $photo = '';
             if (isset($_FILES['photo']) && $_FILES['photo']['error'] === 0) {
                 $ext = pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION);
                 $photo = 'photo_' . time() . '_' . rand(1000, 9999) . '.' . $ext;
                 move_uploaded_file($_FILES['photo']['tmp_name'], $upload_dir . $photo);
-            }            
-            // Upload Birth Certificate
+            }
+            
             $birth_certificate = '';
             if (isset($_FILES['birth_certificate']) && $_FILES['birth_certificate']['error'] === 0) {
                 $ext = pathinfo($_FILES['birth_certificate']['name'], PATHINFO_EXTENSION);
                 $birth_certificate = 'birth_' . time() . '_' . rand(1000, 9999) . '.' . $ext;
                 move_uploaded_file($_FILES['birth_certificate']['tmp_name'], $upload_dir . $birth_certificate);
-            }            
-            // Upload Marksheet
+            }
+            
             $marksheet = '';
             if (isset($_FILES['marksheet']) && $_FILES['marksheet']['error'] === 0) {
                 $ext = pathinfo($_FILES['marksheet']['name'], PATHINFO_EXTENSION);
                 $marksheet = 'marksheet_' . time() . '_' . rand(1000, 9999) . '.' . $ext;
                 move_uploaded_file($_FILES['marksheet']['tmp_name'], $upload_dir . $marksheet);
-            }            
-            // Upload TC Certificate
+            }
+            
             $tc_certificate = '';
             if (isset($_FILES['tc_certificate']) && $_FILES['tc_certificate']['error'] === 0) {
                 $ext = pathinfo($_FILES['tc_certificate']['name'], PATHINFO_EXTENSION);
                 $tc_certificate = 'tc_' . time() . '_' . rand(1000, 9999) . '.' . $ext;
                 move_uploaded_file($_FILES['tc_certificate']['tmp_name'], $upload_dir . $tc_certificate);
-            }            
-            // Upload Student Aadhaar
+            }
+            
             $aadhaar = '';
             if (isset($_FILES['aadhaar']) && $_FILES['aadhaar']['error'] === 0) {
                 $ext = pathinfo($_FILES['aadhaar']['name'], PATHINFO_EXTENSION);
                 $aadhaar = 'aadhaar_' . time() . '_' . rand(1000, 9999) . '.' . $ext;
                 move_uploaded_file($_FILES['aadhaar']['tmp_name'], $upload_dir . $aadhaar);
-            }            
-            // Upload Father Aadhaar
+            }
+            
             $father_aadhaar = '';
             if (isset($_FILES['father_aadhaar']) && $_FILES['father_aadhaar']['error'] === 0) {
                 $ext = pathinfo($_FILES['father_aadhaar']['name'], PATHINFO_EXTENSION);
                 $father_aadhaar = 'father_aadhaar_' . time() . '_' . rand(1000, 9999) . '.' . $ext;
                 move_uploaded_file($_FILES['father_aadhaar']['tmp_name'], $upload_dir . $father_aadhaar);
-            }            
-            // Upload Mother Aadhaar
+            }
+            
             $mother_aadhaar = '';
             if (isset($_FILES['mother_aadhaar']) && $_FILES['mother_aadhaar']['error'] === 0) {
                 $ext = pathinfo($_FILES['mother_aadhaar']['name'], PATHINFO_EXTENSION);
@@ -86,7 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_admission'])) {
                 move_uploaded_file($_FILES['mother_aadhaar']['tmp_name'], $upload_dir . $mother_aadhaar);
             }
             
-            // ====== UPDATED: Insert with student_type and admission_fees ======
+            // ====== INSERT with admission_fees ======
             $stmt = $conn->prepare("INSERT INTO students (admission_no, name, class_id, section_id, gender, dob, phone, email, address, father_name, mother_name, parent_phone, parent_email, photo, birth_certificate, marksheet, tc_certificate, aadhaar, father_aadhaar, mother_aadhaar, student_type, admission_fees, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Active')");
             $stmt->execute([$admission_no, $name, $class_id, $section_id, $gender, $dob, $phone, $email, $address, $father_name, $mother_name, $parent_phone, $parent_email, $photo, $birth_certificate, $marksheet, $tc_certificate, $aadhaar, $father_aadhaar, $mother_aadhaar, $student_type, $admission_fees]);
             
@@ -100,14 +104,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_admission'])) {
     }
 }
 
-// ====== FETCH ALL CLASSES FOR DROPDOWN ======
-try {
-    $stmt = $conn->query("SELECT id, class_name FROM classes WHERE status = 'Active' ORDER BY class_name");
-    $classes = $stmt->fetchAll(PDO::FETCH_ASSOC);
-} catch (Exception $e) {
-    $classes = [];
-}
-
 // ====== FETCH ADMISSION FEES FROM FEES TABLE ======
 try {
     $stmt = $conn->query("SELECT class_id, amount FROM fees WHERE fee_type = 'Admission' AND status = 'Active' ORDER BY class_id");
@@ -119,7 +115,15 @@ try {
     $admission_fee_map = [];
 }
 
-// ====== FETCH ALL SECTIONS FOR DROPDOWN ======
+// ====== FETCH ALL CLASSES ======
+try {
+    $stmt = $conn->query("SELECT id, class_name FROM classes WHERE status = 'Active' ORDER BY class_name");
+    $classes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (Exception $e) {
+    $classes = [];
+}
+
+// ====== FETCH ALL SECTIONS ======
 try {
     $stmt = $conn->query("SELECT s.*, c.class_name FROM sections s LEFT JOIN classes c ON s.class_id = c.id ORDER BY c.class_name, s.section_name");
     $sections = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -162,7 +166,6 @@ include 'includes/header.php';
 
 <!-- ====== PAGE CONTENT ====== -->
 <div class="main-content">
-    <!-- Page Header -->
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
         <div>
             <h3 class="mb-1"><i class="fas fa-user-graduate text-primary me-2"></i>Admission</h3>
@@ -269,7 +272,7 @@ include 'includes/header.php';
             <form class="row g-3" method="post" enctype="multipart/form-data">
                 <input type="hidden" name="add_admission" value="1">
                 
-                <!-- ====== PERSONAL INFORMATION ====== -->
+                <!-- Personal Information -->
                 <div class="col-12">
                     <h6 class="fw-bold mb-3"><i class="fas fa-user text-primary me-2"></i>Personal Information</h6>
                 </div>
@@ -308,7 +311,7 @@ include 'includes/header.php';
                     <textarea class="form-control" name="address" rows="2" placeholder="Full Address"></textarea>
                 </div>
 
-                <!-- ====== PARENT / GUARDIAN DETAILS ====== -->
+                <!-- Parent Details -->
                 <div class="col-12">
                     <h6 class="fw-bold mb-3 mt-2"><i class="fas fa-address-card text-primary me-2"></i>Parent / Guardian Details</h6>
                 </div>
@@ -329,7 +332,7 @@ include 'includes/header.php';
                     <input type="email" class="form-control" name="parent_email" placeholder="parent@example.com">
                 </div>
 
-                <!-- ====== AADHAAR DOCUMENTS ====== -->
+                <!-- Aadhaar Documents -->
                 <div class="col-12">
                     <h6 class="fw-bold mb-3 mt-4"><i class="fas fa-id-card text-primary me-2"></i>Aadhaar Documents</h6>
                 </div>
@@ -349,13 +352,13 @@ include 'includes/header.php';
                     <small class="text-secondary">Upload Student's Aadhaar</small>
                 </div>
 
-                <!-- ====== ACADEMIC DETAILS ====== -->
+                <!-- Academic Details -->
                 <div class="col-12">
                     <h6 class="fw-bold mb-3 mt-4"><i class="fas fa-book-open text-primary me-2"></i>Academic Details</h6>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label fw-semibold">Class <span class="text-danger">*</span></label>
-                    <select class="form-select" name="class_id" required>
+                    <select class="form-select" name="class_id" id="classSelect" required>
                         <option value="">Select Class</option>
                         <?php foreach ($classes as $class): ?>
                         <option value="<?= $class['id'] ?>"><?= htmlspecialchars($class['class_name']) ?></option>
@@ -380,25 +383,25 @@ include 'includes/header.php';
                     <small class="text-secondary">Will be auto-generated on submit</small>
                 </div>
 
-                <!-- ====== STUDENT TYPE & ADMISSION FEES ====== -->
+                <!-- Fee Details -->
                 <div class="col-12">
                     <h6 class="fw-bold mb-3 mt-4"><i class="fas fa-tag text-primary me-2"></i>Fee Details</h6>
                 </div>
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Student Type</label>
-                    <select class="form-select" name="student_type">
+                    <select class="form-select" name="student_type" id="studentType">
                         <option value="Non-RTO">Non-RTO</option>
                         <option value="RTO">RTO</option>
                     </select>
-                    <small class="text-secondary">RTO - Right to Education, Non-RTO - General</small>
+                    <small class="text-secondary">RTO - Right to Education (No fees), Non-RTO - General (Fee applicable)</small>
                 </div>
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Admission Fees (₹)</label>
-                    <input type="number" class="form-control" id="admission_fees" name="admission_fees" placeholder="0.00" min="0" step="0.01" value="<?= htmlspecialchars($_POST['admission_fees'] ?? '') ?>">
-                    <small class="text-secondary">Auto-filled from the Admission fee set in Fees</small>
+                    <input type="number" class="form-control" id="admission_fees" name="admission_fees" placeholder="0.00" min="0" step="0.01" readonly>
+                    <small class="text-secondary">Auto-filled from fees.php (Admission fee type)</small>
                 </div>
 
-                <!-- ====== OTHER DOCUMENTS ====== -->
+                <!-- Other Documents -->
                 <div class="col-12">
                     <h6 class="fw-bold mb-3 mt-4"><i class="fas fa-file-upload text-primary me-2"></i>Other Documents</h6>
                 </div>
@@ -418,7 +421,7 @@ include 'includes/header.php';
                     <small class="text-secondary">Upload Transfer Certificate</small>
                 </div>
 
-                <!-- ====== FORM ACTIONS ====== -->
+                <!-- Form Actions -->
                 <div class="col-12 d-flex justify-content-end gap-2 mt-3">
                     <button type="reset" class="btn btn-outline-secondary rounded-pill px-4">
                         <i class="fas fa-undo me-2"></i>Reset
@@ -431,28 +434,40 @@ include 'includes/header.php';
         </div>
     </div>
 
+    <!-- ====== JAVASCRIPT ====== -->
     <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const classSelect = document.querySelector('select[name="class_id"]');
+        const classSelect = document.getElementById('classSelect');
         const feeInput = document.getElementById('admission_fees');
+        const studentType = document.getElementById('studentType');
+        
+        // Fee map from PHP
         const feeMap = <?= json_encode($admission_fee_map, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
-
-        if (!classSelect || !feeInput) {
-            return;
-        }
 
         function updateAdmissionFee() {
             const classId = classSelect.value;
-            const amount = feeMap[classId];
+            const type = studentType.value;
+            const amount = feeMap[classId] ?? 0;
 
-            if (amount !== undefined && amount !== null && amount !== '') {
-                feeInput.value = amount;
+            if (type === 'RTO') {
+                feeInput.value = '';
+                feeInput.style.backgroundColor = '#f8f9fa';
+                feeInput.style.borderColor = '#dee2e6';
+            } else if (classId) {
+                feeInput.value = amount > 0 ? Number(amount).toFixed(2) : '';
+                feeInput.style.backgroundColor = '#ffffff';
+                feeInput.style.borderColor = amount > 0 ? '#28a745' : '#dee2e6';
             } else {
                 feeInput.value = '';
+                feeInput.style.backgroundColor = '#ffffff';
+                feeInput.style.borderColor = '#dee2e6';
             }
         }
 
         classSelect.addEventListener('change', updateAdmissionFee);
+        studentType.addEventListener('change', updateAdmissionFee);
+        
+        // Initial call
         updateAdmissionFee();
     });
     </script>
@@ -477,6 +492,7 @@ include 'includes/header.php';
                             <th>Section</th>
                             <th>Father Name</th>
                             <th>Type</th>
+                            <th>Fees (₹)</th>
                             <th>Status</th>
                             <th>Action</th>
                         </tr>
@@ -498,6 +514,7 @@ include 'includes/header.php';
                                 <span class="badge bg-secondary">Non-RTO</span>
                                 <?php endif; ?>
                             </td>
+                            <td>₹<?= number_format($student['admission_fees'], 2) ?></td>
                             <td>
                                 <?php if ($student['status'] == 'Active'): ?>
                                 <span class="status-badge bg-success-subtle text-success">Active</span>
@@ -519,7 +536,7 @@ include 'includes/header.php';
                         <?php endforeach; ?>
                         <?php else: ?>
                         <tr>
-                            <td colspan="9" class="text-center py-4 text-secondary">
+                            <td colspan="10" class="text-center py-4 text-secondary">
                                 <i class="fas fa-inbox fa-3x d-block mb-2 text-muted"></i>
                                 No admissions found. Fill the form above to add one.
                             </td>
