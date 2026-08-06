@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 05, 2026 at 03:24 PM
+-- Generation Time: Aug 06, 2026 at 07:12 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -219,7 +219,14 @@ CREATE TABLE `students` (
   `mother_name` varchar(100) DEFAULT NULL,
   `parent_phone` varchar(20) DEFAULT NULL,
   `status` enum('Active','Inactive') DEFAULT 'Active',
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `photo` varchar(255) DEFAULT NULL,
+  `birth_certificate` varchar(255) DEFAULT NULL,
+  `marksheet` varchar(255) DEFAULT NULL,
+  `tc_certificate` varchar(255) DEFAULT NULL,
+  `aadhaar` varchar(255) DEFAULT NULL,
+  `father_aadhaar` varchar(255) DEFAULT NULL,
+  `mother_aadhaar` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------

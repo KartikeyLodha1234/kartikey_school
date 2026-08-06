@@ -3,11 +3,16 @@ ob_start();
 include '../config/config.php';
 include 'includes/auth_check.php'; 
 checkRole(['admin']);
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Handle form submission and save admission data to the database
-    // You can access form data using $_POST and uploaded files using $_FILES
-    // Example: $studentName = $_POST['student_name'];
-    // Example: $photo = $_FILES['photo'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_admission'])) {
+    // Handle form submission for adding a new admission
+    $student_name = $_POST['student_name'];
+    $dob = $_POST['dob'];
+    $gender = $_POST['gender'];
+    $phone = trim($_POST['phone'] ?? '');
+    $email = trim($_POST['email'] ?? '');
+    $address = trim($_POST['address'] ?? '');
+    $father_name = trim($_POST['father_name'] ?? '');
+
 }
 include 'includes/header.php';
 ?>
