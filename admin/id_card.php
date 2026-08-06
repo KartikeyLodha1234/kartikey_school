@@ -56,7 +56,7 @@ include 'includes/header.php';
 ?>
 
 <style>
-/* ====== ID CARD PRINT STYLES ====== */
+/* ====== ID CARD STYLES ====== */
 .id-card-container {
     display: none;
     position: fixed;
@@ -214,6 +214,7 @@ include 'includes/header.php';
         border: 1px solid #ddd;
         page-break-after: always;
         width: 100%;
+        border-radius: 0;
     }
     .id-card-container .btn-close-card {
         display: none !important;
@@ -295,8 +296,8 @@ include 'includes/header.php';
             <h3 class="mb-1"><i class="fas fa-id-card text-primary me-2"></i>Student ID Card</h3>
             <div class="text-secondary small">Generate and manage student identity cards.</div>
         </div>
-        <div class="d-flex gap-2">
-            <button class="btn btn-outline-primary rounded-pill px-3 no-print" onclick="window.print()">
+        <div class="d-flex gap-2 no-print">
+            <button class="btn btn-outline-primary rounded-pill px-3" onclick="printAllCards()">
                 <i class="fas fa-print me-2"></i>Print All
             </button>
         </div>
@@ -419,7 +420,6 @@ function openIDCard(studentId) {
     const modal = document.getElementById('idCardModal');
     const content = document.getElementById('idCardContent');
     
-    // Show loading
     content.innerHTML = `
         <div class="text-center py-5">
             <div class="spinner-border text-primary" role="status">
@@ -431,8 +431,8 @@ function openIDCard(studentId) {
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';
     
-    // Fetch ID card data
-    fetch(`ajax_get_id_card.php?id=${studentId}`)
+    // FIXED: Use correct path with full URL
+    fetch('ajax_get_id_card.php?id=' + studentId)
         .then(response => response.text())
         .then(data => {
             content.innerHTML = data;
@@ -442,6 +442,7 @@ function openIDCard(studentId) {
                 <div class="text-center py-4 text-danger">
                     <i class="fas fa-exclamation-circle fa-3x mb-2"></i>
                     <p>Error loading ID card. Please try again.</p>
+                    <p class="small">${error}</p>
                 </div>
             `;
         });
@@ -454,42 +455,81 @@ function closeIDCard(event) {
     document.body.style.overflow = '';
 }
 
+// ====== FIXED: Print ID Card ======
 function printIDCard(studentId) {
-    // Open in new window for printing
-    const printWindow = window.open('', '_blank', 'width=800,height=600');
+    const printWindow = window.open('', '_blank', 'width=450,height=650');
+    
     printWindow.document.write(`
         <!DOCTYPE html>
         <html>
         <head>
             <title>Student ID Card</title>
-            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
             <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
                 body { 
                     margin: 0; 
-                    padding: 20px; 
+                    padding: 0; 
                     display: flex; 
                     justify-content: center; 
                     align-items: center; 
                     min-height: 100vh; 
                     background: #f3f4f6;
+                    font-family: 'Segoe UI', Arial, sans-serif;
                 }
-                .id-card {
+                .print-container {
                     background: white;
-                    border-radius: 15px;
-                    padding: 25px;
-                    width: 400px;
-                    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+                    border-radius: 14px;
+                    padding: 20px;
+                    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+                    max-width: 420px;
+                    width: 100%;
+                }
+                .loading {
+                    text-align: center;
+                    padding: 40px 0;
+                }
+                .spinner {
+                    border: 4px solid #f3f3f3;
+                    border-top: 4px solid #2563eb;
+                    border-radius: 50%;
+                    width: 40px;
+                    height: 40px;
+                    animation: spin 1s linear infinite;
+                    margin: 0 auto 15px;
+                }
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
                 }
                 @media print {
-                    body { background: white; padding: 0; }
-                    .id-card { box-shadow: none; border: 1px solid #ddd; }
+                    body { 
+                        background: white; 
+                        padding: 0; 
+                        margin: 0;
+                        min-height: 100vh;
+                    }
+                    .print-container { 
+                        box-shadow: none; 
+                        border: none;
+                        border-radius: 0;
+                        padding: 15px;
+                        max-width: 100%;
+                        width: 100%;
+                        min-height: 100vh;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                    }
+                    .no-print { display: none !important; }
                 }
             </style>
         </head>
         <body>
-            <div id="printContent" class="text-center">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Loading...</span>
+            <div class="print-container" id="printContent">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p style="color:#6b7280; font-size:14px;">Loading ID Card...</p>
                 </div>
             </div>
             <script>
@@ -497,8 +537,109 @@ function printIDCard(studentId) {
                     .then(response => response.text())
                     .then(data => {
                         document.getElementById('printContent').innerHTML = data;
-                        setTimeout(() => window.print(), 500);
+                        setTimeout(function() {
+                            window.print();
+                        }, 800);
+                    })
+                    .catch(error => {
+                        document.getElementById('printContent').innerHTML = \`
+                            <div style="text-align:center; padding:30px; color:#dc3545;">
+                                <i class="fas fa-exclamation-circle fa-3x mb-3"></i>
+                                <p>Error loading ID card. Please try again.</p>
+                                <p class="small">\${error}</p>
+                            </div>
+                        \`;
                     });
+            <\/script>
+        </body>
+        </html>
+    `);
+    printWindow.document.close();
+}
+
+// ====== FIXED: Print All Cards ======
+function printAllCards() {
+    const studentIds = <?= json_encode(array_column($students, 'id')) ?>;
+    if (studentIds.length === 0) {
+        alert('No students found to print.');
+        return;
+    }
+    
+    const printWindow = window.open('', '_blank', 'width=450,height=650');
+    let cardsHtml = '';
+    
+    studentIds.forEach((id, index) => {
+        cardsHtml += `<div class="card-wrapper" id="card-${id}">Loading card ${index + 1}...</div>`;
+    });
+    
+    printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>All Student ID Cards</title>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+            <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                body { 
+                    margin: 0; 
+                    padding: 20px; 
+                    background: white;
+                    font-family: 'Segoe UI', Arial, sans-serif;
+                }
+                .card-wrapper {
+                    margin: 10px auto;
+                    max-width: 420px;
+                    page-break-after: always;
+                }
+                .spinner {
+                    border: 4px solid #f3f3f3;
+                    border-top: 4px solid #2563eb;
+                    border-radius: 50%;
+                    width: 30px;
+                    height: 30px;
+                    animation: spin 1s linear infinite;
+                    margin: 0 auto 15px;
+                }
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+                @media print {
+                    body { padding: 0; margin: 0; }
+                    .card-wrapper { margin: 0 auto; }
+                }
+            </style>
+        </head>
+        <body>
+            <div id="allCardsContainer">
+                ${cardsHtml}
+            </div>
+            <script>
+                const studentIds = ${json_encode(array_column($students, 'id'))};
+                let loadedCount = 0;
+                const totalCards = studentIds.length;
+                
+                studentIds.forEach((id) => {
+                    fetch('ajax_get_id_card.php?id=' + id)
+                        .then(response => response.text())
+                        .then(data => {
+                            document.getElementById('card-' + id).innerHTML = data;
+                            loadedCount++;
+                            if (loadedCount === totalCards) {
+                                setTimeout(function() {
+                                    window.print();
+                                }, 1000);
+                            }
+                        })
+                        .catch(error => {
+                            document.getElementById('card-' + id).innerHTML = \`
+                                <div style="text-align:center; padding:20px; color:#dc3545;">
+                                    Error loading card
+                                </div>
+                            \`;
+                            loadedCount++;
+                        });
+                });
             <\/script>
         </body>
         </html>
