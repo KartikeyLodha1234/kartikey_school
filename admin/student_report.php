@@ -3,6 +3,110 @@ include '../config/config.php';
 include 'includes/auth_check.php';
 checkRole(['admin']);
 
+function fetchStudents($conn)
+{
+    try {
+        $stmt = $conn->query("SELECT s.*, c.class_name, sec.section_name FROM students s LEFT JOIN classes c ON s.class_id = c.id LEFT JOIN sections sec ON s.section_id = sec.id ORDER BY s.id DESC");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (Exception $e) {
+        return [];
+    }
+}
+
+function exportExcel($students)
+{
+    $rows = [];
+    $rows[] = ['Admission No', 'Student Name', 'Class', 'Father Name', 'Contact', 'Date', 'Status', 'Student Type', 'Admission Fees'];
+
+    foreach ($students as $student) {
+        $rows[] = [
+            $student['admission_no'] ?? '—',
+            $student['name'] ?? '—',
+            $student['class_name'] ?? '—',
+            $student['father_name'] ?? '—',
+            $student['parent_phone'] ?? $student['phone'] ?? '—',
+            !empty($student['created_at']) ? date('d M Y', strtotime($student['created_at'])) : '—',
+            $student['status'] ?? '—',
+            $student['student_type'] ?? '—',
+            '₹' . number_format((float)($student['admission_fees'] ?? 0), 2),
+        ];
+    }
+
+    header('Content-Type: application/vnd.ms-excel; charset=utf-8');
+    header('Content-Disposition: attachment; filename="student_report.xls"');
+    echo "\xEF\xBB\xBF";
+    $output = fopen('php://output', 'w');
+    foreach ($rows as $row) {
+        $cleanRow = array_map(function ($value) {
+            return str_replace(["\r", "\n"], ' ', (string) $value);
+        }, $row);
+        fputcsv($output, $cleanRow, "\t");
+    }
+    fclose($output);
+    exit();
+}
+
+function exportPdf($students)
+{
+    $lines = [];
+    $lines[] = 'Student Admission Report';
+    $lines[] = 'Generated: ' . date('d M Y H:i:s');
+    $lines[] = '';
+
+    foreach ($students as $index => $student) {
+        $lines[] = ($index + 1) . '. ' . ($student['admission_no'] ?? '—')
+            . ' | ' . ($student['name'] ?? '—')
+            . ' | ' . ($student['class_name'] ?? '—')
+            . ' | ' . ($student['father_name'] ?? '—')
+            . ' | ' . ($student['parent_phone'] ?? $student['phone'] ?? '—')
+            . ' | ' . ($student['student_type'] ?? '—')
+            . ' | ' . number_format((float)($student['admission_fees'] ?? 0), 2);
+    }
+
+    $contentStream = '';
+    $y = 770;
+    foreach ($lines as $line) {
+        $escapedLine = str_replace(['\\', '(', ')'], ['\\\\', '\\(', '\\)'], $line);
+        $contentStream .= "BT /F1 10 Tf 50 {$y} Td ({$escapedLine}) Tj ET\n";
+        $y -= 12;
+    }
+
+    $objects = [];
+    $objects[] = "1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj";
+    $objects[] = "2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj";
+    $objects[] = "3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>\nendobj";
+    $objects[] = "4 0 obj\n<< /Length " . strlen($contentStream) . " >>\nstream\n" . $contentStream . "\nendstream\nendobj";
+    $objects[] = "5 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj";
+
+    $pdf = "%PDF-1.4\n";
+    $offsets = [];
+    foreach ($objects as $object) {
+        $offsets[] = strlen($pdf);
+        $pdf .= $object . "\n";
+    }
+
+    $startxref = strlen($pdf);
+    $pdf .= "xref\n0 " . (count($objects) + 1) . "\n";
+    $pdf .= "0000000000 65535 f \n";
+    foreach ($offsets as $offset) {
+        $pdf .= str_pad($offset, 10, '0', STR_PAD_LEFT) . " 00000 n \n";
+    }
+    $pdf .= "trailer\n<< /Size " . (count($objects) + 1) . " /Root 1 0 R >>\nstartxref\n" . $startxref . "\n%%EOF";
+
+    header('Content-Type: application/pdf');
+    header('Content-Disposition: attachment; filename="student_report.pdf"');
+    echo $pdf;
+    exit();
+}
+
+if (isset($_GET['export']) && in_array($_GET['export'], ['excel', 'pdf'], true)) {
+    $students = fetchStudents($conn);
+    if ($_GET['export'] === 'excel') {
+        exportExcel($students);
+    }
+    exportPdf($students);
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_student'])) {
     $student_id = intval($_POST['student_id'] ?? 0);
     if ($student_id > 0) {
@@ -52,12 +156,7 @@ try {
     $classes = [];
 }
 
-try {
-    $stmt = $conn->query("SELECT s.*, c.class_name, sec.section_name FROM students s LEFT JOIN classes c ON s.class_id = c.id LEFT JOIN sections sec ON s.section_id = sec.id ORDER BY s.id DESC");
-    $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
-} catch (Exception $e) {
-    $students = [];
-}
+$students = fetchStudents($conn);
 
 $selected_student = null;
 $mode = '';
@@ -90,12 +189,12 @@ include 'includes/header.php';
             <div class="text-secondary small">View and manage student admission information.</div>
         </div>
         <div class="d-flex gap-2">
-            <button class="btn btn-outline-primary rounded-pill px-3">
+            <a href="student_report.php?export=pdf" class="btn btn-outline-primary rounded-pill px-3">
                 <i class="fas fa-file-pdf me-2"></i>PDF
-            </button>
-            <button class="btn btn-outline-success rounded-pill px-3">
+            </a>
+            <a href="student_report.php?export=excel" class="btn btn-outline-success rounded-pill px-3">
                 <i class="fas fa-file-excel me-2"></i>Excel
-            </button>
+            </a>
             <button class="btn btn-primary rounded-pill px-3">
                 <i class="fas fa-print me-2"></i>Print
             </button>
