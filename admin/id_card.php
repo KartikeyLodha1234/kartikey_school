@@ -56,7 +56,6 @@ include 'includes/header.php';
 ?>
 
 <style>
-/* ====== ID CARD STYLES ====== */
 .id-card-container {
     display: none;
     position: fixed;
@@ -202,28 +201,6 @@ include 'includes/header.php';
     margin-top: 5px;
 }
 
-/* Print Styles */
-@media print {
-    .id-card-container {
-        position: static;
-        background: white;
-        padding: 0;
-    }
-    .id-card {
-        box-shadow: none;
-        border: 1px solid #ddd;
-        page-break-after: always;
-        width: 100%;
-        border-radius: 0;
-    }
-    .id-card-container .btn-close-card {
-        display: none !important;
-    }
-    .no-print {
-        display: none !important;
-    }
-}
-
 /* ID Card Grid View */
 .id-card-grid {
     display: grid;
@@ -290,7 +267,6 @@ include 'includes/header.php';
 
 <!-- ====== PAGE CONTENT ====== -->
 <div class="main-content">
-    <!-- Page Header -->
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
         <div>
             <h3 class="mb-1"><i class="fas fa-id-card text-primary me-2"></i>Student ID Card</h3>
@@ -303,7 +279,6 @@ include 'includes/header.php';
         </div>
     </div>
 
-    <!-- ====== SEARCH/FILTER ====== -->
     <div class="card border-0 rounded-4 shadow-sm mb-4 no-print">
         <div class="card-body">
             <form method="get" class="row g-3 align-items-center">
@@ -341,7 +316,6 @@ include 'includes/header.php';
         </div>
     </div>
 
-    <!-- ====== ID CARD GRID VIEW ====== -->
     <div class="card border-0 rounded-4 shadow-sm">
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-center mb-3">
@@ -396,15 +370,11 @@ include 'includes/header.php';
 <div class="id-card-container" id="idCardModal" onclick="closeIDCard(event)">
     <div class="id-card" onclick="event.stopPropagation();">
         <div class="card-pattern"></div>
-        
-        <!-- Close Button -->
         <button class="btn btn-sm btn-outline-secondary rounded-circle position-absolute top-0 end-0 m-2 btn-close-card" 
                 onclick="closeIDCard(event)" style="z-index: 10;">
             <i class="fas fa-times"></i>
         </button>
-        
         <div id="idCardContent">
-            <!-- ID Card content loaded via AJAX -->
             <div class="text-center py-5">
                 <div class="spinner-border text-primary" role="status">
                     <span class="visually-hidden">Loading...</span>
@@ -431,7 +401,6 @@ function openIDCard(studentId) {
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';
     
-    // FIXED: Use correct path with full URL
     fetch('ajax_get_id_card.php?id=' + studentId)
         .then(response => response.text())
         .then(data => {
@@ -442,7 +411,6 @@ function openIDCard(studentId) {
                 <div class="text-center py-4 text-danger">
                     <i class="fas fa-exclamation-circle fa-3x mb-2"></i>
                     <p>Error loading ID card. Please try again.</p>
-                    <p class="small">${error}</p>
                 </div>
             `;
         });
@@ -455,9 +423,9 @@ function closeIDCard(event) {
     document.body.style.overflow = '';
 }
 
-// ====== FIXED: Print ID Card ======
+// ====== PERFECT PRINT ID CARD (Like Your Image) ======
 function printIDCard(studentId) {
-    const printWindow = window.open('', '_blank', 'width=450,height=650');
+    const printWindow = window.open('', '_blank', 'width=450,height=650,menubar=no,toolbar=no,location=no,status=no');
     
     printWindow.document.write(`
         <!DOCTYPE html>
@@ -474,16 +442,17 @@ function printIDCard(studentId) {
                     justify-content: center; 
                     align-items: center; 
                     min-height: 100vh; 
-                    background: #f3f4f6;
+                    background: #f0f2f5;
                     font-family: 'Segoe UI', Arial, sans-serif;
                 }
                 .print-container {
                     background: white;
                     border-radius: 14px;
-                    padding: 20px;
+                    padding: 20px 25px;
                     box-shadow: 0 10px 40px rgba(0,0,0,0.15);
                     max-width: 420px;
                     width: 100%;
+                    margin: 20px;
                 }
                 .loading {
                     text-align: center;
@@ -502,6 +471,106 @@ function printIDCard(studentId) {
                     0% { transform: rotate(0deg); }
                     100% { transform: rotate(360deg); }
                 }
+                .id-card-print {
+                    background: white;
+                    border-radius: 12px;
+                    padding: 0;
+                    position: relative;
+                    overflow: hidden;
+                }
+                .id-card-print .top-line {
+                    height: 4px;
+                    background: linear-gradient(90deg, #1a56db, #7c3aed, #1a56db);
+                    margin-bottom: 12px;
+                }
+                .id-card-print .header {
+                    text-align: center;
+                    border-bottom: 2px solid #2563eb;
+                    padding-bottom: 10px;
+                    margin-bottom: 10px;
+                }
+                .id-card-print .logo {
+                    width: 55px;
+                    height: 55px;
+                    border-radius: 50%;
+                    object-fit: cover;
+                    border: 3px solid #2563eb;
+                    padding: 2px;
+                    margin-bottom: 2px;
+                }
+                .id-card-print .school-name {
+                    font-size: 17px;
+                    font-weight: 800;
+                    color: #1a1a2e;
+                    letter-spacing: 1px;
+                }
+                .id-card-print .tagline {
+                    font-size: 8px;
+                    color: #6b7280;
+                    letter-spacing: 1px;
+                    font-weight: 500;
+                }
+                .id-card-print .card-title {
+                    background: linear-gradient(135deg, #2563eb, #7c3aed);
+                    color: white;
+                    padding: 3px 18px;
+                    border-radius: 20px;
+                    font-size: 12px;
+                    font-weight: 700;
+                    display: inline-block;
+                    letter-spacing: 2px;
+                    margin: 4px 0 6px 0;
+                }
+                .id-card-print .photo {
+                    width: 95px;
+                    height: 95px;
+                    border-radius: 50%;
+                    border: 4px solid #2563eb;
+                    object-fit: cover;
+                    margin: 0 auto 8px auto;
+                    display: block;
+                }
+                .id-card-print .info-row {
+                    display: flex;
+                    padding: 3px 0;
+                    font-size: 12.5px;
+                    align-items: baseline;
+                }
+                .id-card-print .info-label {
+                    font-weight: 600;
+                    color: #4b5563;
+                    width: 108px;
+                    flex-shrink: 0;
+                    font-size: 12px;
+                }
+                .id-card-print .info-value {
+                    font-weight: 600;
+                    color: #1a1a2e;
+                    flex: 1;
+                    font-size: 12.5px;
+                    padding-left: 2px;
+                }
+                .id-card-print .footer {
+                    margin-top: 10px;
+                    padding-top: 10px;
+                    border-top: 2px solid #2563eb;
+                    text-align: center;
+                }
+                .id-card-print .principal {
+                    font-size: 10.5px;
+                    color: #6b7280;
+                }
+                .id-card-print .sign-line {
+                    display: inline-block;
+                    width: 110px;
+                    border-top: 2px solid #1a1a2e;
+                    margin-top: 3px;
+                }
+                .id-card-print .valid-till {
+                    font-size: 9.5px;
+                    color: #6b7280;
+                    margin-top: 4px;
+                }
                 @media print {
                     body { 
                         background: white; 
@@ -511,17 +580,19 @@ function printIDCard(studentId) {
                     }
                     .print-container { 
                         box-shadow: none; 
-                        border: none;
+                        border: 1px solid #ddd;
                         border-radius: 0;
                         padding: 15px;
                         max-width: 100%;
                         width: 100%;
                         min-height: 100vh;
+                        margin: 0;
                         display: flex;
                         justify-content: center;
                         align-items: center;
                     }
                     .no-print { display: none !important; }
+                    .id-card-print { border-radius: 0; }
                 }
             </style>
         </head>
@@ -546,7 +617,6 @@ function printIDCard(studentId) {
                             <div style="text-align:center; padding:30px; color:#dc3545;">
                                 <i class="fas fa-exclamation-circle fa-3x mb-3"></i>
                                 <p>Error loading ID card. Please try again.</p>
-                                <p class="small">\${error}</p>
                             </div>
                         \`;
                     });
@@ -557,7 +627,7 @@ function printIDCard(studentId) {
     printWindow.document.close();
 }
 
-// ====== FIXED: Print All Cards ======
+// ====== PRINT ALL CARDS ======
 function printAllCards() {
     const studentIds = <?= json_encode(array_column($students, 'id')) ?>;
     if (studentIds.length === 0) {
@@ -604,9 +674,118 @@ function printAllCards() {
                     0% { transform: rotate(0deg); }
                     100% { transform: rotate(360deg); }
                 }
+                .id-card-print {
+                    background: white;
+                    border-radius: 12px;
+                    padding: 0;
+                    position: relative;
+                    overflow: hidden;
+                    border: 1px solid #e5e7eb;
+                }
+                .id-card-print .top-line {
+                    height: 4px;
+                    background: linear-gradient(90deg, #1a56db, #7c3aed, #1a56db);
+                    margin-bottom: 12px;
+                }
+                .id-card-print .header {
+                    text-align: center;
+                    border-bottom: 2px solid #2563eb;
+                    padding-bottom: 10px;
+                    margin-bottom: 10px;
+                    padding-left: 20px;
+                    padding-right: 20px;
+                }
+                .id-card-print .logo {
+                    width: 55px;
+                    height: 55px;
+                    border-radius: 50%;
+                    object-fit: cover;
+                    border: 3px solid #2563eb;
+                    padding: 2px;
+                    margin-bottom: 2px;
+                }
+                .id-card-print .school-name {
+                    font-size: 17px;
+                    font-weight: 800;
+                    color: #1a1a2e;
+                    letter-spacing: 1px;
+                }
+                .id-card-print .tagline {
+                    font-size: 8px;
+                    color: #6b7280;
+                    letter-spacing: 1px;
+                    font-weight: 500;
+                }
+                .id-card-print .card-title {
+                    background: linear-gradient(135deg, #2563eb, #7c3aed);
+                    color: white;
+                    padding: 3px 18px;
+                    border-radius: 20px;
+                    font-size: 12px;
+                    font-weight: 700;
+                    display: inline-block;
+                    letter-spacing: 2px;
+                    margin: 4px 0 6px 0;
+                }
+                .id-card-print .photo {
+                    width: 95px;
+                    height: 95px;
+                    border-radius: 50%;
+                    border: 4px solid #2563eb;
+                    object-fit: cover;
+                    margin: 0 auto 8px auto;
+                    display: block;
+                }
+                .id-card-print .info-row {
+                    display: flex;
+                    padding: 3px 0;
+                    font-size: 12.5px;
+                    align-items: baseline;
+                    padding-left: 20px;
+                    padding-right: 20px;
+                }
+                .id-card-print .info-label {
+                    font-weight: 600;
+                    color: #4b5563;
+                    width: 108px;
+                    flex-shrink: 0;
+                    font-size: 12px;
+                }
+                .id-card-print .info-value {
+                    font-weight: 600;
+                    color: #1a1a2e;
+                    flex: 1;
+                    font-size: 12.5px;
+                    padding-left: 2px;
+                }
+                .id-card-print .footer {
+                    margin-top: 10px;
+                    padding-top: 10px;
+                    border-top: 2px solid #2563eb;
+                    text-align: center;
+                    padding-left: 20px;
+                    padding-right: 20px;
+                    padding-bottom: 15px;
+                }
+                .id-card-print .principal {
+                    font-size: 10.5px;
+                    color: #6b7280;
+                }
+                .id-card-print .sign-line {
+                    display: inline-block;
+                    width: 110px;
+                    border-top: 2px solid #1a1a2e;
+                    margin-top: 3px;
+                }
+                .id-card-print .valid-till {
+                    font-size: 9.5px;
+                    color: #6b7280;
+                    margin-top: 4px;
+                }
                 @media print {
                     body { padding: 0; margin: 0; }
                     .card-wrapper { margin: 0 auto; }
+                    .id-card-print { border: none; border-radius: 0; }
                 }
             </style>
         </head>
@@ -647,7 +826,6 @@ function printAllCards() {
     printWindow.document.close();
 }
 
-// Close modal on ESC key
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
         closeIDCard(null);
