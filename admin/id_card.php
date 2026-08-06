@@ -63,7 +63,7 @@ include 'includes/header.php';
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.7);
+    background: rgba(0,0,0,0.85);
     z-index: 9999;
     justify-content: center;
     align-items: center;
@@ -74,131 +74,181 @@ include 'includes/header.php';
     display: flex;
 }
 
-.id-card {
+.id-card-modal {
     background: white;
-    border-radius: 15px;
+    border-radius: 16px;
     padding: 25px;
-    width: 400px;
+    width: 420px;
     max-width: 95%;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 25px 80px rgba(0,0,0,0.5);
     position: relative;
-    overflow: hidden;
 }
 
-.id-card .card-pattern {
-    position: absolute;
-    top: -50px;
-    right: -50px;
-    width: 200px;
-    height: 200px;
-    background: linear-gradient(135deg, #2563eb, #7c3aed);
+/* Close Button */
+.btn-close-card {
+    position: sticky;
+    top: 0;
+    float: right;
+    z-index: 100;
+    background: #f3f4f6;
+    border: none;
+    width: 35px;
+    height: 35px;
     border-radius: 50%;
-    opacity: 0.1;
-}
-
-.id-card .card-header {
-    text-align: center;
-    border-bottom: 2px solid #2563eb;
-    padding-bottom: 15px;
-    margin-bottom: 15px;
-    position: relative;
-    z-index: 1;
-}
-
-.id-card .school-logo {
-    width: 70px;
-    height: 70px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid #2563eb;
-    padding: 2px;
-    margin-bottom: 5px;
-}
-
-.id-card .school-name {
-    font-size: 20px;
-    font-weight: 800;
-    color: #1a1a2e;
-    letter-spacing: 1px;
-}
-
-.id-card .school-tagline {
-    font-size: 11px;
-    color: #6b7280;
-    letter-spacing: 2px;
-    font-weight: 500;
-}
-
-.id-card .card-title {
-    background: linear-gradient(135deg, #2563eb, #7c3aed);
-    color: white;
-    padding: 5px 20px;
-    border-radius: 20px;
-    font-size: 14px;
-    font-weight: 700;
-    display: inline-block;
-    letter-spacing: 2px;
-    margin: 5px 0 10px 0;
-}
-
-.id-card .student-photo {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    border: 4px solid #2563eb;
-    object-fit: cover;
-    margin: 0 auto;
-    display: block;
-}
-
-.id-card .card-body {
-    position: relative;
-    z-index: 1;
-}
-
-.id-card .info-row {
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s;
     display: flex;
-    padding: 4px 0;
-    border-bottom: 1px dashed #e5e7eb;
-    font-size: 13px;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
 }
 
-.id-card .info-row:last-child {
-    border-bottom: none;
+.btn-close-card:hover {
+    background: #e5e7eb;
+    transform: rotate(90deg);
 }
 
-.id-card .info-label {
-    font-weight: 600;
-    color: #6b7280;
-    width: 90px;
-    flex-shrink: 0;
+/* Flip Container */
+.flip-container {
+    perspective: 1000px;
+    width: 100%;
+    max-width: 380px;
+    margin: 0 auto;
+    min-height: 450px;
 }
 
-.id-card .info-value {
-    font-weight: 600;
-    color: #1a1a2e;
-    flex: 1;
-}
-
-.id-card .card-footer {
-    margin-top: 12px;
-    padding-top: 12px;
-    border-top: 2px solid #2563eb;
-    text-align: center;
+.flip-container .flipper {
     position: relative;
-    z-index: 1;
+    width: 100%;
+    min-height: 450px;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-style: preserve-3d;
 }
 
-.id-card .principal-sign {
-    font-size: 12px;
-    color: #6b7280;
+.flip-container .flipper.flipped {
+    transform: rotateY(180deg);
 }
 
-.id-card .principal-sign .sign-line {
-    display: inline-block;
-    width: 120px;
-    border-top: 2px solid #1a1a2e;
-    margin-top: 5px;
+.flip-container .front,
+.flip-container .back {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    min-height: 450px;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+.flip-container .back {
+    transform: rotateY(180deg);
+}
+
+/* Flip Button */
+.flip-btn {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.flip-btn button {
+    padding: 8px 25px;
+    border: none;
+    border-radius: 25px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.flip-btn .btn-front {
+    background: #2563eb;
+    color: white;
+}
+
+.flip-btn .btn-front:hover {
+    background: #1d4ed8;
+    transform: scale(1.05);
+}
+
+.flip-btn .btn-back {
+    background: #7c3aed;
+    color: white;
+}
+
+.flip-btn .btn-back:hover {
+    background: #6d28d9;
+    transform: scale(1.05);
+}
+
+.flip-btn .btn-active {
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3);
+    transform: scale(0.95);
+}
+
+/* Loading */
+.id-card-loading {
+    text-align: center;
+    padding: 60px 0;
+}
+
+.id-card-loading .spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #2563eb;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 15px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Print Styles */
+@media print {
+    .id-card-container {
+        position: static;
+        background: white;
+        padding: 0;
+    }
+    .id-card-modal {
+        box-shadow: none;
+        border: 1px solid #ddd;
+        border-radius: 0;
+        padding: 15px;
+        max-width: 100%;
+        max-height: 100%;
+        overflow: visible;
+    }
+    .btn-close-card,
+    .flip-btn {
+        display: none !important;
+    }
+    .flip-container .flipper {
+        transform: none !important;
+    }
+    .flip-container .front,
+    .flip-container .back {
+        position: relative !important;
+        transform: none !important;
+        backface-visibility: visible !important;
+        min-height: auto !important;
+    }
+    .flip-container .back {
+        margin-top: 20px;
+        border-top: 2px dashed #ccc;
+        padding-top: 20px;
+    }
+    .flip-container {
+        min-height: auto !important;
+    }
 }
 
 /* ID Card Grid View */
@@ -366,64 +416,136 @@ include 'includes/header.php';
     </div>
 </div>
 
-<!-- ====== ID CARD MODAL ====== -->
+<!-- ====== ID CARD MODAL WITH FLIP ====== -->
 <div class="id-card-container" id="idCardModal" onclick="closeIDCard(event)">
-    <div class="id-card" onclick="event.stopPropagation();">
-        <div class="card-pattern"></div>
-        <button class="btn btn-sm btn-outline-secondary rounded-circle position-absolute top-0 end-0 m-2 btn-close-card" 
-                onclick="closeIDCard(event)" style="z-index: 10;">
+    <div class="id-card-modal" onclick="event.stopPropagation();">
+        <!-- Close Button -->
+        <button class="btn-close-card" onclick="closeIDCard(event)">
             <i class="fas fa-times"></i>
         </button>
-        <div id="idCardContent">
-            <div class="text-center py-5">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Loading...</span>
+        
+        <!-- Flip Container -->
+        <div class="flip-container" id="flipContainer">
+            <div class="flipper" id="flipper">
+                <!-- Front Side -->
+                <div class="front" id="frontContent">
+                    <div class="id-card-loading">
+                        <div class="spinner"></div>
+                        <p style="color:#6b7280;">Loading Front Side...</p>
+                    </div>
+                </div>
+                <!-- Back Side -->
+                <div class="back" id="backContent">
+                    <div class="id-card-loading">
+                        <div class="spinner"></div>
+                        <p style="color:#6b7280;">Loading Back Side...</p>
+                    </div>
                 </div>
             </div>
+        </div>
+        
+        <!-- Flip Buttons -->
+        <div class="flip-btn no-print">
+            <button class="btn-front btn-active" id="btnFront" onclick="showFront()">
+                <i class="fas fa-id-card"></i> Front
+            </button>
+            <button class="btn-back" id="btnBack" onclick="showBack()">
+                <i class="fas fa-id-card"></i> Back
+            </button>
         </div>
     </div>
 </div>
 
 <!-- ====== JAVASCRIPT ====== -->
 <script>
+let currentStudentId = 0;
+let isFlipped = false;
+
 function openIDCard(studentId) {
+    currentStudentId = studentId;
     const modal = document.getElementById('idCardModal');
-    const content = document.getElementById('idCardContent');
+    const frontContent = document.getElementById('frontContent');
+    const backContent = document.getElementById('backContent');
+    const flipper = document.getElementById('flipper');
     
-    content.innerHTML = `
-        <div class="text-center py-5">
-            <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>
+    // Reset flip
+    flipper.classList.remove('flipped');
+    isFlipped = false;
+    document.getElementById('btnFront').classList.add('btn-active');
+    document.getElementById('btnBack').classList.remove('btn-active');
+    
+    // Show loading
+    frontContent.innerHTML = `
+        <div class="id-card-loading">
+            <div class="spinner"></div>
+            <p style="color:#6b7280;">Loading Front Side...</p>
+        </div>
+    `;
+    backContent.innerHTML = `
+        <div class="id-card-loading">
+            <div class="spinner"></div>
+            <p style="color:#6b7280;">Loading Back Side...</p>
         </div>
     `;
     
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';
     
-    fetch('ajax_get_id_card.php?id=' + studentId)
+    // Load Front Side
+    fetch('ajax_get_id_card.php?id=' + studentId + '&side=front')
         .then(response => response.text())
         .then(data => {
-            content.innerHTML = data;
+            frontContent.innerHTML = data;
         })
         .catch(error => {
-            content.innerHTML = `
-                <div class="text-center py-4 text-danger">
-                    <i class="fas fa-exclamation-circle fa-3x mb-2"></i>
-                    <p>Error loading ID card. Please try again.</p>
+            frontContent.innerHTML = `
+                <div class="text-center py-5 text-danger">
+                    <i class="fas fa-exclamation-circle fa-3x mb-3"></i>
+                    <p>Error loading front side.</p>
+                </div>
+            `;
+        });
+    
+    // Load Back Side
+    fetch('ajax_get_id_card.php?id=' + studentId + '&side=back')
+        .then(response => response.text())
+        .then(data => {
+            backContent.innerHTML = data;
+        })
+        .catch(error => {
+            backContent.innerHTML = `
+                <div class="text-center py-5 text-danger">
+                    <i class="fas fa-exclamation-circle fa-3x mb-3"></i>
+                    <p>Error loading back side.</p>
                 </div>
             `;
         });
 }
 
 function closeIDCard(event) {
-    if (event && event.target !== event.currentTarget) return;
+    if (event && event.target !== event.currentTarget && !event.target.closest('.btn-close-card')) return;
     const modal = document.getElementById('idCardModal');
     modal.classList.remove('active');
     document.body.style.overflow = '';
 }
 
-// ====== PRINT ID CARD WITH FRONT AND BACK ======
+function showFront() {
+    const flipper = document.getElementById('flipper');
+    flipper.classList.remove('flipped');
+    isFlipped = false;
+    document.getElementById('btnFront').classList.add('btn-active');
+    document.getElementById('btnBack').classList.remove('btn-active');
+}
+
+function showBack() {
+    const flipper = document.getElementById('flipper');
+    flipper.classList.add('flipped');
+    isFlipped = true;
+    document.getElementById('btnBack').classList.add('btn-active');
+    document.getElementById('btnFront').classList.remove('btn-active');
+}
+
+// ====== PRINT ID CARD ======
 function printIDCard(studentId) {
     const printWindow = window.open('', '_blank', 'width=450,height=650,menubar=no,toolbar=no,location=no,status=no');
     
@@ -473,13 +595,17 @@ function printIDCard(studentId) {
                 }
                 .card-page {
                     page-break-after: always;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    min-height: 100vh;
                 }
                 .card-page:last-child {
                     page-break-after: avoid;
                 }
-                .side-label {
+                .side-label-print {
                     text-align: center;
-                    font-size: 10px;
+                    font-size: 9px;
                     color: #9ca3af;
                     margin-top: 5px;
                     letter-spacing: 2px;
@@ -500,19 +626,11 @@ function printIDCard(studentId) {
                         width: 100%;
                         min-height: 100vh;
                         margin: 0;
-                        display: flex;
-                        flex-direction: column;
-                        justify-content: center;
-                        align-items: center;
                     }
                     .no-print { display: none !important; }
                     .card-page {
-                        page-break-after: always;
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-                        width: 100%;
                         min-height: 100vh;
+                        page-break-after: always;
                     }
                     .card-page:last-child {
                         page-break-after: avoid;
@@ -528,38 +646,46 @@ function printIDCard(studentId) {
                 </div>
             </div>
             <script>
+                let loadedCount = 0;
+                let frontHTML = '';
+                let backHTML = '';
+                
                 // Load Front Side
                 fetch('ajax_get_id_card.php?id=' + ${studentId} + '&side=front')
                     .then(response => response.text())
                     .then(frontData => {
-                        // Load Back Side
-                        fetch('ajax_get_id_card.php?id=' + ${studentId} + '&side=back')
-                            .then(response => response.text())
-                            .then(backData => {
-                                document.getElementById('printContent').innerHTML = \`
-                                    <div class="card-page">\${frontData}</div>
-                                    <div class="card-page">\${backData}</div>
-                                \`;
-                                setTimeout(function() {
-                                    window.print();
-                                }, 800);
-                            })
-                            .catch(error => {
-                                document.getElementById('printContent').innerHTML = \`
-                                    <div style="text-align:center; padding:30px; color:#dc3545;">
-                                        <i class="fas fa-exclamation-circle fa-3x mb-3"></i>
-                                        <p>Error loading ID card back side.</p>
-                                    </div>
-                                \`;
-                            });
+                        frontHTML = frontData;
+                        loadedCount++;
+                        if (loadedCount === 2) {
+                            document.getElementById('printContent').innerHTML = \`
+                                <div class="card-page">\${frontHTML}</div>
+                                <div class="card-page">\${backHTML}</div>
+                            \`;
+                            setTimeout(function() { window.print(); }, 600);
+                        }
                     })
                     .catch(error => {
-                        document.getElementById('printContent').innerHTML = \`
-                            <div style="text-align:center; padding:30px; color:#dc3545;">
-                                <i class="fas fa-exclamation-circle fa-3x mb-3"></i>
-                                <p>Error loading ID card. Please try again.</p>
-                            </div>
-                        \`;
+                        frontHTML = '<div style="text-align:center;padding:40px;color:#dc3545;">Error loading front</div>';
+                        loadedCount++;
+                    });
+                
+                // Load Back Side
+                fetch('ajax_get_id_card.php?id=' + ${studentId} + '&side=back')
+                    .then(response => response.text())
+                    .then(backData => {
+                        backHTML = backData;
+                        loadedCount++;
+                        if (loadedCount === 2) {
+                            document.getElementById('printContent').innerHTML = \`
+                                <div class="card-page">\${frontHTML}</div>
+                                <div class="card-page">\${backHTML}</div>
+                            \`;
+                            setTimeout(function() { window.print(); }, 600);
+                        }
+                    })
+                    .catch(error => {
+                        backHTML = '<div style="text-align:center;padding:40px;color:#dc3545;">Error loading back</div>';
+                        loadedCount++;
                     });
             <\/script>
         </body>
@@ -602,6 +728,9 @@ function printAllCards() {
                     max-width: 420px;
                     page-break-after: always;
                 }
+                .card-wrapper:last-child {
+                    page-break-after: avoid;
+                }
                 .spinner {
                     border: 4px solid #f3f3f3;
                     border-top: 4px solid #2563eb;
@@ -615,118 +744,19 @@ function printAllCards() {
                     0% { transform: rotate(0deg); }
                     100% { transform: rotate(360deg); }
                 }
-                .id-card-print {
+                .student-card {
                     background: white;
                     border-radius: 12px;
-                    padding: 0;
-                    position: relative;
-                    overflow: hidden;
                     border: 1px solid #e5e7eb;
+                    overflow: hidden;
                 }
-                .id-card-print .top-line {
+                .student-card .top-line {
                     height: 4px;
                     background: linear-gradient(90deg, #1a56db, #7c3aed, #1a56db);
-                    margin-bottom: 12px;
-                }
-                .id-card-print .header {
-                    text-align: center;
-                    border-bottom: 2px solid #2563eb;
-                    padding-bottom: 10px;
-                    margin-bottom: 10px;
-                    padding-left: 20px;
-                    padding-right: 20px;
-                }
-                .id-card-print .logo {
-                    width: 55px;
-                    height: 55px;
-                    border-radius: 50%;
-                    object-fit: cover;
-                    border: 3px solid #2563eb;
-                    padding: 2px;
-                    margin-bottom: 2px;
-                }
-                .id-card-print .school-name {
-                    font-size: 17px;
-                    font-weight: 800;
-                    color: #1a1a2e;
-                    letter-spacing: 1px;
-                }
-                .id-card-print .tagline {
-                    font-size: 8px;
-                    color: #6b7280;
-                    letter-spacing: 1px;
-                    font-weight: 500;
-                }
-                .id-card-print .card-title {
-                    background: linear-gradient(135deg, #2563eb, #7c3aed);
-                    color: white;
-                    padding: 3px 18px;
-                    border-radius: 20px;
-                    font-size: 12px;
-                    font-weight: 700;
-                    display: inline-block;
-                    letter-spacing: 2px;
-                    margin: 4px 0 6px 0;
-                }
-                .id-card-print .photo {
-                    width: 95px;
-                    height: 95px;
-                    border-radius: 50%;
-                    border: 4px solid #2563eb;
-                    object-fit: cover;
-                    margin: 0 auto 8px auto;
-                    display: block;
-                }
-                .id-card-print .info-row {
-                    display: flex;
-                    padding: 3px 0;
-                    font-size: 12.5px;
-                    align-items: baseline;
-                    padding-left: 20px;
-                    padding-right: 20px;
-                }
-                .id-card-print .info-label {
-                    font-weight: 600;
-                    color: #4b5563;
-                    width: 108px;
-                    flex-shrink: 0;
-                    font-size: 12px;
-                }
-                .id-card-print .info-value {
-                    font-weight: 600;
-                    color: #1a1a2e;
-                    flex: 1;
-                    font-size: 12.5px;
-                    padding-left: 2px;
-                }
-                .id-card-print .footer {
-                    margin-top: 10px;
-                    padding-top: 10px;
-                    border-top: 2px solid #2563eb;
-                    text-align: center;
-                    padding-left: 20px;
-                    padding-right: 20px;
-                    padding-bottom: 15px;
-                }
-                .id-card-print .principal {
-                    font-size: 10.5px;
-                    color: #6b7280;
-                }
-                .id-card-print .sign-line {
-                    display: inline-block;
-                    width: 110px;
-                    border-top: 2px solid #1a1a2e;
-                    margin-top: 3px;
-                }
-                .id-card-print .valid-till {
-                    font-size: 9.5px;
-                    color: #6b7280;
-                    margin-top: 4px;
                 }
                 @media print {
                     body { padding: 0; margin: 0; }
                     .card-wrapper { margin: 0 auto; }
-                    .id-card-print { border: none; border-radius: 0; }
                 }
             </style>
         </head>
@@ -740,25 +770,54 @@ function printAllCards() {
                 const totalCards = studentIds.length;
                 
                 studentIds.forEach((id) => {
-                    fetch('ajax_get_id_card.php?id=' + id)
+                    let frontLoaded = false;
+                    let backLoaded = false;
+                    let frontHTML = '';
+                    let backHTML = '';
+                    
+                    fetch('ajax_get_id_card.php?id=' + id + '&side=front')
                         .then(response => response.text())
                         .then(data => {
-                            document.getElementById('card-' + id).innerHTML = data;
-                            loadedCount++;
-                            if (loadedCount === totalCards) {
-                                setTimeout(function() {
-                                    window.print();
-                                }, 1000);
-                            }
+                            frontHTML = data;
+                            frontLoaded = true;
+                            checkAndRender(id);
                         })
-                        .catch(error => {
+                        .catch(() => {
+                            frontHTML = '<div style="text-align:center;padding:20px;color:#dc3545;">Error</div>';
+                            frontLoaded = true;
+                            checkAndRender(id);
+                        });
+                    
+                    fetch('ajax_get_id_card.php?id=' + id + '&side=back')
+                        .then(response => response.text())
+                        .then(data => {
+                            backHTML = data;
+                            backLoaded = true;
+                            checkAndRender(id);
+                        })
+                        .catch(() => {
+                            backHTML = '<div style="text-align:center;padding:20px;color:#dc3545;">Error</div>';
+                            backLoaded = true;
+                            checkAndRender(id);
+                        });
+                    
+                    function checkAndRender(id) {
+                        if (frontLoaded && backLoaded) {
                             document.getElementById('card-' + id).innerHTML = \`
-                                <div style="text-align:center; padding:20px; color:#dc3545;">
-                                    Error loading card
+                                <div class="student-card">
+                                    <div class="top-line"></div>
+                                    \${frontHTML}
+                                    <div style="border-top:2px dashed #ccc;margin:10px 0;padding:10px 0;">
+                                        \${backHTML}
+                                    </div>
                                 </div>
                             \`;
                             loadedCount++;
-                        });
+                            if (loadedCount === totalCards) {
+                                setTimeout(function() { window.print(); }, 1000);
+                            }
+                        }
+                    }
                 });
             <\/script>
         </body>
@@ -767,6 +826,7 @@ function printAllCards() {
     printWindow.document.close();
 }
 
+// Close modal on ESC key
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
         closeIDCard(null);
