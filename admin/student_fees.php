@@ -20,23 +20,30 @@ try {
     $sections = [];
 }
 
-// ====== FETCH FEE TYPES FROM FEES TABLE ======
+// ====== FETCH FEE TYPES WITH AMOUNTS FROM FEES TABLE ======
+$fee_data = [];
 try {
-    $stmt = $conn->query("SELECT DISTINCT fee_type FROM fees WHERE status = 'Active' AND fee_type IS NOT NULL AND fee_type != '' ORDER BY fee_type");
-    $fee_types = $stmt->fetchAll(PDO::FETCH_COLUMN);
-} catch (Exception $e) {
-    $fee_types = ['Tuition', 'Admission', 'Exam', 'Transport', 'Hostel', 'Library', 'Sports', 'Other'];
-}
-
-// ====== FETCH FEE AMOUNTS FROM FEES TABLE ======
-$fee_amounts = [];
-try {
-    $stmt = $conn->query("SELECT fee_type, amount FROM fees WHERE status = 'Active' AND amount > 0");
+    $stmt = $conn->query("SELECT DISTINCT fee_type, amount FROM fees WHERE status = 'Active' AND fee_type IS NOT NULL AND fee_type != '' ORDER BY fee_type");
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        $fee_amounts[$row['fee_type']] = floatval($row['amount']);
+        $fee_data[$row['fee_type']] = floatval($row['amount']);
     }
 } catch (Exception $e) {
-    $fee_amounts = [];
+    $fee_data = [];
+}
+
+$fee_types = array_keys($fee_data);
+if (empty($fee_types)) {
+    $fee_types = ['Tuition', 'Admission', 'Exam', 'Transport', 'Hostel', 'Library', 'Sports', 'Other'];
+    $fee_data = [
+        'Tuition' => 5000,
+        'Admission' => 1000,
+        'Exam' => 500,
+        'Transport' => 1500,
+        'Hostel' => 3000,
+        'Library' => 300,
+        'Sports' => 200,
+        'Other' => 1000
+    ];
 }
 
 // ====== HANDLE FEE COLLECTION ======
@@ -76,11 +83,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['collect_fee'])) {
                     $fee = $stmt2->fetch(PDO::FETCH_ASSOC);
                     $fee_id = $fee['id'] ?? 0;
 
-                    // Get amount from fees table
-                    $stmt3 = $conn->prepare("SELECT amount FROM fees WHERE id = ?");
-                    $stmt3->execute([$fee_id]);
-                    $fee_data = $stmt3->fetch(PDO::FETCH_ASSOC);
-                    $per_fee_amount = $fee_data['amount'] ?? ($amount / count($fee_types_selected));
+                    // Get amount from fees table or use per fee amount
+                    $per_fee_amount = $fee_data[$fee_type] ?? ($amount / count($fee_types_selected));
 
                     $stmt = $conn->prepare("INSERT INTO student_fees (student_id, fee_id, fee_type, amount_paid, late_fee, discount, total_amount, payment_method, remarks, payment_status, paid_on, month, year) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                     $stmt->execute([$student_id, $fee_id, $fee_type, $per_fee_amount, $late_fee, $discount, $total_amount, $payment_method, $remarks, $payment_status, $payment_date, $month, $year]);
@@ -88,10 +92,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['collect_fee'])) {
                 }
             }
             
-            if ($error_count > 0) {
-                $error = 'Some fees already exist for this month.';
+            if ($error_count > 0 && empty($last_inserted_ids)) {
+                $error = 'All fees already exist for this month.';
             } else {
-                $_SESSION['success'] = '✅ Fee collected successfully for ' . count($fee_types_selected) . ' fee type(s)!';
+                $_SESSION['success'] = '✅ Fee collected successfully for ' . count($last_inserted_ids) . ' fee type(s)!';
                 $_SESSION['last_receipt_id'] = end($last_inserted_ids);
                 ob_end_clean();
                 header('Location: student_fees.php?success=1');
@@ -192,7 +196,7 @@ try {
 
 // ====== GET STATISTICS ======
 try {
-    $stmt = $conn->query("SELECT COUNT(*) as total, SUM(total_amount) as total_amount FROM student_fees");
+    $stmt = $conn->query("SELECT COUNT(*) as total, SUM(amount_paid) as total_amount FROM student_fees");
     $stats = $stmt->fetch(PDO::FETCH_ASSOC);
     $total_collections = $stats['total'] ?? 0;
     $total_amount = $stats['total_amount'] ?? 0;
@@ -202,7 +206,7 @@ try {
 }
 
 try {
-    $stmt = $conn->query("SELECT COUNT(*) as today_count, SUM(total_amount) as today_amount FROM student_fees WHERE DATE(paid_on) = CURDATE()");
+    $stmt = $conn->query("SELECT COUNT(*) as today_count, SUM(amount_paid) as today_amount FROM student_fees WHERE DATE(paid_on) = CURDATE()");
     $today_stats = $stmt->fetch(PDO::FETCH_ASSOC);
     $today_collections = $today_stats['today_count'] ?? 0;
     $today_amount = $today_stats['today_amount'] ?? 0;
@@ -215,7 +219,6 @@ include 'includes/header.php';
 ?>
 
 <style>
-/* ====== MAIN STYLES ====== */
 .student-result {
     cursor: pointer;
     transition: all 0.2s;
@@ -229,8 +232,6 @@ include 'includes/header.php';
     background: #e8f0fe !important;
     border-left-color: #2563eb;
 }
-
-/* ====== STUDENT DETAILS BOX ====== */
 .student-details-box {
     background: #f8f9fa;
     border-radius: 12px;
@@ -248,8 +249,6 @@ include 'includes/header.php';
     color: #4b5563;
     font-weight: 600;
 }
-
-/* ====== TOTAL AMOUNT DISPLAY ====== */
 .total-amount-display {
     background: #f0f7ff;
     font-weight: 700;
@@ -258,8 +257,6 @@ include 'includes/header.php';
     border: 2px solid #2563eb;
     text-align: center;
 }
-
-/* ====== FEE TYPE CHECKBOX ====== */
 .fee-checkbox-group {
     display: flex;
     flex-wrap: wrap;
@@ -287,8 +284,6 @@ include 'includes/header.php';
 .fee-checkbox-group .form-check-input:checked + .form-check-label {
     color: #2563eb;
 }
-
-/* ====== STATS CARDS ====== */
 .stats-card {
     transition: all 0.3s ease;
 }
@@ -296,16 +291,12 @@ include 'includes/header.php';
     transform: translateY(-3px);
     box-shadow: 0 10px 30px rgba(0,0,0,0.08);
 }
-
-/* ====== SEARCH INFO ====== */
 .search-info {
     font-size: 13px;
     color: #6b7280;
     margin-top: 5px;
     padding-left: 5px;
 }
-
-/* ====== RECENT COLLECTIONS TABLE ====== */
 .table-custom tbody tr {
     transition: all 0.2s;
 }
@@ -319,14 +310,14 @@ include 'includes/header.php';
     <!-- Page Header -->
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
         <div>
-            <h3 class="mb-1"><i class="fas fa-hand-holding-usd text-primary me-2"></i>Collect Fee</h3>
+            <h3 class="mb-1"><i class="fas fa-hand-holding-usd text-primary me-2"></i>Student Fee Collect</h3>
             <div class="text-secondary small">Collect and manage student fee payments.</div>
         </div>
         <div class="d-flex gap-2">
             <button class="btn btn-outline-primary rounded-pill px-3" onclick="window.print()">
                 <i class="fas fa-print me-2"></i>Print
             </button>
-            <a href="student_fees.php" class="btn btn-outline-success rounded-pill px-3">
+            <a href="fee_report.php" class="btn btn-outline-success rounded-pill px-3">
                 <i class="fas fa-chart-bar me-2"></i>Reports
             </a>
         </div>
@@ -526,7 +517,7 @@ include 'includes/header.php';
                             $i = 0;
                             foreach ($fee_types as $ft): 
                                 $checked = ($i == 0) ? 'checked' : '';
-                                $fee_amount = $fee_amounts[$ft] ?? 0;
+                                $fee_amount = $fee_data[$ft] ?? 0;
                             ?>
                             <div class="form-check">
                                 <input class="form-check-input fee-checkbox" type="checkbox" 
@@ -535,7 +526,7 @@ include 'includes/header.php';
                                        data-amount="<?= $fee_amount ?>"
                                        <?= $checked ?>>
                                 <label class="form-check-label" for="fee_<?= md5($ft) ?>">
-                                    <?= $fee_icons[$ft] ?? '📌' ?> <?= htmlspecialchars($ft) ?> Fee 
+                                    <?= $fee_icons[$ft] ?? '📌' ?> <?= htmlspecialchars($ft) ?> Fee
                                     <?php if ($fee_amount > 0): ?>
                                     <span class="badge bg-primary">₹<?= number_format($fee_amount, 2) ?></span>
                                     <?php endif; ?>
@@ -543,7 +534,7 @@ include 'includes/header.php';
                             </div>
                             <?php $i++; endforeach; ?>
                         </div>
-                        <small class="text-secondary">Select one or more fee types (Amount auto-fetched from fees table)</small>
+                        <small class="text-secondary">Select one or more fee types</small>
                     </div>
 
                     <!-- Month -->
@@ -560,13 +551,12 @@ include 'includes/header.php';
                         </select>
                     </div>
 
-                    <!-- Amount - Auto filled from fees table -->
+                    <!-- Amount - Auto filled -->
                     <div class="col-md-3">
                         <label class="form-label fw-semibold">Amount (₹)</label>
                         <input type="number" class="form-control" name="amount" id="feeAmount" 
                                placeholder="0" min="0" step="0.01" readonly 
                                style="background: #e8f5e9; font-weight: bold; color: #155724; border-color: #28a745;">
-                        <small class="text-success">Auto-filled from fees table</small>
                     </div>
 
                     <!-- Late Fee -->
@@ -638,7 +628,7 @@ include 'includes/header.php';
                         <button type="submit" name="collect_fee" class="btn btn-primary rounded-pill px-4">
                             <i class="fas fa-save me-2"></i>Collect Fee
                         </button>
-                        <button type="button" class="btn btn-success rounded-pill px-4" onclick="printReceipt()">
+                        <button type="button" class="btn btn-success rounded-pill px-4" onclick="printLatestReceipt()">
                             <i class="fas fa-print me-2"></i>Print Receipt
                         </button>
                     </div>
@@ -682,7 +672,7 @@ include 'includes/header.php';
                             <td><strong><?= htmlspecialchars($collection['student_name'] ?? 'N/A') ?></strong></td>
                             <td><?= htmlspecialchars($collection['class_name'] ?? 'N/A') ?></td>
                             <td><?= htmlspecialchars($collection['fee_type'] ?? 'N/A') ?></td>
-                            <td><strong>₹<?= number_format($collection['total_amount'] ?? $collection['amount_paid'] ?? 0, 2) ?></strong></td>
+                            <td><strong>₹<?= number_format($collection['amount_paid'] ?? 0, 2) ?></strong></td>
                             <td>
                                 <?php
                                 $method_icons = [
@@ -709,13 +699,22 @@ include 'includes/header.php';
                             </td>
                             <td class="text-center">
                                 <div class="d-flex gap-1 justify-content-center">
-                                    <a href="student_fees.php?id=<?= $collection['id'] ?>" class="btn btn-sm btn-outline-primary rounded-circle" title="View Receipt" target="_blank">
+                                    <a href="fee_receipt.php?id=<?= $collection['id'] ?>" 
+                                       class="btn btn-sm btn-outline-primary rounded-circle" 
+                                       title="View Receipt" 
+                                       target="_blank">
                                         <i class="fas fa-eye"></i>
                                     </a>
-                                    <a href="student_fees.php?id=<?= $collection['id'] ?>&print=1" class="btn btn-sm btn-outline-success rounded-circle" title="Print Receipt" target="_blank">
+                                    <a href="fee_receipt.php?id=<?= $collection['id'] ?>&print=1" 
+                                       class="btn btn-sm btn-outline-success rounded-circle" 
+                                       title="Print Receipt" 
+                                       target="_blank">
                                         <i class="fas fa-print"></i>
                                     </a>
-                                    <a href="student_fees.php?delete_id=<?= $collection['id'] ?>" class="btn btn-sm btn-outline-danger rounded-circle" title="Delete" onclick="return confirm('Delete this fee record?')">
+                                    <a href="javascript:void(0)" 
+                                       class="btn btn-sm btn-outline-danger rounded-circle" 
+                                       title="Delete" 
+                                       onclick="deleteFee(<?= $collection['id'] ?>, '<?= htmlspecialchars(addslashes($collection['student_name'] ?? 'N/A')) ?>')">
                                         <i class="fas fa-trash"></i>
                                     </a>
                                 </div>
@@ -758,10 +757,7 @@ function calculateTotal() {
 document.addEventListener('DOMContentLoaded', function() {
     const feeCheckboxes = document.querySelectorAll('.fee-checkbox');
     const feeAmount = document.getElementById('feeAmount');
-    const lateFee = document.getElementById('lateFee');
-    const discount = document.getElementById('discount');
     
-    // Set first checkbox checked by default
     if (feeCheckboxes.length > 0) {
         feeCheckboxes[0].checked = true;
     }
@@ -770,27 +766,24 @@ document.addEventListener('DOMContentLoaded', function() {
         checkbox.addEventListener('change', function() {
             const checkedBoxes = document.querySelectorAll('.fee-checkbox:checked');
             if (checkedBoxes.length > 0) {
-                // Calculate total amount from checked fees
                 let total = 0;
                 checkedBoxes.forEach(function(cb) {
                     total += parseFloat(cb.getAttribute('data-amount')) || 0;
                 });
                 feeAmount.value = total;
-                calculateTotal();
             } else {
                 feeAmount.value = 0;
-                calculateTotal();
             }
+            calculateTotal();
         });
     });
     
-    // Initial calculation
     calculateTotal();
 });
 
-// ====== PRINT RECEIPT FUNCTION ======
-function printReceipt() {
-    const receiptLinks = document.querySelectorAll('a[href*="student_fees.php?id="]');
+// ====== PRINT LATEST RECEIPT ======
+function printLatestReceipt() {
+    const receiptLinks = document.querySelectorAll('a[href*="fee_receipt.php?id="]');
     
     if (receiptLinks.length > 0) {
         const firstLink = receiptLinks[0];
@@ -798,6 +791,17 @@ function printReceipt() {
         window.open(href, '_blank');
     } else {
         alert('No receipt found to print. Please collect fee first.');
+    }
+}
+
+function printReceipt() {
+    printLatestReceipt();
+}
+
+// ====== DELETE FEE FUNCTION ======
+function deleteFee(id, studentName) {
+    if (confirm('Are you sure you want to delete fee record for "' + studentName + '"? This action cannot be undone.')) {
+        window.location.href = 'student_fees.php?delete_id=' + id;
     }
 }
 </script>
